@@ -3,7 +3,7 @@ import numpy.linalg as la
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
-GRID_SIZE = 10
+GRID_SIZE =5
 PLOT_RESOLUTION_FACTOR = 4
 
 
@@ -57,8 +57,8 @@ def mse(func_a, func_b, x, y):
 
 
 def plot_contour(ax, func, grid_size):
-    x = np.linspace(-grid_size, grid_size, 8 * grid_size)
-    y = np.linspace(-grid_size, grid_size, 8 * grid_size)
+    x = np.linspace(-grid_size, grid_size, 2 * PLOT_RESOLUTION_FACTOR * grid_size)
+    y = np.linspace(-grid_size, grid_size, 2 * PLOT_RESOLUTION_FACTOR * grid_size)
     X, Y = np.meshgrid(x, y)
     Z = np.zeros(X.shape)
     for index in np.ndindex(X.shape):
@@ -73,7 +73,6 @@ def main():
     x = np.linspace(-GRID_SIZE, GRID_SIZE, 2 * GRID_SIZE)
     y = np.linspace(-GRID_SIZE, GRID_SIZE, 2 * GRID_SIZE)
     grid = (x, y)
-    # fine_grid = generate_grid(GRID_SIZE, PLOT_RESOLUTION_FACTOR)
 
     # Create phi
     phi = generate_kernel(rbf)
@@ -81,12 +80,8 @@ def main():
     # Get original function
     original_function = generate_original_function()
 
-    # Calculate values on all points
-    # fine_grid_values = map(original_function, fine_grid)
-
     # Interpolate
     interpolant = interpolate(phi, original_function, grid)
-    # fine_grid_interpolated_values = map(interpolant, fine_grid)
 
     # Plot values on finer grid
     plt.figure()
