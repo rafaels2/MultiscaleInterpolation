@@ -30,13 +30,8 @@ def interpolate(phi, original_function, points):
     coefficients = np.matmul(la.inv(kernel), values_at_points)
 
     def interpolant(x, y):
-        z = np.zeros(x.shape)
-        for index in np.ndindex(x.shape):
-            point_as_vectors = np.array([x[index], y[index]])
-            for b_j, x_j in zip(coefficients, points_as_vectors):
-                curr_val = b_j * phi(point_as_vectors, x_j)
-                z[index] += curr_val
-        return z
+        return sum(b_j * phi(np.array([x, y]), x_j)
+                   for b_j, x_j in zip(coefficients, points_as_vectors))
     return interpolant
 
 
@@ -49,26 +44,25 @@ def generate_kernel(rbf):
 
 def generate_original_function():
     def original_function(x, y):
-        return x * y
+        return x*y
 
     return original_function
 
 
-def generate_grid(grid_size, plot_resolution_factor=1):
-    return sum(([np.array([i / plot_resolution_factor, j / plot_resolution_factor]) for
-                 i in range(-grid_size * plot_resolution_factor, (grid_size * plot_resolution_factor) + 1)]
-                for j in range(-grid_size, grid_size + 1)), [])
-
-
-def mse(x, y):
-    return (np.square(x-y)).mean()
+def mse(func_a, func_b, x, y):
+    errors = np.zeros(x.shape)
+    for index in np.ndindex(x.shape):
+        errors[index] = np.square(func_a(x[index], y[index]) - func_b(x[index], y[index]))
+    return errors.mean()
 
 
 def plot_contour(ax, func, grid_size):
     x = np.linspace(-grid_size, grid_size, 8 * grid_size)
     y = np.linspace(-grid_size, grid_size, 8 * grid_size)
     X, Y = np.meshgrid(x, y)
-    Z = func(X, Y)
+    Z = np.zeros(X.shape)
+    for index in np.ndindex(X.shape):
+        Z[index] = func(X[index], Y[index])
     ax.contour3D(X, Y, Z, 50, cmap='binary')
 
 
@@ -103,7 +97,9 @@ def main():
     ax = plt.axes(projection='3d')
     plot_contour(ax, interpolant, GRID_SIZE)
     plt.show()
-    print("MSE was: ", mse(original_function(x, y), interpolant(x, y)))
+    x = np.linspace(-GRID_SIZE, GRID_SIZE, 8 * GRID_SIZE)
+    y = np.linspace(-GRID_SIZE, GRID_SIZE, 8 * GRID_SIZE)
+    print("MSE was: ", mse(original_function, interpolant, x, y))
 
 
 if __name__ == "__main__":
