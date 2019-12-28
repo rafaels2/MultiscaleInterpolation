@@ -27,12 +27,16 @@ def interpolate(phi, original_function, points):
     values_at_points = original_function(*points)
     points_as_vectors = [np.array([x, y]) for x, y in zip(*points)]
     kernel = np.array([[phi(x_i, x_j) for x_j in points_as_vectors] for x_i in points_as_vectors])
-    coefficients = la.inv(kernel) * values_at_points
+    coefficients = np.matmul(la.inv(kernel), values_at_points)
 
     def interpolant(x, y):
-        point_as_vectors = np.array([x, y])
-        return sum(b_j * phi(point_as_vectors, x_j) for b_j, x_j in zip(coefficients, points_as_vectors))
-
+        z = np.zeros(x.shape)
+        for index in np.ndindex(x.shape):
+            point_as_vectors = np.array([x[index], y[index]])
+            for b_j, x_j in zip(coefficients, points_as_vectors):
+                curr_val = b_j * phi(point_as_vectors, x_j)
+                z[index] += curr_val
+        return z
     return interpolant
 
 
@@ -94,7 +98,11 @@ def main():
     plt.figure()
     ax = plt.axes(projection='3d')
     plot_contour(ax, original_function, GRID_SIZE)
+    plt.show()
+    plt.figure()
+    ax = plt.axes(projection='3d')
     plot_contour(ax, interpolant, GRID_SIZE)
+    plt.show()
     print("MSE was: ", mse(original_function(x, y), interpolant(x, y)))
 
 
