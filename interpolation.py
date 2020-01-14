@@ -17,24 +17,6 @@ SCALE = 2
 NUMBER_OF_SCALES = 3
 
 
-def sum_functions(a, b):
-    def new_func(*args):
-        return a(*args) + b(*args)
-
-    return new_func
-
-
-def sub_functions(a, b):
-    def new_func(*args):
-        return a(*args) - b(*args)
-
-    return new_func
-
-
-def zero_func(*args):
-    return 0
-
-
 def wendland(x):
     if x < 0:
         raise ValueError("x should be > 0, not {}".format(x))
@@ -67,15 +49,7 @@ def interpolate(phi, original_function, points):
 def generate_kernel(rbf, scale=1):
     def kernel(x, y):
         # TODO: Maybe scale should be squared?
-        # try:
-        ans = 0
-        # try:
-        ans = (1 / scale) * rbf(la.norm(x-y) / scale)
-        # except Exception as e:
-            # import ipdb; ipdb.set_trace()
-        return ans
-        # except ValueError as e:
-        #     import ipdb; ipdb.set_trace
+        return (1 / scale) * rbf(la.norm(x-y) / scale)
 
     return kernel
 
@@ -111,23 +85,10 @@ def generate_grid(grid_size, resolution, scale=1):
     return x_matrix.ravel(), y_matrix.ravel()
 
 
-def scaled_interpolation(scale, original_function, grid_resolution, grid_size, rbf):
+def scaled_interpolation(scale, grid_resolution, grid_size, original_function, rbf):
     x, y = generate_grid(grid_size, grid_resolution, scale)
     phi = generate_kernel(rbf, scale)
     return interpolate(phi, original_function, (x, y))
-
-
-def multiscale_interpolation(number_of_scales, original_function, **kwargs):
-    f_j = zero_func
-    e_j = original_function
-    for scale in range(1, number_of_scales + 1):
-        print("NEW SCALE: {}".format(scale))
-        s_j = scaled_interpolation(scale, e_j, **kwargs.copy())
-        print("interpolated!")
-        f_j = sum_functions(f_j, s_j)
-        e_j = sub_functions(e_j, s_j)
-
-    return f_j
 
 
 def main():
@@ -139,15 +100,14 @@ def main():
     plot_contour(ax, original_function, GRID_SIZE)
     plt.show()
 
-
-    interpolant = multiscale_interpolation(
-        number_of_scales=NUMBER_OF_SCALES,
-        original_function=original_function,
+    interpolant = scaled_interpolation(
+        scale=SCALE,
         grid_resolution=BASE_RESOLUTION,
         grid_size=GRID_SIZE,
+        original_function=original_function,
         rbf=rbf
     )
-
+    
     plt.figure()
     ax = plt.axes(projection='3d')
     plot_contour(ax, interpolant, GRID_SIZE)
@@ -159,32 +119,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-def scaled_main():
-    rbf = wendland
-    original_function = generate_original_function()
-
-    plt.figure()
-    ax = plt.axes(projection='3d')
-    plot_contour(ax, original_function, GRID_SIZE)
-    plt.show()
-
-    interpolant = scaled_interpolation(
-        scale=SCALE,
-        original_function=original_function,
-        grid_resolution=BASE_RESOLUTION,
-        grid_size=GRID_SIZE,
-        rbf=rbf
-    )
-    
-    plt.figure()
-    ax = plt.axes(projection='3d')
-    plot_contour(ax, interpolant, GRID_SIZE)
-    plt.show()
-
-    test_x, test_y = generate_grid(GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR ,SCALE)
-    print("MSE was: ", mse(original_function, interpolant, test_x, test_y))
 
 
 def nonscaled_interpolation_main():
