@@ -39,7 +39,6 @@ def interpolate(phi, original_function, points):
     values_at_points = original_function(np.array(X), np.array(Y))
     points_as_vectors = [np.array([x, y]) for x, y in zip(X, Y)]
     kernel = np.array([[phi(x_i, x_j) for x_j in points_as_vectors] for x_i in points_as_vectors])
-    import ipdb; ipdb.set_trace()
     coefficients = np.matmul(la.inv(kernel), values_at_points)
     def interpolant(x, y):
         return sum(b_j * phi(np.array([x, y]), x_j)
@@ -56,7 +55,7 @@ def generate_kernel(rbf):
 
 def generate_original_function():
     def original_function(x, y):
-        return x*y
+        return y * (np.sin(x) - 1)
 
     return original_function
 
