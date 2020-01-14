@@ -95,21 +95,23 @@ def mse(func_a, func_b, x, y):
     return errors.mean()
 
 
-def plot_contour(ax, func, grid_size):
-    x = np.linspace(-grid_size, grid_size, 2 * PLOT_RESOLUTION_FACTOR * grid_size)
-    y = np.linspace(-grid_size, grid_size, 2 * PLOT_RESOLUTION_FACTOR * grid_size)
-    X, Y = np.meshgrid(x, y)
-    Z = np.zeros(X.shape)
-    for index in np.ndindex(X.shape):
-        Z[index] = func(X[index], Y[index])
-    ax.contour3D(X, Y, Z, 50, cmap='binary')
-
-
-def generate_grid(grid_size, resolution, scale=1):
+def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
     x = np.linspace(-grid_size / resolution, grid_size / resolution, 2 * scale * grid_size)
     y = np.linspace(-grid_size / resolution, grid_size / resolution, 2 * scale * grid_size)
     x_matrix, y_matrix = np.meshgrid(x, y)
-    return x_matrix.ravel(), y_matrix.ravel()
+    if should_ravel:
+        return x_matrix.ravel(), y_matrix.ravel()
+    else:
+         return x_matrix, y_matrix
+
+
+def plot_contour(ax, func, *args):
+    import ipdb; ipdb.set_trace()
+    x, y = generate_grid(*args, should_ravel=False)
+    z = np.zeros(x.shape)
+    for index in np.ndindex(x.shape):
+        z[index] = func(x[index], y[index])
+    ax.contour3D(x, y, z, 50, cmap='binary')
 
 
 def scaled_interpolation(scale, original_function, grid_resolution, grid_size, rbf):
@@ -137,7 +139,7 @@ def main():
 
     plt.figure()
     ax = plt.axes(projection='3d')
-    plot_contour(ax, original_function, GRID_SIZE)
+    plot_contour(ax, original_function, GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR, SCALE)
     plt.show()
 
 
@@ -151,7 +153,7 @@ def main():
 
     plt.figure()
     ax = plt.axes(projection='3d')
-    plot_contour(ax, interpolant, GRID_SIZE)
+    plot_contour(ax, interpolant, GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR, SCALE)
     plt.show()
 
     test_x, test_y = generate_grid(GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR, SCALE)
