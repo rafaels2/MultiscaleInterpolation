@@ -10,7 +10,11 @@ import matplotlib.pyplot as plt
 
 GRID_SIZE = 4
 ORIGINAL_SCALE = 2
+BASE_RESOLUTION = 3
 PLOT_RESOLUTION_FACTOR = 4
+DIMENSION = 2
+SCALE = 2
+NUMBER_OF_SCALES = 3
 
 
 def wendland(x):
@@ -30,25 +34,22 @@ def interpolate(phi, original_function, points):
     :param points:
     :return:
     """
-    x_matrix, y_matrix = points
-    X = []
-    Y = []
-    for index in np.ndindex(x_matrix.shape):
-        X.append(x_matrix[index])
-        Y.append(y_matrix[index])
-    values_at_points = original_function(np.array(X), np.array(Y))
-    points_as_vectors = [np.array([x, y]) for x, y in zip(X, Y)]
+    x_axis, y_axis = points
+    values_at_points = original_function(x_axis, y_axis)
+    points_as_vectors = [np.array([x_0, y_0]) for x_0, y_0 in zip(x_axis, y_axis)]
     kernel = np.array([[phi(x_i, x_j) for x_j in points_as_vectors] for x_i in points_as_vectors])
     coefficients = np.matmul(la.inv(kernel), values_at_points)
+    print(kernel)
     def interpolant(x, y):
         return sum(b_j * phi(np.array([x, y]), x_j)
                    for b_j, x_j in zip(coefficients, points_as_vectors))
     return interpolant
 
 
-def generate_kernel(rbf):
+def generate_kernel(rbf, scale=1):
     def kernel(x, y):
-        return rbf(la.norm(x-y))
+        # TODO: Maybe scale should be squared?
+        return (1 / scale) * rbf(la.norm(x-y) / scale)
 
     return kernel
 
@@ -77,13 +78,54 @@ def plot_contour(ax, func, grid_size):
     ax.contour3D(X, Y, Z, 50, cmap='binary')
 
 
+def generate_grid(grid_size, resolution, scale=1):
+    x = np.linspace(-grid_size, grid_size, 2 * resolution * scale * grid_size)
+    y = np.linspace(-grid_size, grid_size, 2 * resolution * scale * grid_size)
+    x_matrix, y_matrix = np.meshgrid(x, y)
+    return x_matrix.ravel(), y_matrix.ravel()
+
+
+def scaled_interpolation(scale, grid_resolution, grid_size, original_function, rbf):
+    x, y = generate_grid(grid_size, grid_resolution, scale)
+    phi = generate_kernel(rbf, scale)
+    return interpolate(phi, original_function, (x, y))
+
+
 def main():
     rbf = wendland
+    original_function = generate_original_function()
 
+    plt.figure()
+    ax = plt.axes(projection='3d')
+    plot_contour(ax, original_function, GRID_SIZE)
+    plt.show()
+
+    interpolant = scaled_interpolation(
+        scale=SCALE,
+        grid_resolution=BASE_RESOLUTION,
+        grid_size=GRID_SIZE,
+        original_function=original_function,
+        rbf=rbf
+    )
+    
+    plt.figure()
+    ax = plt.axes(projection='3d')
+    plot_contour(ax, interpolant, GRID_SIZE)
+    plt.show()
+
+    test_x, test_y = generate_grid(GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR ,SCALE)
+    print("MSE was: ", mse(original_function, interpolant, test_x, test_y))
+
+
+if __name__ == "__main__":
+    main()
+
+
+def nonscaled_interpolation_main():
+    rbf = wendland
     # Generate grid
-    x = np.linspace(-GRID_SIZE, GRID_SIZE, 2 * PLOT_RESOLUTION_FACTOR * GRID_SIZE)
-    y = np.linspace(-GRID_SIZE, GRID_SIZE, 2 * PLOT_RESOLUTION_FACTOR * GRID_SIZE)
-    grid = np.meshgrid(x, y)
+    x, y = generate_grid(GRID_SIZE, PLOT_RESOLUTION_FACTOR)
+
     # fine_grid = generate_grid(GRID_SIZE, PLOT_RESOLUTION_FACTOR)
 
     # Create phi
@@ -96,7 +138,7 @@ def main():
     # fine_grid_values = map(original_function, fine_grid)
 
     # Interpolate
-    interpolant = interpolate(phi, original_function, grid)
+    interpolant = interpolate(phi, original_function, (x, y))
     # fine_grid_interpolated_values = map(interpolant, fine_grid)
 
     # Plot values on finer grid
@@ -111,7 +153,3 @@ def main():
     x = np.linspace(-GRID_SIZE, GRID_SIZE, 8 * GRID_SIZE)
     y = np.linspace(-GRID_SIZE, GRID_SIZE, 8 * GRID_SIZE)
     print("MSE was: ", mse(original_function, interpolant, x, y))
-
-
-if __name__ == "__main__":
-    main()
