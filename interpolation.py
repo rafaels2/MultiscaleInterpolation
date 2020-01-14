@@ -1,9 +1,15 @@
+"""
+Issues:
+1. should be scaled or have more points
+"""
+
 import numpy as np
 import numpy.linalg as la
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
-GRID_SIZE = 10
+GRID_SIZE = 4
+ORIGINAL_SCALE = 2
 PLOT_RESOLUTION_FACTOR = 4
 
 
@@ -24,11 +30,17 @@ def interpolate(phi, original_function, points):
     :param points:
     :return:
     """
-    values_at_points = original_function(*points)
-    points_as_vectors = [np.array([x, y]) for x, y in zip(*points)]
+    x_matrix, y_matrix = points
+    X = []
+    Y = []
+    for index in np.ndindex(x_matrix.shape):
+        X.append(x_matrix[index])
+        Y.append(y_matrix[index])
+    values_at_points = original_function(np.array(X), np.array(Y))
+    points_as_vectors = [np.array([x, y]) for x, y in zip(X, Y)]
     kernel = np.array([[phi(x_i, x_j) for x_j in points_as_vectors] for x_i in points_as_vectors])
+    import ipdb; ipdb.set_trace()
     coefficients = np.matmul(la.inv(kernel), values_at_points)
-
     def interpolant(x, y):
         return sum(b_j * phi(np.array([x, y]), x_j)
                    for b_j, x_j in zip(coefficients, points_as_vectors))
@@ -70,9 +82,9 @@ def main():
     rbf = wendland
 
     # Generate grid
-    x = np.linspace(-GRID_SIZE, GRID_SIZE, 2 * GRID_SIZE)
-    y = np.linspace(-GRID_SIZE, GRID_SIZE, 2 * GRID_SIZE)
-    grid = (x, y)
+    x = np.linspace(-GRID_SIZE, GRID_SIZE, 2 * PLOT_RESOLUTION_FACTOR * GRID_SIZE)
+    y = np.linspace(-GRID_SIZE, GRID_SIZE, 2 * PLOT_RESOLUTION_FACTOR * GRID_SIZE)
+    grid = np.meshgrid(x, y)
     # fine_grid = generate_grid(GRID_SIZE, PLOT_RESOLUTION_FACTOR)
 
     # Create phi
