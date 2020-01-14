@@ -14,7 +14,7 @@ BASE_RESOLUTION = 3
 PLOT_RESOLUTION_FACTOR = 4
 DIMENSION = 2
 SCALE = 2
-NUMBER_OF_SCALES = 3
+NUMBER_OF_SCALES = 1
 
 
 def sum_functions(a, b):
@@ -44,6 +44,10 @@ def wendland(x):
         return (1 + (4 * x)) * ((1 - x) ** 4)
 
 
+def run_on_array(function, x, y):
+    return np.array([function(x[index], y[index]) for index in np.ndindex(x.shape)])
+
+
 def interpolate(phi, original_function, points):
     """
     Generating I_Xf(x) for the given kernel and points
@@ -52,12 +56,16 @@ def interpolate(phi, original_function, points):
     :param points:
     :return:
     """
+    print("started interpolation")
     x_axis, y_axis = points
-    values_at_points = original_function(x_axis, y_axis)
+    print("x shape {}".format(x_axis.shape))
+    values_at_points = run_on_array(original_function, x_axis, y_axis)
     points_as_vectors = [np.array([x_0, y_0]) for x_0, y_0 in zip(x_axis, y_axis)]
+    print("len: {}".format(len(points_as_vectors)))
     kernel = np.array([[phi(x_i, x_j) for x_j in points_as_vectors] for x_i in points_as_vectors])
     coefficients = np.matmul(la.inv(kernel), values_at_points)
     print(kernel)
+
     def interpolant(x, y):
         return sum(b_j * phi(np.array([x, y]), x_j)
                    for b_j, x_j in zip(coefficients, points_as_vectors))
@@ -67,15 +75,8 @@ def interpolate(phi, original_function, points):
 def generate_kernel(rbf, scale=1):
     def kernel(x, y):
         # TODO: Maybe scale should be squared?
-        # try:
-        ans = 0
-        # try:
         ans = (1 / scale) * rbf(la.norm(x-y) / scale)
-        # except Exception as e:
-            # import ipdb; ipdb.set_trace()
         return ans
-        # except ValueError as e:
-        #     import ipdb; ipdb.set_trace
 
     return kernel
 
@@ -105,8 +106,8 @@ def plot_contour(ax, func, grid_size):
 
 
 def generate_grid(grid_size, resolution, scale=1):
-    x = np.linspace(-grid_size, grid_size, 2 * resolution * scale * grid_size)
-    y = np.linspace(-grid_size, grid_size, 2 * resolution * scale * grid_size)
+    x = np.linspace(-grid_size / resolution, grid_size / resolution, 2 * scale * grid_size)
+    y = np.linspace(-grid_size / resolution, grid_size / resolution, 2 * scale * grid_size)
     x_matrix, y_matrix = np.meshgrid(x, y)
     return x_matrix.ravel(), y_matrix.ravel()
 
@@ -153,7 +154,7 @@ def main():
     plot_contour(ax, interpolant, GRID_SIZE)
     plt.show()
 
-    test_x, test_y = generate_grid(GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR ,SCALE)
+    test_x, test_y = generate_grid(GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR, SCALE)
     print("MSE was: ", mse(original_function, interpolant, test_x, test_y))
 
 
