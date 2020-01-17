@@ -14,7 +14,7 @@ BASE_RESOLUTION = 3
 PLOT_RESOLUTION_FACTOR = 4
 DIMENSION = 2
 SCALE = 2
-NUMBER_OF_SCALES = 1
+NUMBER_OF_SCALES = 2
 
 
 def sum_functions(a, b):
@@ -83,7 +83,7 @@ def generate_kernel(rbf, scale=1):
 
 def generate_original_function():
     def original_function(x, y):
-        return y * (np.sin(x) - 1)
+        return (x ** 2) * np.sin(5*(x + y))
 
     return original_function
 
@@ -106,11 +106,11 @@ def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
 
 
 def plot_contour(ax, func, *args):
-    import ipdb; ipdb.set_trace()
     x, y = generate_grid(*args, should_ravel=False)
     z = np.zeros(x.shape)
     for index in np.ndindex(x.shape):
         z[index] = func(x[index], y[index])
+    print("Z:\n", z)
     ax.contour3D(x, y, z, 50, cmap='binary')
 
 
