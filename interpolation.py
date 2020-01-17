@@ -1,8 +1,3 @@
-"""
-Issues:
-1. should be scaled or have more points
-"""
-
 import numpy as np
 import numpy.linalg as la
 from mpl_toolkits import mplot3d
@@ -14,9 +9,12 @@ BASE_RESOLUTION = 3
 PLOT_RESOLUTION_FACTOR = 4
 DIMENSION = 2
 SCALE = 2
-NUMBER_OF_SCALES = 2
+NUMBER_OF_SCALES = 3
 
 
+"""
+Util functions - should be in Func class
+"""
 def sum_functions(a, b):
     def new_func(*args):
         return a(*args) + b(*args)
@@ -142,7 +140,6 @@ def main():
     plot_contour(ax, original_function, GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR, SCALE)
     plt.show()
 
-
     interpolant = multiscale_interpolation(
         number_of_scales=NUMBER_OF_SCALES,
         original_function=original_function,
@@ -163,6 +160,9 @@ def main():
 if __name__ == "__main__":
     main()
 
+"""
+These are my previous mains that helped me develop the interpolation and scaled interpolation.
+"""
 
 def scaled_main():
     rbf = wendland
