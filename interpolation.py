@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from utils import plot_contour, generate_grid, mse, run_on_array, \
     sum_functions, sub_functions, zero_func, wendland, generate_original_function
 from naive import naive_scaled_interpolation
+from quasi_interpolation import quasi_scaled_interpolation
 
 GRID_SIZE = 4
 ORIGINAL_SCALE = 2
@@ -18,6 +19,7 @@ PLOT_RESOLUTION_FACTOR = 4
 DIMENSION = 2
 SCALE = 2
 NUMBER_OF_SCALES = 3
+
 
 def multiscale_interpolation(number_of_scales, original_function, scaled_interpolation_method=naive_scaled_interpolation, **kwargs):
     f_j = zero_func
@@ -47,7 +49,8 @@ def main():
         original_function=original_function,
         grid_resolution=BASE_RESOLUTION,
         grid_size=GRID_SIZE,
-        rbf=rbf
+        rbf=rbf,
+        scaled_interpolation_method=quasi_scaled_interpolation
     )
 
     plt.figure()

@@ -71,3 +71,13 @@ def wendland(x):
         return 0
     else:
         return (1 + (4 * x)) * ((1 - x) ** 4)
+
+
+def evaluate_original_on_points(original_function, points):
+    print("started interpolation")
+    x_axis, y_axis = points
+    print("x shape {}".format(x_axis.shape))
+    values_at_points = run_on_array(original_function, x_axis, y_axis)
+    points_as_vectors = [np.array([x_0, y_0]) for x_0, y_0 in zip(x_axis, y_axis)]
+    print("len: {}".format(len(points_as_vectors)))
+    return points_as_vectors, values_at_points
