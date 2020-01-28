@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from utils import plot_contour, generate_grid, mse, run_on_array, \
     sum_functions, sub_functions, zero_func, wendland, generate_original_function
 from naive import naive_scaled_interpolation
-from quasi_interpolation import quasi_scaled_interpolation
+from quasi_interpolation import quasi_scaled_interpolation, const_rbf
 
 GRID_SIZE = 4
 ORIGINAL_SCALE = 2
@@ -18,7 +18,7 @@ BASE_RESOLUTION = 3
 PLOT_RESOLUTION_FACTOR = 4
 DIMENSION = 2
 SCALE = 2
-NUMBER_OF_SCALES = 3
+NUMBER_OF_SCALES = 1
 
 
 def multiscale_interpolation(number_of_scales, original_function, scaled_interpolation_method=naive_scaled_interpolation, **kwargs):
@@ -35,13 +35,13 @@ def multiscale_interpolation(number_of_scales, original_function, scaled_interpo
 
 
 def main():
-    rbf = wendland
+    rbf = const_rbf
     original_function = generate_original_function()
 
-    plt.figure()
-    ax = plt.axes(projection='3d')
-    plot_contour(ax, original_function, GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR, SCALE)
-    plt.show()
+    # plt.figure()
+    # ax = plt.axes(projection='3d')
+    # plot_contour(ax, original_function, GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR, SCALE)
+    # plt.show()
 
 
     interpolant = multiscale_interpolation(
@@ -55,10 +55,10 @@ def main():
 
     plt.figure()
     ax = plt.axes(projection='3d')
-    plot_contour(ax, interpolant, GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR, SCALE)
+    plot_contour(ax, interpolant, GRID_SIZE, BASE_RESOLUTION, SCALE * PLOT_RESOLUTION_FACTOR)
     plt.show()
 
-    test_x, test_y = generate_grid(GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR, SCALE)
+    test_x, test_y = generate_grid(GRID_SIZE, BASE_RESOLUTION, SCALE * PLOT_RESOLUTION_FACTOR)
     print("MSE was: ", mse(original_function, interpolant, test_x, test_y))
 
 

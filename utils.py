@@ -4,6 +4,7 @@ from numpy import linalg as la
 
 def generate_original_function():
     def original_function(x, y):
+        return 1.0
         return (y ** 2) * (np.sin(5* (x + y)))
 
     return original_function
