@@ -1,28 +1,17 @@
 import numpy as np
 from numpy import linalg as la
-from utils import generate_grid, generate_kernel, run_on_array, evaluate_original_on_points, wendland, mse
-
-
-def polynom(x, y):
-    return (x - 20) * (x + 20) * (y - 20) * (y + 20)
+from utils import generate_grid, generate_kernel, evaluate_original_on_points, \
+    wendland, mse, sum_functions_list, div_functions
 
 
 def const(x, y):
     return 1
 
 
-def const_rbf(x):
-    if x == 0:
-        return 2
-    if x == 1:
-        return -0.25
-    return 0
-
-
-def _calculate_phi(rbf, scale, point):
+def _calculate_phi(kernel, point):
     def phi(x, y):
         vector = np.array([x, y])
-        return rbf(la.norm(vector - point) / scale)
+        return kernel(vector, point)
     return phi
 
 
@@ -36,15 +25,23 @@ def _interpolate(original_function, points, phis):
 
 def quasi_scaled_interpolation(scale, original_function, grid_resolution, grid_size, rbf):
     x, y = generate_grid(grid_size, grid_resolution, scale)
-    phis = [_calculate_phi(rbf, scale, np.array([x_i, y_i])) for x_i, y_i in zip(x, y)]
-    return _interpolate(original_function, (x, y), phis)
+    kernel = generate_kernel(rbf, scale)
+
+    phis = [_calculate_phi(kernel, np.array([x_i, y_i])) for x_i, y_i in zip(x, y)]
+    normalizer = sum_functions_list(phis)
+    phis = list(map(lambda phi: div_functions(phi, normalizer), phis))
+
+    interpolant = _interpolate(original_function, (x, y), phis)
+
+    import ipdb; ipdb.set_trace()
+    return interpolant
 
 
 def main():
     """
     This main tests the assumptions on the quasi interpolation theory
     """
-    rbf = const_rbf
+    rbf = wendland
     x, y = generate_grid(5, 3, 1)
     phis = [_calculate_phi(rbf, 1, np.array([x_i, y_i]), polynom) for x_i, y_i in zip(x, y)]
 

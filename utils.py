@@ -54,6 +54,20 @@ def sum_functions(a, b):
     return new_func
 
 
+def sum_functions_list(funcs):
+    def new_func(*args):
+        return sum(func(*args) for func in funcs)
+
+    return new_func
+
+
+def div_functions(a, b):
+    def new_func(*args):
+        return a(*args) / b(*args)
+
+    return new_func
+
+
 def sub_functions(a, b):
     def new_func(*args):
         return a(*args) - b(*args)

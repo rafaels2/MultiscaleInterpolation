@@ -2,18 +2,18 @@ import numpy as np
 import numpy.linalg as la
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
-from utils import plot_contour, generate_grid, mse, run_on_array, \
+from utils import plot_contour, generate_grid, mse, \
     sum_functions, sub_functions, zero_func, wendland, generate_original_function
 from naive import naive_scaled_interpolation
-from quasi_interpolation import quasi_scaled_interpolation, const_rbf
+from quasi_interpolation import quasi_scaled_interpolation
 
-GRID_SIZE = 4
+GRID_SIZE = 2
 ORIGINAL_SCALE = 2
 BASE_RESOLUTION = 3
 PLOT_RESOLUTION_FACTOR = 4
 DIMENSION = 2
 SCALE = 2
-NUMBER_OF_SCALES = 3
+NUMBER_OF_SCALES = 1
 
 
 def multiscale_interpolation(number_of_scales, original_function, scaled_interpolation_method=naive_scaled_interpolation, **kwargs):
@@ -30,7 +30,7 @@ def multiscale_interpolation(number_of_scales, original_function, scaled_interpo
 
 
 def main():
-    rbf = const_rbf
+    rbf = wendland
     original_function = generate_original_function()
 
     # plt.figure()
