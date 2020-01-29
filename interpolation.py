@@ -33,10 +33,10 @@ def main():
     rbf = wendland
     original_function = generate_original_function()
 
-    # plt.figure()
-    # ax = plt.axes(projection='3d')
-    # plot_contour(ax, original_function, GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR, SCALE)
-    # plt.show()
+    plt.figure()
+    ax = plt.axes(projection='3d')
+    plot_contour(ax, original_function, GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR, SCALE)
+    plt.show()
 
     interpolant = multiscale_interpolation(
         number_of_scales=NUMBER_OF_SCALES,
@@ -46,7 +46,7 @@ def main():
         rbf=rbf,
         scaled_interpolation_method=quasi_scaled_interpolation
     )
-
+    
     plt.figure()
     ax = plt.axes(projection='3d')
     plot_contour(ax, interpolant, GRID_SIZE, BASE_RESOLUTION, SCALE * PLOT_RESOLUTION_FACTOR)

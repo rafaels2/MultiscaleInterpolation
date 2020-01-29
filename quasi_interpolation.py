@@ -2,6 +2,7 @@ import numpy as np
 from numpy import linalg as la
 from utils import generate_grid, generate_kernel, evaluate_original_on_points, \
     wendland, mse, sum_functions_list, div_functions
+from cachetools import cached
 
 
 def const(x, y):
@@ -9,6 +10,7 @@ def const(x, y):
 
 
 def _calculate_phi(kernel, point):
+    @cached(cache={})
     def phi(x, y):
         vector = np.array([x, y])
         return kernel(vector, point)
@@ -18,7 +20,9 @@ def _calculate_phi(kernel, point):
 def _interpolate(original_function, points, phis):
     points_as_vectors, values_at_points = evaluate_original_on_points(original_function, points)
 
+    @cached(cache={})
     def interpolant(x, y):
+        print("Calculating {} {}".format(x, y))
         return sum(phi(x, y) * value_at_point for phi, value_at_point in zip(phis, values_at_points))
     return interpolant
 
@@ -33,7 +37,6 @@ def quasi_scaled_interpolation(scale, original_function, grid_resolution, grid_s
 
     interpolant = _interpolate(original_function, (x, y), phis)
 
-    import ipdb; ipdb.set_trace()
     return interpolant
 
 
