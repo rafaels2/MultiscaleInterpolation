@@ -1,8 +1,10 @@
 import numpy as np
 from numpy import linalg as la
+from cachetools import cached
 
 
 def generate_original_function():
+    @cached(cache={})
     def original_function(x, y):
         return (y ** 2) * (np.sin(5* (x + y)))
 

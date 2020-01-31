@@ -2,15 +2,24 @@ import numpy as np
 from numpy import linalg as la
 from utils import generate_grid, generate_kernel, evaluate_original_on_points, \
     wendland, mse, sum_functions_list, div_functions
-from cachetools import cached
+from cachetools import cached, LFUCache
+
+
+num_of_caches_g = 0
 
 
 def const(x, y):
     return 1
 
 
+def generate_cache(maxsize=32):
+    global num_of_caches_g
+    num_of_caches_g += 1
+    print("New Cache! Now having {}".format(num_of_caches_g))
+    return LFUCache(maxsize=maxsize)
+
 def _calculate_phi(kernel, point):
-    @cached(cache={})
+    @cached(cache=generate_cache(maxsize=10))
     def phi(x, y):
         vector = np.array([x, y])
         return kernel(vector, point)
@@ -20,7 +29,7 @@ def _calculate_phi(kernel, point):
 def _interpolate(original_function, points, phis):
     points_as_vectors, values_at_points = evaluate_original_on_points(original_function, points)
 
-    @cached(cache={})
+    @cached(cache=generate_cache(maxsize=10))
     def interpolant(x, y):
         print("Calculating {} {}".format(x, y))
         return sum(phi(x, y) * value_at_point for phi, value_at_point in zip(phis, values_at_points))
