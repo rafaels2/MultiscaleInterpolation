@@ -6,15 +6,7 @@ from utils import plot_contour, generate_grid, mse, \
     sum_functions, sub_functions, zero_func, wendland, generate_original_function
 from naive import naive_scaled_interpolation
 from quasi_interpolation import quasi_scaled_interpolation
-
-GRID_SIZE = 2
-ORIGINAL_SCALE = 2
-BASE_RESOLUTION = 3
-PLOT_RESOLUTION_FACTOR = 4
-DIMENSION = 2
-SCALE = 2
-NUMBER_OF_SCALES = 1
-
+from config import CONFIG
 
 def multiscale_interpolation(number_of_scales, original_function, scaled_interpolation_method=naive_scaled_interpolation, **kwargs):
     f_j = zero_func
@@ -32,27 +24,33 @@ def multiscale_interpolation(number_of_scales, original_function, scaled_interpo
 def main():
     rbf = wendland
     original_function = generate_original_function()
+    
+    grid_size = CONFIG["GRID_SIZE"]
+    base_resolution = CONFIG["BASE_RESOLUTION"]
+    plot_resolution_factor = CONFIG["PLOT_RESOLUTION_FACTOR"]
+    scale = CONFIG["SCALE"]
+    number_of_scales = CONFIG["NUMBER_OF_SCALES"]
 
     plt.figure()
     ax = plt.axes(projection='3d')
-    plot_contour(ax, original_function, GRID_SIZE, BASE_RESOLUTION * PLOT_RESOLUTION_FACTOR, SCALE)
+    plot_contour(ax, original_function, grid_size, base_resolution * plot_resolution_factor, scale)
     plt.show()
 
     interpolant = multiscale_interpolation(
-        number_of_scales=NUMBER_OF_SCALES,
+        number_of_scales=number_of_scales,
         original_function=original_function,
-        grid_resolution=BASE_RESOLUTION,
-        grid_size=GRID_SIZE,
+        grid_resolution=base_resolution,
+        grid_size=grid_size,
         rbf=rbf,
         scaled_interpolation_method=quasi_scaled_interpolation
     )
     
     plt.figure()
     ax = plt.axes(projection='3d')
-    plot_contour(ax, interpolant, GRID_SIZE, BASE_RESOLUTION, SCALE * PLOT_RESOLUTION_FACTOR)
+    plot_contour(ax, interpolant, grid_size, base_resolution, scale * plot_resolution_factor)
     plt.show()
 
-    test_x, test_y = generate_grid(GRID_SIZE, BASE_RESOLUTION, SCALE * PLOT_RESOLUTION_FACTOR)
+    test_x, test_y = generate_grid(grid_size, base_resolution, scale * plot_resolution_factor)
     print("MSE was: ", mse(original_function, interpolant, test_x, test_y))
 
 
