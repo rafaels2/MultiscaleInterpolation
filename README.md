@@ -1,7 +1,9 @@
 # MultiscalteInterpolation
 ## How to run?
-`pip instasll -r requirements.txt`
-`python interpolation.py`
+```bash
+pip instasll -r requirements.txt
+python interpolation.py
+```
 ## Modules 
 - `interpolation.py` is the main module. It runs the multiscale logic on a specific method.
 - `quasi_interpolation.py` now includes an environemnt averaging using RBF coefficients.
