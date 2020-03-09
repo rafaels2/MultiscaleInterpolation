@@ -32,7 +32,7 @@ def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
 
 def generate_kernel(rbf, scale=1):
     def kernel(x, y):
-        ans = (1 / scale ** 2) * rbf(la.norm(x-y) / scale)
+        ans = (1 / scale ** 2) * rbf(la.norm(x-y) * scale)
         return ans
 
     return kernel
