@@ -2,6 +2,7 @@ CONFIG = {
     "GRID_SIZE": 3,
     "BASE_RESOLUTION": 1.5,
     "PLOT_RESOLUTION_FACTOR": 2,
-    "SCALE": 2,
-    "NUMBER_OF_SCALES": 1,
+    "SCALE": 1,
+    "NUMBER_OF_SCALES": 2,
+    "TEST_SCALE": 2
 }

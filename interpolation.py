@@ -30,10 +30,11 @@ def main():
     plot_resolution_factor = CONFIG["PLOT_RESOLUTION_FACTOR"]
     scale = CONFIG["SCALE"]
     number_of_scales = CONFIG["NUMBER_OF_SCALES"]
+    test_scale = CONFIG["TEST_SCALE"]
 
     plt.figure()
     ax = plt.axes(projection='3d')
-    plot_contour(ax, original_function, grid_size, base_resolution * plot_resolution_factor, scale)
+    true_values_on_grid = plot_contour(ax, original_function, grid_size, base_resolution * plot_resolution_factor, test_scale)
     plt.show()
 
     interpolant = multiscale_interpolation(
@@ -47,11 +48,10 @@ def main():
     
     plt.figure()
     ax = plt.axes(projection='3d')
-    plot_contour(ax, interpolant, grid_size, base_resolution, scale * plot_resolution_factor)
+    approximated_values_on_grid = plot_contour(ax, interpolant, grid_size, base_resolution * plot_resolution_factor, test_scale)
     plt.show()
 
-    test_x, test_y = generate_grid(grid_size, base_resolution, scale * plot_resolution_factor)
-    print("MSE was: ", mse(original_function, interpolant, test_x, test_y))
+    print("MSE was: ", np.mean(np.square(approximated_values_on_grid - true_values_on_grid)))
 
 
 if __name__ == "__main__":

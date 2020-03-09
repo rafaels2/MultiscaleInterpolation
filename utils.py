@@ -6,7 +6,7 @@ from cachetools import cached
 def generate_original_function():
     @cached(cache={})
     def original_function(x, y):
-        return (y ** 2) * (np.sin(5* (x + y)))
+        return (x)
 
     return original_function
 
@@ -17,11 +17,12 @@ def plot_contour(ax, func, *args):
     for index in np.ndindex(x.shape):
         z[index] = func(x[index], y[index])
     ax.contour3D(x, y, z, 50, cmap='binary')
+    return z
 
 
 def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
-    x = np.linspace(-grid_size / resolution, grid_size / resolution, 2 * scale * grid_size)
-    y = np.linspace(-grid_size / resolution, grid_size / resolution, 2 * scale * grid_size)
+    x = np.linspace(-grid_size, grid_size, 2 * scale * grid_size * resolution)
+    y = np.linspace(-grid_size, grid_size, 2 * scale * grid_size * resolution)
     x_matrix, y_matrix = np.meshgrid(x, y)
     if should_ravel:
         return x_matrix.ravel(), y_matrix.ravel()
