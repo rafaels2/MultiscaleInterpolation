@@ -4,5 +4,6 @@ CONFIG = {
     "PLOT_RESOLUTION_FACTOR": 2,
     "SCALE": 1,
     "NUMBER_OF_SCALES": 1,
-    "TEST_SCALE": 2
+    "TEST_SCALE": 0.2,
+    "SCALING_FACTOR": 0.8 ** 3,
 }

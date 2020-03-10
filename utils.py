@@ -1,12 +1,21 @@
 import numpy as np
 from numpy import linalg as la
-from cachetools import cached
+from cachetools import cached, LFUCache
+
+num_of_caches_g = 0
+
+
+def generate_cache(maxsize=32):
+    global num_of_caches_g
+    num_of_caches_g += 1
+    print("New Cache! Now having {}".format(num_of_caches_g))
+    return LFUCache(maxsize=maxsize)
 
 
 def generate_original_function():
     @cached(cache={})
     def original_function(x, y):
-        return x **2 + y **2 -x*y
+        return np.sin(5*x)*np.cos(4*y) * (x ** 2 + y ** 2 + 0.5)
 
     return original_function
 
@@ -14,15 +23,19 @@ def generate_original_function():
 def plot_contour(ax, func, *args):
     x, y = generate_grid(*args, should_ravel=False)
     z = np.zeros(x.shape)
+    print("Z shape", z.shape)
     for index in np.ndindex(x.shape):
+        if index[1] == 0:
+            print(index)
         z[index] = func(x[index], y[index])
     ax.contour3D(x, y, z, 50, cmap='binary')
     return z
 
 
 def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
-    x = np.linspace(-grid_size, grid_size, 2 * scale * resolution)
-    y = np.linspace(-grid_size, grid_size, 2 * scale * resolution)
+    print("creating a grid", 2 * resolution / scale)
+    y = np.linspace(-grid_size, grid_size, 2 * resolution / scale)
+    x = np.linspace(-grid_size, grid_size, 2 * resolution / scale)
     x_matrix, y_matrix = np.meshgrid(x, y)
     if should_ravel:
         return x_matrix.ravel(), y_matrix.ravel()
@@ -32,7 +45,7 @@ def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
 
 def generate_kernel(rbf, scale=1):
     def kernel(x, y):
-        ans = (1 / scale ** 2) * rbf(la.norm(x-y) * scale)
+        ans = (1 / scale ** 2) * rbf(la.norm(x-y) / scale)
         return ans
 
     return kernel
@@ -65,6 +78,7 @@ def sum_functions_list(funcs):
 
 
 def div_functions(a, b):
+    @cached(cache=generate_cache(maxsize=100))
     def new_func(*args):
         return a(*args) / b(*args)
 
