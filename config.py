@@ -4,7 +4,7 @@ CONFIG = {
     "PLOT_RESOLUTION_FACTOR": 2,
     "SCALE": 1,
     "NUMBER_OF_SCALES": 4,
-    "TEST_SCALE": 0.2,
+    "TEST_SCALE": 0.1,
     "SCALING_FACTOR": 0.8,
     "NAME": "temp",
     "OUTPUT_DIR": "results",

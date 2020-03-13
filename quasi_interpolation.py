@@ -20,7 +20,7 @@ def _calculate_phi(kernel, point):
 def _interpolate(original_function, points, phis, hx, radius_in_index, min_value):
     values_at_points = evaluate_original_on_points(original_function, points)
 
-    # @cached(cache=generate_cache(maxsize=10))
+    @cached(cache=generate_cache(maxsize=10))
     def interpolant(x, y):
         x_0 = (x - min_value) / hx
         y_0 = (y - min_value) / hx

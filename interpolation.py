@@ -104,11 +104,11 @@ def main():
     output_dir = CONFIG["OUTPUT_DIR"]
 
     diffs = [
-        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
+        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 8)
     ] + [
         {"NAME": "single_scale_{}".format(i), 
          "NUMBER_OF_SCALES": 1,
-         "SCALING_FACTOR": scaling_factor ** i} for i in range(1, 5)
+         "SCALING_FACTOR": scaling_factor ** i} for i in range(1, 8)
     ]
 
     with set_output_directory(output_dir):
