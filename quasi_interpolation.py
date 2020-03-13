@@ -17,26 +17,50 @@ def _calculate_phi(kernel, point):
     return phi
 
 
-def _interpolate(original_function, points, phis):
-    points_as_vectors, values_at_points = evaluate_original_on_points(original_function, points)
+def _interpolate(original_function, points, phis, hx, radius_in_index, min_value):
+    values_at_points = evaluate_original_on_points(original_function, points)
 
-    @cached(cache=generate_cache(maxsize=10))
+    # @cached(cache=generate_cache(maxsize=10))
     def interpolant(x, y):
-        # print("Calculating {} {}".format(x, y))
-        # print(sum(1 for phi, value_at_point in zip(phis, values_at_points) if phi(x, y) != 0))
-        return sum(phi(x, y) * value_at_point for phi, value_at_point in zip(phis, values_at_points))
+        x_0 = (x - min_value) / hx
+        y_0 = (y - min_value) / hx
+        averages = 0
+        normalizer = 0
+        
+        for indx in np.ndindex((2 * radius_in_index + 2, 2 * radius_in_index + 2)):
+            x_i = int(x_0 - radius_in_index - 1+ indx[0])
+            y_i = int(y_0 - radius_in_index - 1 + indx[1])
+            
+            if any([x_i < 0, y_i <0, x_i >= phis.shape[0], y_i >= phis.shape[1]]):
+                continue 
+            
+            current_phi_value = phis[y_i, x_i](x, y)
+            averages += current_phi_value * values_at_points[y_i, x_i] 
+            normalizer += current_phi_value
+        
+        if normalizer == 0:
+            normalizer = 0.00001
+        
+        return float(averages / normalizer)
     return interpolant
 
 
 def quasi_scaled_interpolation(scale, original_function, grid_resolution, grid_size, rbf):
-    x, y = generate_grid(grid_size, grid_resolution, scale)
+    x, y = generate_grid(grid_size, grid_resolution, scale, should_ravel=False)
     kernel = generate_kernel(rbf, scale)
 
-    phis = [_calculate_phi(kernel, np.array([x_i, y_i])) for x_i, y_i in zip(x, y)]
-    normalizer = sum_functions_list(phis)
-    phis = list(map(lambda phi: div_functions(phi, normalizer), phis))
+    hx = (2 * grid_size / x.shape[0])
+    radius_in_index = int(np.ceil(scale / hx))
 
-    interpolant = _interpolate(original_function, (x, y), phis)
+    phis = list()
+    for i in range(x.shape[0]):
+        current_phis = list()
+        for j in range(x.shape[1]):
+            current_phis.append(_calculate_phi(kernel, np.array([x[i, j], y[i, j]])))
+        phis.append(current_phis)
+    phis = np.array(phis)
+
+    interpolant = _interpolate(original_function, (x, y), phis, hx, radius_in_index, -grid_size)
 
     return interpolant
 

@@ -47,6 +47,7 @@ def run_single_experiment(config, rbf, original_function):
         ax = plt.axes(projection='3d')
         true_values_on_grid = plot_contour(ax, original_function, grid_size, base_resolution, test_scale)
         plt.savefig("original.png")
+        ax.remove()
 
         interpolant = multiscale_interpolation(
             number_of_scales=number_of_scales,
@@ -57,12 +58,13 @@ def run_single_experiment(config, rbf, original_function):
             rbf=rbf,
             scaled_interpolation_method=quasi_scaled_interpolation
         )
-        
+
         plt.figure()
         plt.title("approximation")
         ax = plt.axes(projection='3d')
         approximated_values_on_grid = plot_contour(ax, interpolant, grid_size, base_resolution, test_scale)
         plt.savefig("approximation.png")
+        ax.remove()
 
         plt.figure()
         plt.title("difference map")

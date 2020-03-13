@@ -18,7 +18,7 @@ def generate_cache(maxsize=32):
 def generate_original_function():
     @cached(cache={})
     def original_function(x, y):
-        return np.sin(5*x)*np.cos(4*y) + 0.6 * (np.cos(18 * x) * np.sin(15*y))
+        return np.sin(5*x)*np.cos(4*y)
 
     return original_function
 
@@ -110,12 +110,14 @@ def wendland(x):
 
 def evaluate_original_on_points(original_function, points):
     print("started interpolation")
-    x_axis, y_axis = points
-    print("x shape {}".format(x_axis.shape))
-    values_at_points = run_on_array(original_function, x_axis, y_axis)
-    points_as_vectors = [np.array([x_0, y_0]) for x_0, y_0 in zip(x_axis, y_axis)]
-    print("len: {}".format(len(points_as_vectors)))
-    return points_as_vectors, values_at_points
+    x, y = points
+    print("x shape {}".format(x.shape))
+    values_at_points = np.zeros_like(x)
+    for index in np.ndindex(x.shape):
+        x_i = x[index]
+        y_i = y[index]
+        values_at_points[index] = original_function(x_i, y_i) 
+    return values_at_points
 
 @contextmanager
 def set_output_directory(path):
