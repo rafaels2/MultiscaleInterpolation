@@ -1,6 +1,9 @@
-import numpy as np
-from numpy import linalg as la
 from cachetools import cached, LFUCache
+from contextlib import contextmanager
+from numpy import linalg as la
+from matplotlib import cm
+import numpy as np
+import os
 
 num_of_caches_g = 0
 
@@ -8,7 +11,7 @@ num_of_caches_g = 0
 def generate_cache(maxsize=32):
     global num_of_caches_g
     num_of_caches_g += 1
-    print("New Cache! Now having {}".format(num_of_caches_g))
+    # print("New Cache! Now having {}".format(num_of_caches_g))
     return LFUCache(maxsize=maxsize)
 
 
@@ -28,7 +31,7 @@ def plot_contour(ax, func, *args):
         if index[1] == 0:
             print(index)
         z[index] = func(x[index], y[index])
-    ax.contour3D(x, y, z, 50, cmap='binary')
+    ax.plot_surface(x, y, z, cmap=cm.coolwarm, linewidth=0, antialiased=False)
     return z
 
 
@@ -113,3 +116,14 @@ def evaluate_original_on_points(original_function, points):
     points_as_vectors = [np.array([x_0, y_0]) for x_0, y_0 in zip(x_axis, y_axis)]
     print("len: {}".format(len(points_as_vectors)))
     return points_as_vectors, values_at_points
+
+@contextmanager
+def set_output_directory(path):
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    last_cwd = os.getcwd()
+    os.chdir(path)
+    yield
+
+    os.chdir(last_cwd)
+    return

@@ -5,5 +5,8 @@ CONFIG = {
     "SCALE": 1,
     "NUMBER_OF_SCALES": 1,
     "TEST_SCALE": 0.2,
-    "SCALING_FACTOR": 0.8 ** 3,
+    "SCALING_FACTOR": 0.8,
+    "NAME": "temp",
+    "OUTPUT_DIR": "results",
+    "EXECUTION_NAME": "1-2 scales and single scales"
 }
