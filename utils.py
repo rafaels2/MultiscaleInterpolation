@@ -18,7 +18,7 @@ def generate_cache(maxsize=32):
 def generate_original_function():
     @cached(cache={})
     def original_function(x, y):
-        return np.sin(5*x)*np.cos(4*y) * (x ** 2 + y ** 2 + 0.5)
+        return np.sin(5*x)*np.cos(4*y) + 0.6 * (np.cos(18 * x) * np.sin(15*y))
 
     return original_function
 

@@ -7,6 +7,6 @@ CONFIG = {
     "TEST_SCALE": 0.2,
     "SCALING_FACTOR": 0.8,
     "NAME": "temp",
-    "OUTPUT_DIR": "results",
-    "EXECUTION_NAME": "1-2 scales and single scales"
+    "OUTPUT_DIR": "ForMeeting",
+    "EXECUTION_NAME": "1-4 scales and single scales"
 }
