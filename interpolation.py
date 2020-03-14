@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 from quasi_interpolation import quasi_scaled_interpolation
 from naive import naive_scaled_interpolation
-from config import CONFIG
+from config import CONFIG, DIFFS
 from utils import *
 
 
@@ -98,18 +98,11 @@ def run_all_experiments(config, diffs, *args):
 
 def main():
     rbf = wendland
-    original_function = generate_original_function()
+    original_function = CONFIG["ORIGINAL_FUNCTION"]
     config = CONFIG
     scaling_factor = CONFIG["SCALING_FACTOR"]
     output_dir = CONFIG["OUTPUT_DIR"]
-
-    diffs = [
-        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 8)
-    ] + [
-        {"NAME": "single_scale_{}".format(i), 
-         "NUMBER_OF_SCALES": 1,
-         "SCALING_FACTOR": scaling_factor ** i} for i in range(1, 8)
-    ]
+    diffs = DIFFS
 
     with set_output_directory(output_dir):
         results = run_all_experiments(config, diffs, rbf, original_function)
