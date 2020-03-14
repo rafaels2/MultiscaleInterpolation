@@ -1,7 +1,7 @@
-from datetime import datetime
 import numpy.linalg as la
 import pickle as pkl
 import numpy as np
+import time
 import os
 
 from mpl_toolkits import mplot3d
@@ -83,7 +83,7 @@ def run_single_experiment(config, rbf, original_function):
 def run_all_experiments(config, diffs, *args):
     mses = list()
     execution_name = config["EXECUTION_NAME"]
-    path = "{}_{}".format(execution_name, str(datetime.now()))
+    path = "{}_{}".format(execution_name, time.strftime("%Y%m%d__%H%M%S"))
     with set_output_directory(path):
         for diff in diffs:
             current_config = config.copy()
