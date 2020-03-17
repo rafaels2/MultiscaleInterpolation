@@ -27,6 +27,13 @@ def _interpolate(original_function, points, phis, hx, radius_in_index, min_value
         averages = 0
         normalizer = 0
         
+        """
+        TODO:
+            1. averages should be calculated with:
+                1.1 The Q, P formula; or
+                1.2 Least squares (I  guess it's more accurate)
+            2. phis are the lambdas
+        """
         for indx in np.ndindex((2 * radius_in_index + 2, 2 * radius_in_index + 2)):
             x_i = int(x_0 - radius_in_index - 1+ indx[0])
             y_i = int(y_0 - radius_in_index - 1 + indx[1])

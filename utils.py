@@ -67,6 +67,7 @@ def run_on_array(function, x, y):
 
 def sum_functions(a, b):
     def new_func(*args):
+        # TODO: Use the P transform
         return a(*args) + b(*args)
 
     return new_func
@@ -90,6 +91,7 @@ def div_functions(a, b):
 
 def sub_functions(a, b):
     def new_func(*args):
+        # TODO: Use the Q transform
         return a(*args) - b(*args)
 
     return new_func
