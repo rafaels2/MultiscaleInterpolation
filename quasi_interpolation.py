@@ -17,7 +17,7 @@ def _calculate_phi(kernel, point):
     return phi
 
 
-def _interpolate(original_function, points, phis, hx, radius_in_index, min_value):
+def _interpolate(manifold, original_function, points, phis, hx, radius_in_index, min_value):
     values_at_points = evaluate_original_on_points(original_function, points)
 
     @cached(cache=generate_cache(maxsize=10))
@@ -52,7 +52,7 @@ def _interpolate(original_function, points, phis, hx, radius_in_index, min_value
     return interpolant
 
 
-def quasi_scaled_interpolation(scale, original_function, grid_resolution, grid_size, rbf):
+def quasi_scaled_interpolation(manifold, scale, original_function, grid_resolution, grid_size, rbf):
     x, y = generate_grid(grid_size, grid_resolution, scale, should_ravel=False)
     kernel = generate_kernel(rbf, scale)
 
@@ -67,7 +67,7 @@ def quasi_scaled_interpolation(scale, original_function, grid_resolution, grid_s
         phis.append(current_phis)
     phis = np.array(phis)
 
-    interpolant = _interpolate(original_function, (x, y), phis, hx, radius_in_index, -grid_size)
+    interpolant = _interpolate(manifold, original_function, (x, y), phis, hx, radius_in_index, -grid_size)
 
     return interpolant
 

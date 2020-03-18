@@ -23,14 +23,20 @@ def generate_original_function():
     return original_function
 
 
-def plot_contour(ax, func, *args):
+def evaluate_on_grid(func, *args):
     x, y = generate_grid(*args, should_ravel=False)
     z = np.zeros(x.shape)
     print("Z shape", z.shape)
+
     for index in np.ndindex(x.shape):
         if index[1] == 0:
             print(index)
         z[index] = func(x[index], y[index])
+
+    return x, y, z
+
+def plot_contour(ax, func, *args):
+    x, y, z = evalueat_on_grid(func, *args)
     ax.plot_surface(x, y, z, cmap=cm.coolwarm, linewidth=0, antialiased=False)
     return z
 
@@ -63,6 +69,13 @@ def mse(func_a, func_b, x, y):
 
 def run_on_array(function, x, y):
     return np.array([function(x[index], y[index]) for index in np.ndindex(x.shape)])
+
+
+def act_on_functions(action, a, b):
+    @cached(cache=generate_cache(maxsize=100))
+    def new_func(*args):
+        return action(a(*args), b(*args))
+    return new_func
 
 
 def sum_functions(a, b):
@@ -120,6 +133,7 @@ def evaluate_original_on_points(original_function, points):
         y_i = y[index]
         values_at_points[index] = original_function(x_i, y_i) 
     return values_at_points
+
 
 @contextmanager
 def set_output_directory(path):

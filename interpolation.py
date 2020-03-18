@@ -13,17 +13,17 @@ from config import CONFIG, DIFFS
 from utils import *
 
 
-def multiscale_interpolation(number_of_scales, original_function, scaling_factor,
+def multiscale_interpolation(manifold, number_of_scales, original_function, scaling_factor,
     scaled_interpolation_method=naive_scaled_interpolation, **kwargs):
-    f_j = zero_func
-    e_j = original_function
+    f_j = manifold.zero_func
+    e_j = act_on_functions(manifold.log, f_j, original_function)
     for scale_index in range(1, number_of_scales + 1):
         scale = scaling_factor ** scale_index
         print("NEW SCALE: {}".format(scale))
-        s_j = scaled_interpolation_method(scale, e_j, **kwargs.copy())
+        s_j = scaled_interpolation_method(manifold, scale, e_j, **kwargs.copy())
         print("interpolated!")
-        f_j = sum_functions(f_j, s_j)
-        e_j = sub_functions(e_j, s_j)
+        f_j = act_on_functions(manifold.exp, f_j, s_j)
+        e_j = act_on_functions(manifold.log, f_j, original_function)
 
     return f_j
 
@@ -37,19 +37,17 @@ def run_single_experiment(config, rbf, original_function):
     test_scale = config["TEST_SCALE"]
     scaling_factor = config["SCALING_FACTOR"]
     experiment_name = config["NAME"] or "temp"
+    manifold = config["MANIFOLD"]
 
     with set_output_directory(experiment_name):
         with open("config.pkl", "wb") as f:
             pkl.dump(config, f)
 
-        plt.figure()
-        plt.title("original")
-        ax = plt.axes(projection='3d')
-        true_values_on_grid = plot_contour(ax, original_function, grid_size, base_resolution, test_scale)
-        plt.savefig("original.png")
-        ax.remove()
+        _, _, true_values_on_grid = evaluate_on_grid(original_function, grid_size, base_resolution, test_scale)
+        manifold.plot(true_values_on_grid, "original", "original.png")
 
         interpolant = multiscale_interpolation(
+            manifold,
             number_of_scales=number_of_scales,
             original_function=original_function,
             grid_resolution=base_resolution,
@@ -59,19 +57,9 @@ def run_single_experiment(config, rbf, original_function):
             scaled_interpolation_method=quasi_scaled_interpolation
         )
 
-        plt.figure()
-        plt.title("approximation")
-        ax = plt.axes(projection='3d')
-        approximated_values_on_grid = plot_contour(ax, interpolant, grid_size, base_resolution, test_scale)
-        plt.savefig("approximation.png")
-        ax.remove()
-
-        plt.figure()
-        plt.title("difference map")
-        plt.imshow(approximated_values_on_grid - true_values_on_grid)
-        cb = plt.colorbar()
-        plt.savefig("difference.png")
-        cb.remove()
+        _, _, approximated_values_on_grid = evaluate_on_grid(interpolant, grid_size, base_resolution, test_scale)
+        manifold.plot(approximated_values_on_grid, "approximation", "approximation.png")
+        manifold.plot(approximated_values_on_grid - true_values_on_grid, "difference map", "difference.png")
         
         mse = np.mean(np.square(approximated_values_on_grid - true_values_on_grid))
         with open("log.dat", "w") as f:
