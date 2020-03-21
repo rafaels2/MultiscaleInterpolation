@@ -39,12 +39,19 @@ class PositiveNumbers(AbstractManifold):
         return x ** y
 
     def log(self, x, y):
-        return np.log(y) / np.log(x)
+        if x == 1:
+            epsilon = 0.00001
+        else:
+            epsilon = 0
+        return np.log(y) / (np.log(x) + epsilon)
 
     def _visualize(self, plt, data):
         plt.imshow(data)
         cb = plt.colorbar()
         return cb
+
+    def zero_func(self, x_0, x_1):
+        return 2
 
 
 class Circle(AbstractManifold):
