@@ -16,7 +16,10 @@ class AbstractManifold(object):
         pass
 
     def calculate_error(self, x, y):
-        return np.norm(self.log(x, y))
+        error = np.zeros_like(x, dtype=np.float32)
+        for index in np.ndindex(x.shape):
+            error[index] = la.norm(self.log(x[index], y[index]))
+        return error
 
     @abstractmethod
     def _visualize(self, plt, data):

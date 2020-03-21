@@ -59,11 +59,20 @@ def run_single_experiment(config, rbf, original_function):
 
         _, _, approximated_values_on_grid = evaluate_on_grid(interpolant, grid_size, base_resolution, test_scale)
         manifold.plot(approximated_values_on_grid, "approximation", "approximation.png")
-        manifold.plot(approximated_values_on_grid - true_values_on_grid, "difference map", "difference.png")
+
+        error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
+        print("error:shape {}".format(error.shape))
+        plot_and_save(error, "difference map", "difference.png")
         
-        mse = np.mean(np.square(approximated_values_on_grid - true_values_on_grid))
-        with open("log.dat", "w") as f:
-            f.write("MSE was: {}".format(mse))
+        mse = np.mean(error)
+        with open("results.pkl", "wb") as f:
+            results = {
+                "original_values": true_values_on_grid,
+                "approximation": approximated_values_on_grid,
+                "errors": error,
+                "mse": mse
+            }
+            pkl.dump(results, f)
 
     return mse
 

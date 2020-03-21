@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from numpy import linalg as la
 from matplotlib import cm
 import numpy as np
+from matplotlib import pyplot as plt
 import os
 
 num_of_caches_g = 0
@@ -35,10 +36,20 @@ def evaluate_on_grid(func, *args):
 
     return x, y, z
 
+
 def plot_contour(ax, func, *args):
     x, y, z = evalueat_on_grid(func, *args)
     ax.plot_surface(x, y, z, cmap=cm.coolwarm, linewidth=0, antialiased=False)
     return z
+
+
+def plot_and_save(data, filename, title):
+    plt.figure()
+    plt.title(title)
+    plt.imshow(data)
+    cb = plt.colorbar()
+    plt.savefig(filename)
+    cb.remove()
 
 
 def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
