@@ -1,4 +1,4 @@
-# MultiscalteInterpolation
+# MultiscaleInterpolation
 ## How to run?
 ```bash
 pip instasll -r requirements.txt
