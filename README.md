@@ -10,3 +10,4 @@ python interpolation.py
 - `naive.py` picks the RBFs' coefficients by solving interpolation constaint.
 - `utils.py` is as it sounds :)
 - `config.py` configures the run.
+- `retraction_pairs.py` contains the exp-log implementations for some manifolds.
