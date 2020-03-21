@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import linalg as la
-from utils import generate_grid, generate_kernel, run_on_array, evaluate_original_on_points
+from utils import generate_grid, generate_kernel, evaluate_on_grid
 
 
 def _interpolate(phi, original_function, points):
@@ -11,7 +11,7 @@ def _interpolate(phi, original_function, points):
     :param points:
     :return:
     """
-    points_as_vectors, values_at_points = evaluate_original_on_points(original_function, points)
+    points_as_vectors, values_at_points = evaluate_on_grid(original_function, points=points)
     kernel = np.array([[phi(x_i, x_j) for x_j in points_as_vectors] for x_i in points_as_vectors])
     coefficients = np.matmul(la.inv(kernel), values_at_points)
     print(kernel)

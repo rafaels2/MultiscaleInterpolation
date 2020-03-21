@@ -7,14 +7,12 @@ import os
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
-from quasi_interpolation import quasi_scaled_interpolation
-from naive import naive_scaled_interpolation
 from config import CONFIG, DIFFS
 from utils import *
 
 
 def multiscale_interpolation(manifold, number_of_scales, original_function, scaling_factor,
-    scaled_interpolation_method=naive_scaled_interpolation, **kwargs):
+    scaled_interpolation_method, **kwargs):
     f_j = manifold.zero_func
     e_j = act_on_functions(manifold.log, f_j, original_function)
     for scale_index in range(1, number_of_scales + 1):
@@ -38,12 +36,13 @@ def run_single_experiment(config, rbf, original_function):
     scaling_factor = config["SCALING_FACTOR"]
     experiment_name = config["NAME"] or "temp"
     manifold = config["MANIFOLD"]
+    scaled_interpolation_method=config["SCALED_INTERPOLATION_METHOD"]
 
     with set_output_directory(experiment_name):
         with open("config.pkl", "wb") as f:
             pkl.dump(config, f)
 
-        _, _, true_values_on_grid = evaluate_on_grid(original_function, grid_size, base_resolution, test_scale)
+        true_values_on_grid = evaluate_on_grid(original_function, grid_size, base_resolution, test_scale, should_log=True)
         manifold.plot(true_values_on_grid, "original", "original.png")
 
         interpolant = multiscale_interpolation(
@@ -54,10 +53,10 @@ def run_single_experiment(config, rbf, original_function):
             grid_size=grid_size,
             scaling_factor=scaling_factor,
             rbf=rbf,
-            scaled_interpolation_method=quasi_scaled_interpolation
+            scaled_interpolation_method=scaled_interpolation_method
         )
 
-        _, _, approximated_values_on_grid = evaluate_on_grid(interpolant, grid_size, base_resolution, test_scale)
+        approximated_values_on_grid = evaluate_on_grid(interpolant, grid_size, base_resolution, test_scale, should_log=True)
         manifold.plot(approximated_values_on_grid, "approximation", "approximation.png")
 
         error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)

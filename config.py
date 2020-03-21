@@ -1,5 +1,6 @@
 import numpy as np
 from retraction_pairs import PositiveNumbers, Circle
+from quasi_interpolation import quasi_scaled_interpolation
 
 _SCALING_FACTOR = 0.8
 
@@ -20,18 +21,19 @@ CONFIG = {
     "OUTPUT_DIR": "results",
     "EXECUTION_NAME": "1-4 scales and single scales",
     "ORIGINAL_FUNCTION": _original_function,
-    "MANIFOLD": Circle()
+    "MANIFOLD": Circle(),
+    "SCALED_INTERPOLATION_METHOD": quasi_scaled_interpolation
 }
 
 
+DIFFS = [
+        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(3, 4)
+    ]
+
 # DIFFS = [
 #         {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
+#     ] + [
+#         {"NAME": "single_scale_{}".format(i), 
+#          "NUMBER_OF_SCALES": 1,
+#          "SCALING_FACTOR": _SCALING_FACTOR ** i} for i in range(1, 5)
 #     ]
-
-DIFFS = [
-        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
-    ] + [
-        {"NAME": "single_scale_{}".format(i), 
-         "NUMBER_OF_SCALES": 1,
-         "SCALING_FACTOR": _SCALING_FACTOR ** i} for i in range(1, 5)
-    ]
