@@ -25,7 +25,7 @@ def generate_original_function():
 
 def evaluate_on_grid(func, *args):
     x, y = generate_grid(*args, should_ravel=False)
-    z = np.zeros(x.shape)
+    z = np.zeros(x.shape, dtype=object)
     print("Z shape", z.shape)
 
     for index in np.ndindex(x.shape):
@@ -127,7 +127,7 @@ def evaluate_original_on_points(original_function, points):
     print("started interpolation")
     x, y = points
     print("x shape {}".format(x.shape))
-    values_at_points = np.zeros_like(x)
+    values_at_points = np.zeros_like(x, dtype=object)
     for index in np.ndindex(x.shape):
         x_i = x[index]
         y_i = y[index]

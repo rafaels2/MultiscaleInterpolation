@@ -80,11 +80,15 @@ class Circle(AbstractManifold):
         for index in np.ndindex(visualization.shape):
             x = data[index]
             visualization[index] = np.arctan2(x[1], x[0])
-        plt.imshow(data)
+        plt.imshow(visualization)
         cb = plt.colorbar()
+        return cb
 
     def gen_point(self, phi):
         return np.array([np.cos(phi), np.sin(phi)])
+
+    def zero_func(self, x_0, x_1):
+        return np.array([0, 1])
 
 
 def main():

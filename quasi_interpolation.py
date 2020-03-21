@@ -48,7 +48,7 @@ def _interpolate(manifold, original_function, points, phis, hx, radius_in_index,
         if normalizer == 0:
             normalizer = 0.00001
         
-        return float(averages / normalizer)
+        return (averages / normalizer)
     return interpolant
 
 

@@ -1,10 +1,11 @@
 import numpy as np
-from retraction_pairs import PositiveNumbers
+from retraction_pairs import PositiveNumbers, Circle
 
 _SCALING_FACTOR = 0.8
 
 def _original_function(x, y):
-    return np.sin(5 * x) * np.sin(4 * y) + 4
+    phi = 5 * y + x
+    return np.array([np.cos(phi), np.sin(phi)])
 
 
 CONFIG = {
@@ -19,7 +20,7 @@ CONFIG = {
     "OUTPUT_DIR": "results",
     "EXECUTION_NAME": "1-4 scales and single scales",
     "ORIGINAL_FUNCTION": _original_function,
-    "MANIFOLD": PositiveNumbers()
+    "MANIFOLD": Circle()
 }
 
 
