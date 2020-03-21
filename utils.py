@@ -1,9 +1,9 @@
 from cachetools import cached, LFUCache
 from contextlib import contextmanager
+from matplotlib import pyplot as plt
 from numpy import linalg as la
 from matplotlib import cm
 import numpy as np
-from matplotlib import pyplot as plt
 import os
 
 num_of_caches_g = 0

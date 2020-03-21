@@ -36,7 +36,6 @@ class AbstractManifold(object):
         return 0
 
 
-
 class PositiveNumbers(AbstractManifold):
     def exp(self, x, y):
         return x ** y
@@ -65,7 +64,6 @@ class Circle(AbstractManifold):
     def exp(self, x, y):
         z = x + y
         return z / la.norm(z, ord=2)
-
 
     def log(self, x, y):
         inner_product = np.inner(x, y)

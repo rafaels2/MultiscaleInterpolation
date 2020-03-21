@@ -61,7 +61,6 @@ def run_single_experiment(config, rbf, original_function):
         manifold.plot(approximated_values_on_grid, "approximation", "approximation.png")
 
         error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
-        print("error:shape {}".format(error.shape))
         plot_and_save(error, "difference map", "difference.png")
         
         mse = np.mean(error)
