@@ -39,6 +39,7 @@ class PositiveNumbers(AbstractManifold):
         return x ** y
 
     def log(self, x, y):
+        # TODO: Think if we want to change to log(1+x)
         if x == 1:
             epsilon = 0.00001
         else:
@@ -64,7 +65,10 @@ class Circle(AbstractManifold):
 
 
     def log(self, x, y):
-        return ((y / np.inner(x, y)) - x)
+        inner_product = np.inner(x, y)
+        if inner_product == 0:
+            inner_product = 0.00001
+        return ((y / np.abs(inner_product)) - x)
 
     def _visualize(self, plt, data):
         """
