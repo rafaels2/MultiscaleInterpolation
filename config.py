@@ -24,14 +24,14 @@ CONFIG = {
 }
 
 
-DIFFS = [
-        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(3, 4)
-    ]
-
 # DIFFS = [
-#         {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(3, 4   )
-#     ] + [
-#         {"NAME": "single_scale_{}".format(i), 
-#          "NUMBER_OF_SCALES": 1,
-#          "SCALING_FACTOR": _SCALING_FACTOR ** i} for i in range(3, 4)
+#         {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
 #     ]
+
+DIFFS = [
+        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
+    ] + [
+        {"NAME": "single_scale_{}".format(i), 
+         "NUMBER_OF_SCALES": 1,
+         "SCALING_FACTOR": _SCALING_FACTOR ** i} for i in range(1, 5)
+    ]
