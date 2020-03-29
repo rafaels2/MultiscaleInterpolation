@@ -35,6 +35,7 @@ def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
 
 
 def handle_boundaries(func, index, boundaries, x, y):
+    boundaries_type = "mirror"
     if boundaries:
         index = list(index)
         # Mirror conditions
