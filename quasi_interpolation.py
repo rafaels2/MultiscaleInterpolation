@@ -13,10 +13,11 @@ def _calculate_phi(kernel, point):
 
 
 def _interpolate(manifold, original_function, points, phis, hx, radius_in_index, min_value, boundaries):
+    print('boundaries: ', boundaries)
     values_at_points = evaluate_on_grid(
         original_function,
         points=points,
-        boundaries=radius_in_index
+        boundaries=boundaries
     )
 
     @cached(cache=generate_cache(maxsize=10))
@@ -54,12 +55,13 @@ def _interpolate(manifold, original_function, points, phis, hx, radius_in_index,
 
 def quasi_scaled_interpolation(manifold, scale, original_function, grid_resolution, grid_size, rbf):
     # boundaries = scale
-    boundaries = 0
+    boundaries = scale
     x, y = generate_grid(grid_size + boundaries, grid_resolution, scale, should_ravel=False)
     kernel = generate_kernel(rbf, scale)
 
     hx = (2 * grid_size / x.shape[0])
     radius_in_index = int(np.ceil(scale / hx))
+    boundaries_in_index = int(np.ceil(boundaries / hx))
 
     phis = list()
     for i in range(x.shape[0]):
@@ -69,7 +71,7 @@ def quasi_scaled_interpolation(manifold, scale, original_function, grid_resoluti
         phis.append(current_phis)
     phis = np.array(phis)
 
-    interpolant = _interpolate(manifold, original_function, (x, y), phis, hx, radius_in_index, -grid_size, boundaries)
+    interpolant = _interpolate(manifold, original_function, (x, y), phis, hx, radius_in_index, -grid_size, boundaries=boundaries_in_index)
 
     return interpolant
 

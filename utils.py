@@ -37,13 +37,19 @@ def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
 def handle_boundaries(func, index, boundaries, x, y):
     if boundaries:
         index = list(index)
-        # Periodic conditions
+        # Mirror conditions
+        old = index[:]
         for i in range(0, 2):
             if index[i] < boundaries:
-                index[i] = x.shape[i] - (2 * boundaries) - index[i]
-            if x.shape[i] - index[i] < boundaries:
-                index[i] = boundaries + x.shape[i] - index[i]
+                index[i] = boundaries + (boundaries - index[i])
+            elif x.shape[i] - index[i] < boundaries:
+                index[i] = 2 * (x.shape[i] - boundaries) - index[i]
+        if old != index:
+            print("changed: ", old, index)
         index = tuple(index)
+    else:
+        pass
+        # print("no boundaries")
     return func(x[index], y[index])
 
 
