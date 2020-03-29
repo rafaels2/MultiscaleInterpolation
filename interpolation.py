@@ -18,7 +18,8 @@ def multiscale_interpolation(manifold, number_of_scales, original_function, scal
     for scale_index in range(1, number_of_scales + 1):
         scale = scaling_factor ** scale_index
         print("NEW SCALE: {}".format(scale))
-        s_j = scaled_interpolation_method(manifold, scale, e_j, **kwargs.copy())
+        function_to_interpolate = act_on_functions(manifold.exp, f_j, e_j)
+        s_j = scaled_interpolation_method(manifold, scale, function_to_interpolate, **kwargs.copy())
         print("interpolated!")
         f_j = act_on_functions(manifold.exp, f_j, s_j)
         e_j = act_on_functions(manifold.log, f_j, original_function)

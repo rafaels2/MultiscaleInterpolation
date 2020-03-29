@@ -19,7 +19,8 @@ def _interpolate(manifold, original_function, points, phis, hx, radius_in_index,
     def interpolant(x, y):
         x_0 = (x - min_value) / hx
         y_0 = (y - min_value) / hx
-        averages = 0
+        values_to_average = list()
+        weights = list()
         normalizer = 0
         
         """
@@ -29,21 +30,23 @@ def _interpolate(manifold, original_function, points, phis, hx, radius_in_index,
                 1.2 Least squares (I  guess it's more accurate)
             2. phis are the lambdas
         """
+
         for indx in np.ndindex((2 * radius_in_index + 2, 2 * radius_in_index + 2)):
             x_i = int(x_0 - radius_in_index - 1+ indx[0])
             y_i = int(y_0 - radius_in_index - 1 + indx[1])
             
             if any([x_i < 0, y_i <0, x_i >= phis.shape[0], y_i >= phis.shape[1]]):
                 continue 
-            
             current_phi_value = phis[y_i, x_i](x, y)
-            averages += current_phi_value * values_at_points[y_i, x_i] 
+            values_to_average.append(values_at_points[y_i, x_i])
+            weights.append(current_phi_value)
             normalizer += current_phi_value
         
         if normalizer == 0:
             normalizer = 0.00001
-        
-        return (averages / normalizer)
+
+        weights = [w_i / normalizer for w_i in weights]
+        return manifold.average(values_to_average, weights)
     return interpolant
 
 

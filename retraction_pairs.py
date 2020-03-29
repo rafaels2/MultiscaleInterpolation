@@ -35,6 +35,16 @@ class AbstractManifold(object):
     def zero_func(self, x_0, x_1):
         return 0
 
+    def average(self, values_to_average, weights):
+        total_weight = 0
+        average = 0
+
+        for value, weight in zip(values_to_average, weights):
+            average += weight * self.log(values_to_average[0], value)
+            total_weight += weight
+
+        return self.exp(values_to_average[0], average / total_weight)
+
 
 class PositiveNumbers(AbstractManifold):
     def exp(self, x, y):
