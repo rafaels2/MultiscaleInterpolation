@@ -34,7 +34,20 @@ def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
          return x_matrix, y_matrix
 
 
-def evaluate_on_grid(func, *args, points=None, should_log=False):
+def handle_boundaries(func, index, boundaries, x, y):
+    if boundaries:
+        index = list(index)
+        # Periodic conditions
+        for i in range(0, 2):
+            if index[i] < boundaries:
+                index[i] = x.shape[i] - (2 * boundaries) - index[i]
+            if x.shape[i] - index[i] < boundaries:
+                index[i] = boundaries + x.shape[i] - index[i]
+        index = tuple(index)
+    return func(x[index], y[index])
+
+
+def evaluate_on_grid(func, *args, points=None, boundaries=0, should_log=False):
     if points is not None:
         x, y = points
     else:
@@ -46,7 +59,7 @@ def evaluate_on_grid(func, *args, points=None, should_log=False):
     for index in np.ndindex(x.shape):
         if index[1] == 0 and should_log:
             print("current percentage: ", index[0] / x.shape[0])
-        z[index] = func(x[index], y[index])
+        z[index] = handle_boundaries(func, index, boundaries, x, y)
 
     return z
 
