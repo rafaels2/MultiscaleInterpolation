@@ -40,10 +40,21 @@ def handle_boundaries(func, index, boundaries, x, y):
         # Mirror conditions
         old = index[:]
         for i in range(0, 2):
-            if index[i] < boundaries:
-                index[i] = boundaries + (boundaries - index[i])
-            elif x.shape[i] - index[i] < boundaries:
-                index[i] = 2 * (x.shape[i] - boundaries) - index[i]
+            if boundaries_type == "periodic":
+                if index[i] < boundaries:
+                    index[i] = x.shape[i] - (2 * boundaries) - index[i]
+                if x.shape[i] - index[i] < boundaries:
+                    index[i] = boundaries + x.shape[i] - index[i]
+            elif boundaries_type == "mirror":
+                if index[i] < boundaries:
+                    index[i] = boundaries + (boundaries - index[i])
+                elif x.shape[i] - index[i] < boundaries:
+                    index[i] = 2 * (x.shape[i] - boundaries) - index[i]
+            elif boundaries_type == "constant":
+                if index[i] < boundaries:
+                    index[i] = boundaries
+                elif x.shape[i] - index[i] < boundaries:
+                    index[i] = x.shape[i] - boundaries
         if old != index:
             print("changed: ", old, index)
         index = tuple(index)
