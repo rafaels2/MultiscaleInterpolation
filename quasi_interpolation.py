@@ -40,6 +40,7 @@ def _interpolate(manifold, original_function, points, phis, hx, radius_in_index,
             averages += current_phi_value * values_at_points[y_i, x_i] 
             normalizer += current_phi_value
         
+        
         if normalizer == 0:
             normalizer = 0.00001
         
