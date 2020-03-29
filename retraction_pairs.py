@@ -35,7 +35,47 @@ class AbstractManifold(object):
     def zero_func(self, x_0, x_1):
         return 0
 
+    @abstractmethod
+    def _get_geodetic_line(self, x, y):
+        pass
+
+    def _geodetic_average_two_points(self, x, y, w_x, w_y):
+        if not w_y:
+            return x
+        if not w_x:
+            return y
+        ratio = w_x / (w_x + w_y)
+        line = self._get_geodetic_line(x, y)
+        return line(ratio)
+
+    def _geodetic_average(self, values_to_average, weights):
+        """
+        This calculation is recursive because we always know to 
+        calculate the geodetic average only for a couple of points.
+        """
+        average = self._geodetic_average_two_points(
+            values_to_average[0],
+            values_to_average[-1],
+            weights[0],
+            weights[-1]
+        )
+        
+        values_to_average = values_to_average[:-1]
+        new_weight = weights[0] + weights[-1]
+        values_to_average[0] = average
+        weights = weights[:-1]
+        weights[0] = new_weight
+
+        if len(values_to_average) == 1:
+            return values_to_average[0]
+        else:
+            return self._geodetic_average(values_to_average, weights)
+
     def average(self, values_to_average, weights):
+        """
+        This function is the last resort...
+        We can make it iterative to get to better results
+        """
         total_weight = 0
         average = 0
 
@@ -101,6 +141,24 @@ class Circle(AbstractManifold):
     def zero_func(self, x_0, x_1):
         return np.array([0, 1])
 
+    def _get_geodetic_line(self, x, y):
+        theta_x = np.arctan2(x[1], x[0])
+        theta_y = np.arctan2(y[1], y[0])
+        if max(theta_x, theta_y) - min(theta_x, theta_y) >= np.pi:
+            if theta_x > theta_y:
+                theta_x -= 2 * np.pi
+            else:
+                theta_y -= 2 * np.pi
+
+        def line(t):
+            theta = theta_x + ((theta_y - theta_x) * (1 - t))
+            return self.gen_point(theta)
+
+        return line
+
+    def average(self, values_to_average, weights):
+        return self._geodetic_average(values_to_average, weights)
+
 
 def main():
     m = Circle()
@@ -108,6 +166,8 @@ def main():
     b = m.gen_point(2)
     e = m.gen_point(1)
     f = m.gen_point (0.5)
+    s = m.average([a, b, e], [1, 1, 1])
+    print("s: ", np.arctan2(s[1], s[0]))
     c = m.log(a, b)
     g = m.log(a, e)
     h = m.log(a, f)
