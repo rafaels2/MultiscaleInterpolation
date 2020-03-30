@@ -5,6 +5,8 @@ from abc import abstractmethod
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
+ALLOWED_AVERAGING_ERROR = 0.05
+
 
 class AbstractManifold(object):
     @abstractmethod
@@ -71,11 +73,10 @@ class AbstractManifold(object):
         else:
             return self._geodetic_average(values_to_average, weights)
 
-    def average(self, values_to_average, weights):
-        """
-        This function is the last resort...
-        We can make it iterative to get to better results
-        """
+    def _karcher_mean(self, values_to_average, weights, base=None, iterations=0):
+        if base is None:
+            base = values_to_average[0]
+
         total_weight = 0
         average = 0
 
@@ -83,7 +84,20 @@ class AbstractManifold(object):
             average += weight * self.log(values_to_average[0], value)
             total_weight += weight
 
-        return self.exp(values_to_average[0], average / total_weight)
+        new_base = self.exp(base, average / total_weight)
+        print("new_base: ", new_base)
+        if la.norm(self.log(base, new_base)) < ALLOWED_AVERAGING_ERROR:
+            print("Calculated iterations: ", iterations)
+            return new_base
+
+        return self._karcher_mean(values_to_average, weights, base=new_base, iterations=(iterations+1))
+
+    def average(self, values_to_average, weights):
+        """
+        This function is the last resort...
+        We can make it iterative to get to better results
+        """
+        return self._karcher_mean(values_to_average, weights)
 
 
 class PositiveNumbers(AbstractManifold):
@@ -157,7 +171,7 @@ class Circle(AbstractManifold):
         return line
 
     def average(self, values_to_average, weights):
-        return self._geodetic_average(values_to_average, weights)
+        return self._karcher_mean(values_to_average, weights)
 
 
 def main():
@@ -166,7 +180,7 @@ def main():
     b = m.gen_point(2)
     e = m.gen_point(1)
     f = m.gen_point (0.5)
-    s = m.average([a, b, e], [1, 1, 1])
+    s = m.average([a, b], [1, 1])
     print("s: ", np.arctan2(s[1], s[0]))
     c = m.log(a, b)
     g = m.log(a, e)
