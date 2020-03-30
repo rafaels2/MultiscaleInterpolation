@@ -171,7 +171,7 @@ class Circle(AbstractManifold):
         return line
 
     def average(self, values_to_average, weights):
-        return self._karcher_mean(values_to_average, weights)
+        return self._geodetic_average(values_to_average, weights)
 
 
 def main():
