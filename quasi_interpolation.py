@@ -22,26 +22,19 @@ def _interpolate(manifold, original_function, points, phis, hx, radius_in_index,
         values_to_average = list()
         weights = list()
         normalizer = 0
-        
-        """
-        TODO:
-            1. averages should be calculated with:
-                1.1 The Q, P formula; or
-                1.2 Least squares (I  guess it's more accurate)
-            2. phis are the lambdas
-        """
 
         for indx in np.ndindex((2 * radius_in_index + 2, 2 * radius_in_index + 2)):
             x_i = int(x_0 - radius_in_index - 1+ indx[0])
             y_i = int(y_0 - radius_in_index - 1 + indx[1])
-            
+
             if any([x_i < 0, y_i <0, x_i >= phis.shape[0], y_i >= phis.shape[1]]):
                 continue 
+
             current_phi_value = phis[y_i, x_i](x, y)
             values_to_average.append(values_at_points[y_i, x_i])
             weights.append(current_phi_value)
             normalizer += current_phi_value
-        
+
         if normalizer == 0:
             normalizer = 0.00001
 
@@ -50,7 +43,8 @@ def _interpolate(manifold, original_function, points, phis, hx, radius_in_index,
     return interpolant
 
 
-def quasi_scaled_interpolation(manifold, scale, original_function, grid_resolution, grid_size, rbf):
+def quasi_scaled_interpolation(manifold, scale, original_function, \
+                               grid_resolution, grid_size, rbf):
     x, y = generate_grid(grid_size, grid_resolution, scale, should_ravel=False)
     kernel = generate_kernel(rbf, scale)
 
@@ -65,7 +59,15 @@ def quasi_scaled_interpolation(manifold, scale, original_function, grid_resoluti
         phis.append(current_phis)
     phis = np.array(phis)
 
-    interpolant = _interpolate(manifold, original_function, (x, y), phis, hx, radius_in_index, -grid_size)
+    interpolant = _interpolate(
+        manifold,
+        original_function,
+        (x, y),
+        phis,
+        hx,
+        radius_in_index,
+        -grid_size
+    )
 
     return interpolant
 

@@ -90,7 +90,12 @@ class AbstractManifold(object):
             print("Calculated iterations: ", iterations)
             return new_base
 
-        return self._karcher_mean(values_to_average, weights, base=new_base, iterations=(iterations+1))
+        return self._karcher_mean(
+            values_to_average,
+            weights,
+            base=new_base,
+            iterations=(iterations+1)
+        )
 
     def average(self, values_to_average, weights):
         """
