@@ -1,12 +1,12 @@
 import numpy as np
-from retraction_pairs import PositiveNumbers, Circle
+from retraction_pairs import PositiveNumbers, Circle, SymmetricPositiveDefinite
 from quasi_interpolation import quasi_scaled_interpolation
 
 _SCALING_FACTOR = 0.8
 
 def _original_function(x, y):
-    phi = 5 * y + x
-    return np.array([np.cos(phi), np.sin(phi)])
+    z = (5 + x) * np.eye(3) + np.array([[np.sin(5 * y), y, x*y], [0, 0, y ** 2],[0,0,0]])
+    return (z + np.transpose(z))
 
 
 CONFIG = {
@@ -21,13 +21,13 @@ CONFIG = {
     "OUTPUT_DIR": "results",
     "EXECUTION_NAME": "1-4 scales and single scales",
     "ORIGINAL_FUNCTION": _original_function,
-    "MANIFOLD": Circle(),
+    "MANIFOLD": SymmetricPositiveDefinite(),
     "SCALED_INTERPOLATION_METHOD": quasi_scaled_interpolation
 }
 
 
 DIFFS = [
-        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(3, 4)
+        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 2)
     ]
 
 # DIFFS = [

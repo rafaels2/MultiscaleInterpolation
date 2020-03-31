@@ -224,7 +224,7 @@ class SymmetricPositiveDefinite(AbstractManifold):
         return la.norm(logm(log_param))
 
     def _to_numbers(self, x):
-        return np.norm(x, ord=2)
+        return la.norm(x, ord=2)
 
     def gen_point(self):
         return make_spd_matrix(self.dim)
@@ -244,7 +244,7 @@ class SymmetricPositiveDefinite(AbstractManifold):
     def _karcher_mean(self, values_to_average, weights, base=None):
         if base is None:
             base = np.eye(self.dim)
-        nu = 1 / sum(1 / w_i for w_i in weights)
+        nu = sum(w_i for w_i in weights)
 
         x_sqrt = sqrtm(base)
 
@@ -252,7 +252,7 @@ class SymmetricPositiveDefinite(AbstractManifold):
         for a_i, w_i in zip(values_to_average, weights):
             try:
                 log_param = np.matmul(x_sqrt, np.matmul(a_i, x_sqrt))
-                sum_of_logs += (1 / w_i) * logm(log_param)
+                sum_of_logs += (w_i) * logm(log_param)
             except:
                 import ipdb; ipdb.set_trace()
                 print("hello")
@@ -261,6 +261,10 @@ class SymmetricPositiveDefinite(AbstractManifold):
 
         if self.distance(x, base) < ALLOWED_AVERAGING_ERROR:
             return x
+
+        if not self.is_in_manifold(x):
+            print("WARNING! x not on manifold ", x)
+            return base
 
         return self._karcher_mean(values_to_average, weights, base=x)
 
