@@ -8,7 +8,7 @@ from sklearn.datasets import make_spd_matrix
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
-ALLOWED_AVERAGING_ERROR = 0.05
+ALLOWED_AVERAGING_ERROR = 10 ** -3
 SYMMETRIC_ERROR = 10 ** -5
 
 
@@ -241,8 +241,28 @@ class SymmetricPositiveDefinite(AbstractManifold):
 
         return line
 
-    def _karcher_mean(self, values_to_average, weights):
-        raise NotImplementedError("TODO")
+    def _karcher_mean(self, values_to_average, weights, base=None):
+        if base is None:
+            base = np.eye(self.dim)
+        nu = 1 / sum(1 / w_i for w_i in weights)
+
+        x_sqrt = sqrtm(base)
+
+        sum_of_logs = np.zeros_like(base)
+        for a_i, w_i in zip(values_to_average, weights):
+            try:
+                log_param = np.matmul(x_sqrt, np.matmul(a_i, x_sqrt))
+                sum_of_logs += (1 / w_i) * logm(log_param)
+            except:
+                import ipdb; ipdb.set_trace()
+                print("hello")
+
+        x = base - (nu * np.matmul(np.matmul(x_sqrt, sum_of_logs), x_sqrt))
+
+        if self.distance(x, base) < ALLOWED_AVERAGING_ERROR:
+            return x
+
+        return self._karcher_mean(values_to_average, weights, base=x)
 
     def average(self, values_to_average, weights):
         return self._karcher_mean(values_to_average, weights)
