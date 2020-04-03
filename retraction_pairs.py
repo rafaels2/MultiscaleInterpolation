@@ -9,6 +9,7 @@ from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
 from karcher_mean import KarcherMean
+from visualization import ElipsoidVisualizer
 
 ALLOWED_AVERAGING_ERROR = 10 ** -3
 SYMMETRIC_ERROR = 10 ** -5
@@ -250,6 +251,14 @@ class SymmetricPositiveDefinite(AbstractManifold):
 
     def average(self, values_to_average, weights):
         return self._karcher_mean(values_to_average, weights)
+
+    def plot(self, data, title, filename):
+        centers = np.zeros_like(data, dtype=object)
+        for index in np.ndindex(data.shape):
+            centers[index] = np.array([index[0], index[1], 0])
+        print("start to visualize")
+        ElipsoidVisualizer(data, centers).save(filename, title)
+
 
 
 def main():
