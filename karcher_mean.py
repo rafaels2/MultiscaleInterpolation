@@ -2,7 +2,8 @@ import numpy as np
 from numpy import linalg as la
 from scipy.linalg import expm, logm, sqrtm
 
-from retraction_pairs import SymmetricPositiveDefinite
+if __name__ == "__main__":
+    from retraction_pairs import SymmetricPositiveDefinite
 
 AVERAGE_TOLERANCE = 0.001
 
@@ -43,7 +44,6 @@ class KarcherMean(object):
 		x = np.matmul(base, expm(exp_param))
 		
 		distance = self._manifold.distance(x, base) 
-		print("iteration {}, distance {}".format(i, distance))
 		if distance < AVERAGE_TOLERANCE:
 			return x
 
