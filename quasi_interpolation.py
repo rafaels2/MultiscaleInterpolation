@@ -12,7 +12,8 @@ def _calculate_phi(kernel, point):
     return phi
 
 
-def _interpolate(manifold, original_function, points, phis, hx, radius_in_index, min_value):
+def _interpolate(manifold, original_function, points, phis, hx, radius_in_index, min_value,
+    is_approximating_on_tangent):
     values_at_points = evaluate_on_grid(original_function, points=points)
 
     @cached(cache=generate_cache(maxsize=10))
@@ -39,12 +40,15 @@ def _interpolate(manifold, original_function, points, phis, hx, radius_in_index,
             normalizer = 0.00001
 
         weights = [w_i / normalizer for w_i in weights]
+        if is_approximating_on_tangent:
+            return sum(w_i * x_i for w_i, x_i in zip(weights, values_to_average))
+
         return manifold.average(values_to_average, weights)
     return interpolant
 
 
 def quasi_scaled_interpolation(manifold, scale, original_function, \
-                               grid_resolution, grid_size, rbf):
+                               grid_resolution, grid_size, rbf, is_approximating_on_tangent):
     x, y = generate_grid(grid_size, grid_resolution, scale, should_ravel=False)
     kernel = generate_kernel(rbf, scale)
 
@@ -66,7 +70,8 @@ def quasi_scaled_interpolation(manifold, scale, original_function, \
         phis,
         hx,
         radius_in_index,
-        -grid_size
+        -grid_size,
+        is_approximating_on_tangent
     )
 
     return interpolant

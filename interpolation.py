@@ -12,23 +12,32 @@ from utils import *
 
 
 def multiscale_interpolation(manifold, number_of_scales, original_function, scaling_factor,
-    scaled_interpolation_method, **kwargs):
+    scaled_interpolation_method, is_approximating_on_tangent, **kwargs):
     f_j = manifold.zero_func
     e_j = act_on_functions(manifold.log, f_j, original_function)
     for scale_index in range(1, number_of_scales + 1):
         scale = scaling_factor ** scale_index
-
         print("NEW SCALE: {}".format(scale))
-        function_to_interpolate = act_on_functions(manifold.exp, manifold.zero_func, e_j)
+
+        if is_approximating_on_tangent:
+            function_to_interpolate = e_j
+        else:
+            function_to_interpolate = act_on_functions(manifold.exp, manifold.zero_func, e_j)
+
         s_j = scaled_interpolation_method(
             manifold,
             scale,
             function_to_interpolate,
-            **kwargs.copy()
+            is_approximating_on_tangent=is_approximating_on_tangent
+            **kwargs.copy(),
         )
         print("interpolated!")
 
-        function_added_to_f_j = act_on_functions(manifold.log, manifold.zero_func, s_j)
+        if is_approximating_on_tangent:
+            function_added_to_f_j = s_j
+        else:
+            function_added_to_f_j = act_on_functions(manifold.log, manifold.zero_func, s_j)
+
         f_j = act_on_functions(manifold.exp, f_j, function_added_to_f_j)
         e_j = act_on_functions(manifold.log, f_j, original_function)
 
@@ -46,19 +55,27 @@ def run_single_experiment(config, rbf, original_function):
     experiment_name = config["NAME"] or "temp"
     manifold = config["MANIFOLD"]
     scaled_interpolation_method=config["SCALED_INTERPOLATION_METHOD"]
+    norm_visualization = config["NORM_VISUALIZATION"]
+    is_approximating_on_tangent = config["IS_APPROXIMATING_ON_TANGENT"]
 
-    with set_output_directory(experiment_name):
-        with open("config.pkl", "wb") as f:
-            pkl.dump(config, f)
-
-        true_values_on_grid = evaluate_on_grid(
+    true_values_on_grid = evaluate_on_grid(
             original_function,
             grid_size,
             base_resolution,
             test_scale,
             should_log=True
         )
-        manifold.plot(true_values_on_grid, "original", "original.png")
+
+    manifold.plot(
+        true_values_on_grid,
+        "original",
+        "original.png",
+        norm_visualization=norm_visualization
+    )
+
+    with set_output_directory(experiment_name):
+        with open("config.pkl", "wb") as f:
+            pkl.dump(config, f)
 
         interpolant = multiscale_interpolation(
             manifold,
@@ -68,7 +85,8 @@ def run_single_experiment(config, rbf, original_function):
             grid_size=grid_size,
             scaling_factor=scaling_factor,
             rbf=rbf,
-            scaled_interpolation_method=scaled_interpolation_method
+            scaled_interpolation_method=scaled_interpolation_method,
+            is_approximating_on_tangent=is_approximating_on_tangent
         )
 
         approximated_values_on_grid = evaluate_on_grid(
@@ -78,7 +96,12 @@ def run_single_experiment(config, rbf, original_function):
             test_scale,
             should_log=True
         )
-        manifold.plot(approximated_values_on_grid, "approximation", "approximation.png")
+        manifold.plot(
+            approximated_values_on_grid,
+            "approximation",
+            "approximation.png",
+            norm_visualization=norm_visualization
+        )
 
         error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
         plot_and_save(error, "difference map", "difference.png")

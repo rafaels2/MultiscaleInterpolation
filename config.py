@@ -22,7 +22,9 @@ CONFIG = {
     "EXECUTION_NAME": "1-4 scales and single scales",
     "ORIGINAL_FUNCTION": _original_function,
     "MANIFOLD": SymmetricPositiveDefinite(),
-    "SCALED_INTERPOLATION_METHOD": quasi_scaled_interpolation
+    "SCALED_INTERPOLATION_METHOD": quasi_scaled_interpolation,
+    "NORM_VISUALIZATION": True,
+    "IS_APPROXIMATING_ON_TANGENT": False
 }
 
 

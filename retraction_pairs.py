@@ -252,13 +252,14 @@ class SymmetricPositiveDefinite(AbstractManifold):
     def average(self, values_to_average, weights):
         return self._karcher_mean(values_to_average, weights)
 
-    def plot(self, data, title, filename):
+    def plot(self, data, title, filename, norm_visualization=False):
+        if norm_visualization:
+            return super().plot(data, title, filename)
         centers = np.zeros_like(data, dtype=object)
         for index in np.ndindex(data.shape):
             centers[index] = np.array([index[0], index[1], 0])
         print("start to visualize")
         ElipsoidVisualizer(data, centers).save(filename, title)
-
 
 
 def main():
