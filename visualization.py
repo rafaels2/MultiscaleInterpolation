@@ -18,6 +18,7 @@ class ElipsoidVisualizer(object):
     def __init__(self, matrices, centers):
         self.fig = plt.figure(figsize=(8,8))
         self.ax = self.fig.add_subplot(projection='3d')
+        self.ax.view_init(azim=0, elev=90)
         self._matrices = matrices
         self._centers = centers
         
@@ -56,17 +57,24 @@ class ElipsoidVisualizer(object):
             for j in range(len(x)):
                 [x[i,j],y[i,j],z[i,j]] = np.dot([x[i,j],y[i,j],z[i,j]], rotation) + center
         
-        self.ax.plot_surface(x, y, z,  rstride=3, cstride=3, linewidth=0.1, alpha=1, shade=True)
+        self.ax.plot_surface(x, y, z,  rstride=3, cstride=3, linewidth=0.1, alpha=1, shade=True,
+            cmap=cm.coolwarm)
 
-    def show(self):
+    def save(self, filename, title):
         for index in np.ndindex(self._matrices.shape):
             self._process_matrix(
                 self._centers[index], 
                 self._singular_values[index],
                 self._rotations[index]
                 )
-        
-        plt.show()
+        # Hide axes ticks
+        self.ax.set_xticks([])
+        self.ax.set_yticks([])
+        self.ax.set_zticks([])
+        # Add a color bar which maps values to colors.
+        # plt.colorbar()
+        plt.title(title)
+        plt.savefig(filename)
 
 
 def main():
@@ -78,7 +86,7 @@ def main():
         matrices[index] = spd.gen_point()
         centers[index] = np.array([index[0], index[1], 0])
     print("start to visualize")
-    ElipsoidVisualizer(matrices, centers).show()
+    ElipsoidVisualizer(matrices, centers).save("vis.png", "ellipsoids")
 
 
 if __name__ == "__main__":
