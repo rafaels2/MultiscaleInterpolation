@@ -17,33 +17,34 @@ if __name__ == "__main__":
 class ElipsoidVisualizer(object):
     def __init__(self, matrices, centers):
         self.fig = plt.figure(figsize=(8,8))
-        self.ax = fig.plot(projection='3d')
+        self.ax = self.fig.add_subplot(projection='3d')
         self._matrices = matrices
         self._centers = centers
         
         self._svd_matrices()
-        self._normalize_singular_values()
+        self._calculate_normalizer()
 
     def _calculate_normalizer(self):
         max_radius = 0
-        for radii in self._singular_values:
+        for index in np.ndindex(self._singular_values.shape):
+            radii = self._singular_values[index]
             if max(radii) > max_radius:
                 max_radius = max(radii)
 
         print("Max Radius is ", max_radius)
 
-        return max_radius
+        self._normalizer = max_radius * 2
 
     def _svd_matrices(self):
         singular_values = np.zeros_like(self._matrices, dtype=object)
         rotations = np.zeros_like(self._matrices)
-        for index in np.ndindex(self._matrices.shape)
+        for index in np.ndindex(self._matrices.shape):
             _, singular_values[index], rotations[index] = la.svd(self._matrices[index])
 
         self._singular_values = singular_values
         self._rotations = rotations
 
-    def _process_matrix(self, center, radii, rotation)
+    def _process_matrix(self, center, radii, rotation):
         # calculate cartesian coordinates for the ellipsoid surface
         u = np.linspace(0.0, 2.0 * np.pi, 60)
         v = np.linspace(0.0, np.pi, 60)
@@ -72,7 +73,7 @@ def main():
     print("start")
     spd = SymmetricPositiveDefinite()
     matrices = np.zeros((3, 3), dtype=object)
-    centers=zeros_like(matrices)
+    centers = np.zeros_like(matrices)
     for index in np.ndindex(matrices.shape):
         matrices[index] = spd.gen_point()
         centers[index] = np.array([index[0], index[1], 0])
