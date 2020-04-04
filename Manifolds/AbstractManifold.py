@@ -54,7 +54,7 @@ class AbstractManifold(object):
     def _get_geodetic_line(self, x, y):
         pass
 
-    def _geodetic_average_two_points(self, x, y, w_x, w_y):
+    def _geodesic_average_two_points(self, x, y, w_x, w_y):
         if not w_y:
             return x
         if not w_x:
@@ -63,12 +63,12 @@ class AbstractManifold(object):
         line = self._get_geodetic_line(x, y)
         return line(ratio)
 
-    def _geodetic_average(self, values_to_average, weights):
+    def _geodesic_average(self, values_to_average, weights):
         """
         This calculation is recursive because we always know to 
         calculate the geodetic average only for a couple of points.
         """
-        average = self._geodetic_average_two_points(
+        average = self._geodesic_average_two_points(
             values_to_average[0],
             values_to_average[-1],
             weights[0],
@@ -84,38 +84,18 @@ class AbstractManifold(object):
         if len(values_to_average) == 1:
             return values_to_average[0]
         else:
-            return self._geodetic_average(values_to_average, weights)
+            return self._geodesic_average(values_to_average, weights)
 
+    @abstractmethod
     def _karcher_mean(self, values_to_average, weights, base=None, iterations=0):
-        if base is None:
-            base = values_to_average[0]
-
-        total_weight = 0
-        average = 0
-
-        for value, weight in zip(values_to_average, weights):
-            average += weight * self.log(values_to_average[0], value)
-            total_weight += weight
-
-        new_base = self.exp(base, average / total_weight)
-        print("new_base: ", new_base)
-        if la.norm(self.log(base, new_base)) < ALLOWED_AVERAGING_ERROR:
-            print("Calculated iterations: ", iterations)
-            return new_base
-
-        return self._karcher_mean(
-            values_to_average,
-            weights,
-            base=new_base,
-            iterations=(iterations+1)
-        )
+        pass
 
     def average(self, values_to_average, weights):
         """
         This function is the last resort...
         We can make it iterative to get to better results
         """
-        return self._karcher_mean(values_to_average, weights)
+        return self._geodesic_average(values_to_average, weights)
 
 
 class PositiveNumbers(AbstractManifold):

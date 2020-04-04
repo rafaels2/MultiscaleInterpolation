@@ -46,6 +46,3 @@ class Circle(AbstractManifold):
             return self.gen_point(theta)
 
         return line
-
-    def average(self, values_to_average, weights):
-        return self._geodetic_average(values_to_average, weights)
