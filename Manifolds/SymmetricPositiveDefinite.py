@@ -28,11 +28,6 @@ class SymmetricPositiveDefinite(AbstractManifold):
         exp_param = self._calculate_log_param(x, y)
         return np.matmul(np.matmul(sqrt_x, expm(exp_param)), sqrt_x)
 
-    def old_log(self, x, y):
-        sqrt_x = sqrtm(x)
-        inv_sqrt_x = la.inv(sqrt_x) 
-        return sqrt_x * logm(inv_sqrt_x * y * inv_sqrt_x) * sqrt_x
-
     def _calculate_log_param(self, x, y):
         sqrt_x = sqrtm(x)
         inv_sqrt_x = la.inv(sqrt_x) 
