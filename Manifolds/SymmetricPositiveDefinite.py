@@ -7,6 +7,8 @@ from sklearn.datasets import make_spd_matrix
 from Tools.KarcherMean import KarcherMean
 from Tools.Visualization import ElipsoidVisualizer
 
+from .AbstractManifold import AbstractManifold
+
 SYMMETRIC_ERROR = 10 ** -5
 
 

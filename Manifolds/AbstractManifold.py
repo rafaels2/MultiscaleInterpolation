@@ -5,8 +5,6 @@ from abc import abstractmethod
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
-from .AbstractManifold import AbstractManifold
-
 ALLOWED_AVERAGING_ERROR = 10 ** -3
 SYMMETRIC_ERROR = 10 ** -5
 
