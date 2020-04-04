@@ -1,6 +1,7 @@
 import numpy.linalg as la
 import pickle as pkl
 import numpy as np
+from datetime import datetime
 import time
 import os
 
@@ -28,7 +29,7 @@ def multiscale_interpolation(manifold, number_of_scales, original_function, scal
             manifold,
             scale,
             function_to_interpolate,
-            is_approximating_on_tangent=is_approximating_on_tangent
+            is_approximating_on_tangent=is_approximating_on_tangent,
             **kwargs.copy(),
         )
         print("interpolated!")
@@ -121,17 +122,22 @@ def run_single_experiment(config, rbf, original_function):
 
 def run_all_experiments(config, diffs, *args):
     mses = list()
+    calculation_time = list()
     execution_name = config["EXECUTION_NAME"]
     path = "{}_{}".format(execution_name, time.strftime("%Y%m%d__%H%M%S"))
     with set_output_directory(path):
         for diff in diffs:
+            t_0 = datetime.now()
             current_config = config.copy()
             for k, v in diff.items():
                 current_config[k] = v
             mse = run_single_experiment(current_config, *args)
             mses.append(mse)
+            t_f = datetime.now()
+            calculation_time.append(t_f - t_0)
 
     print("MSEs are: {}".format(mses))
+    print("times are: {}".format(calculation_time))
     return mses
 
 

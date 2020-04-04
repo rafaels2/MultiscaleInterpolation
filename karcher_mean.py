@@ -47,6 +47,10 @@ class KarcherMean(object):
 		if distance < AVERAGE_TOLERANCE:
 			return x
 
+		if i > 10:
+			print("average did not converge")
+			return x
+
 		return self.get_average(x, i+1)
 
 
