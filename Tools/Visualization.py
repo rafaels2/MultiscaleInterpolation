@@ -11,7 +11,7 @@ from matplotlib import cm
 import matplotlib.colors as colors
 
 if __name__ == "__main__":
-    from retraction_pairs import SymmetricPositiveDefinite
+    from Manifolds.SymmetricPositiveDefinite import SymmetricPositiveDefinite
 
 
 class ElipsoidVisualizer(object):

@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import linalg as la
-from utils import generate_grid, generate_kernel, evaluate_on_grid
+from Tools.Utils import generate_grid, generate_kernel, evaluate_on_grid
 
 
 def _interpolate(phi, original_function, points):

@@ -1,6 +1,6 @@
 import numpy as np
-from retraction_pairs import PositiveNumbers, Circle, SymmetricPositiveDefinite
-from quasi_interpolation import quasi_scaled_interpolation
+from Manifolds.SymmetricPositiveDefinite import SymmetricPositiveDefinite
+from ApproximationMethods.Quasi import quasi_scaled_interpolation
 
 _SCALING_FACTOR = 0.8
 

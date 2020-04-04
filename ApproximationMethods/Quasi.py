@@ -1,7 +1,7 @@
 import numpy as np
 from cachetools import cached
 from numpy import linalg as la
-from utils import generate_grid, generate_kernel, evaluate_on_grid, generate_cache
+from Tools.Utils import generate_grid, generate_kernel, evaluate_on_grid, generate_cache
 
 
 def _calculate_phi(kernel, point):

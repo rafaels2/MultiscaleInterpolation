@@ -8,8 +8,8 @@ import os
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
-from config import CONFIG, DIFFS
-from utils import *
+from Config import CONFIG, DIFFS
+from Tools.Utils import *
 
 
 def multiscale_interpolation(manifold, number_of_scales, original_function, scaling_factor,

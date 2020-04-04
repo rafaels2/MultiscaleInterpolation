@@ -3,7 +3,7 @@ from numpy import linalg as la
 from scipy.linalg import expm, logm, sqrtm
 
 if __name__ == "__main__":
-    from retraction_pairs import SymmetricPositiveDefinite
+    from Manifolds.SymmetricPositiveDefinite import SymmetricPositiveDefinite
 
 AVERAGE_TOLERANCE = 0.001
 
