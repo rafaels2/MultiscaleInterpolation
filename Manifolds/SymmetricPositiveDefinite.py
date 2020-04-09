@@ -63,8 +63,6 @@ class SymmetricPositiveDefinite(AbstractManifold):
     def _karcher_mean(self, values_to_average, weights, base=None):
         return KarcherMean(self, values_to_average, weights).get_average()
 
-        return self._karcher_mean(values_to_average, weights, base=x)
-
     def average(self, values_to_average, weights):
         return self._karcher_mean(values_to_average, weights)
 

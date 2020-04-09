@@ -1,7 +1,7 @@
+from datetime import datetime
 import numpy.linalg as la
 import pickle as pkl
 import numpy as np
-from datetime import datetime
 import time
 import os
 
