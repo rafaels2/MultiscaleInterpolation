@@ -38,7 +38,7 @@ class AbstractManifold(object):
             visualization[index] = self._to_numbers(x)
         plt.imshow(visualization)
         cb = plt.colorbar()
-        return cb    
+        return cb
 
     def plot(self, data, title, filename):
         plt.figure()
@@ -96,25 +96,6 @@ class AbstractManifold(object):
         We can make it iterative to get to better results
         """
         return self._geodesic_average(values_to_average, weights)
-
-
-class PositiveNumbers(AbstractManifold):
-    def exp(self, x, y):
-        return x ** y
-
-    def log(self, x, y):
-        # TODO: Think if we want to change to log(1+x)
-        if x == 1:
-            epsilon = 0.00001
-        else:
-            epsilon = 0
-        return np.log(y) / (np.log(x) + epsilon)
-
-    def _to_numbers(self, x):
-        return x
-
-    def zero_func(self, x_0, x_1):
-        return 2
 
 
 if __name__ == "__main__":
