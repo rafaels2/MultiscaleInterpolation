@@ -30,7 +30,8 @@ CONFIG = {
     "MANIFOLD": RealNumbers(),
     "SCALED_INTERPOLATION_METHOD": quasi_scaled_interpolation,
     "NORM_VISUALIZATION": True,
-    "IS_APPROXIMATING_ON_TANGENT": False
+    "IS_APPROXIMATING_ON_TANGENT": False,
+    "MSE_LABEL":"Default Run",
 }
 
 
@@ -41,9 +42,10 @@ DIFFS = [
 """
 
 DIFFS = [
-        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
+        {"MSE_LABEL": "Multiscale", "NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
     ] + [
         {"NAME": "single_scale_{}".format(i), 
+         "MSE_LABEL": "Single scale",
          "NUMBER_OF_SCALES": 1,
          "SCALING_FACTOR": _SCALING_FACTOR ** i} for i in range(1, 5)
     ]

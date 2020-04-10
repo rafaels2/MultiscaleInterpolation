@@ -41,11 +41,12 @@ class AbstractManifold(object):
         return cb
 
     def plot(self, data, title, filename, **kwargs):
-        plt.figure()
+        self.fig = plt.figure()
         plt.title(title)
         cb = self._visualize(plt, data)
         plt.savefig(filename)
         cb.remove()
+        plt.close(self.fig)
 
     def zero_func(self, x_0, x_1):
         return 0

@@ -60,6 +60,18 @@ def plot_and_save(data, filename, title):
     cb.remove()
 
 
+def plot_lines(lines, filename, title, xlabel, ylabel):
+    fig = plt.figure()
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    for line_name, line_dots in lines.items():
+        plt.plot(line_dots, label=line_name)
+    plt.legend(lines.keys())
+    plt.savefig(filename)
+    plt.close(fig)
+
+
 def generate_kernel(rbf, scale=1):
     def kernel(x, y):
         ans = (1 / scale ** 2) * rbf(la.norm(x-y) / scale)
