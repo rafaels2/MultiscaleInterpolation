@@ -104,7 +104,10 @@ def run_single_experiment(config, rbf, original_function):
             norm_visualization=norm_visualization
         )
 
-        error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
+        try:
+            error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
+        except ValueError as e:
+            import ipdb; ipdb.set_trace()
         plot_and_save(error, "difference map", "difference.png")
         
         mse = np.mean(error)
