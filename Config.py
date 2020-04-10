@@ -1,12 +1,26 @@
 import numpy as np
 from Manifolds.SymmetricPositiveDefinite import SymmetricPositiveDefinite
+from Manifolds.RealNumbers import RealNumbers
+from Manifolds.Circle import Circle
 from ApproximationMethods.Quasi import quasi_scaled_interpolation
 
-_SCALING_FACTOR = 0.8
+_SCALING_FACTOR = 0.7
 
+"""
 def _original_function(x, y):
     z = (5 + x) * np.eye(3) + np.array([[np.sin(5 * y), y, x*y], [0, 0, y ** 2],[0,0,0]])
     return (z + np.transpose(z))
+"""
+
+"""
+Real Numbers
+def _original_function(x, y):
+    return np.sin(5*x) * np.cos(4*y) + np.sin(7*x*y) - x ** 2 - y ** 2
+"""
+
+def _original_function(x, y):
+    phi = (np.pi / 2) * np.exp(-x**2 - y**2)
+    return np.array([np.cos(phi), np.sin(phi)])
 
 
 CONFIG = {
@@ -19,23 +33,27 @@ CONFIG = {
     "SCALING_FACTOR": _SCALING_FACTOR,
     "NAME": "temp",
     "OUTPUT_DIR": "results",
-    "EXECUTION_NAME": "1-4 scales and single scales",
+    "EXECUTION_NAME": "CircleTangent",
     "ORIGINAL_FUNCTION": _original_function,
-    "MANIFOLD": SymmetricPositiveDefinite(),
+    "MANIFOLD": Circle(),
     "SCALED_INTERPOLATION_METHOD": quasi_scaled_interpolation,
     "NORM_VISUALIZATION": True,
-    "IS_APPROXIMATING_ON_TANGENT": False
+    "IS_APPROXIMATING_ON_TANGENT": True,
+    "MSE_LABEL":"Default Run",
 }
 
 
+"""
 DIFFS = [
         {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 2)
     ]
+"""
 
-# DIFFS = [
-#         {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
-#     ] + [
-#         {"NAME": "single_scale_{}".format(i), 
-#          "NUMBER_OF_SCALES": 1,
-#          "SCALING_FACTOR": _SCALING_FACTOR ** i} for i in range(1, 5)
-#     ]
+DIFFS = [
+        {"MSE_LABEL": "Multiscale", "NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
+    ] + [
+        {"NAME": "single_scale_{}".format(i), 
+         "MSE_LABEL": "Single scale",
+         "NUMBER_OF_SCALES": 1,
+         "SCALING_FACTOR": _SCALING_FACTOR ** i} for i in range(1, 5)
+    ]

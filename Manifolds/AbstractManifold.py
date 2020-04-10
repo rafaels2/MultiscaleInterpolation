@@ -40,12 +40,13 @@ class AbstractManifold(object):
         cb = plt.colorbar()
         return cb
 
-    def plot(self, data, title, filename):
-        plt.figure()
+    def plot(self, data, title, filename, **kwargs):
+        self.fig = plt.figure()
         plt.title(title)
         cb = self._visualize(plt, data)
         plt.savefig(filename)
         cb.remove()
+        plt.close(self.fig)
 
     def zero_func(self, x_0, x_1):
         return 0

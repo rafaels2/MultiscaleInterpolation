@@ -121,7 +121,7 @@ def run_single_experiment(config, rbf, original_function):
 
 
 def run_all_experiments(config, diffs, *args):
-    mses = list()
+    mses = dict()
     calculation_time = list()
     execution_name = config["EXECUTION_NAME"]
     path = "{}_{}".format(execution_name, time.strftime("%Y%m%d__%H%M%S"))
@@ -132,9 +132,14 @@ def run_all_experiments(config, diffs, *args):
             for k, v in diff.items():
                 current_config[k] = v
             mse = run_single_experiment(current_config, *args)
-            mses.append(mse)
+            mse_label = current_config["MSE_LABEL"]
+            current_mses = mses.get(mse_label, list())
+            current_mses.append(mse)
+            mses[mse_label] = current_mses
             t_f = datetime.now()
             calculation_time.append(t_f - t_0)
+    
+        plot_lines(mses, "mses.png", "Error in different runs", "Iteration", "Error")
 
     print("MSEs are: {}".format(mses))
     print("times are: {}".format(calculation_time))
