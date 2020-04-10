@@ -40,7 +40,7 @@ class AbstractManifold(object):
         cb = plt.colorbar()
         return cb
 
-    def plot(self, data, title, filename):
+    def plot(self, data, title, filename, **kwargs):
         plt.figure()
         plt.title(title)
         cb = self._visualize(plt, data)
