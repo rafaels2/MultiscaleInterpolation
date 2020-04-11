@@ -45,13 +45,12 @@ class RigidRotations(AbstractManifold):
         x_quat = self._quaternion_from_matrix(x)
         y_quat = self._quaternion_from_matrix(y)
 
-        return self._matrix_from_quaternion(Quaternion.log_map(x_quat, y_quat))
+        return np.array(list(Quaternion.log_map(x_quat, y_quat)))
 
     def exp(self, x, y):
         x_quat = self._quaternion_from_matrix(x)
-        y_quat = self._quaternion_from_matrix(y)
 
-        return self._matrix_from_quaternion(Quaternion.exp_map(x_quat, y_quat))
+        return self._matrix_from_quaternion(Quaternion.exp_map(x_quat, Quaternion(y)))
 
     def gen_point(self):
         matrix = np.array(special_ortho_group.rvs(self.dim))
@@ -73,7 +72,7 @@ class RigidRotations(AbstractManifold):
             print(matrix, is_special, is_orthogonal)
         return answer
 
-    def geodesic_l2_mean_step(self, current_estimator, noisy_samples, weights, tolerance=0.0001):
+    def geodesic_l2_mean_step(self, current_estimator, noisy_samples, weights, tolerance=0.00000001):
         projected_diff_samples = [w_i * scipy.linalg.logm(np.matmul(np.linalg.inv(current_estimator), noisy_sample)) 
                                   for w_i, noisy_sample in
                                   zip(weights, noisy_samples)]
@@ -90,7 +89,7 @@ class RigidRotations(AbstractManifold):
             state_of_convergence = False
             return new_estimator, state_of_convergence
 
-    def geodesic_l2_mean(self, noisy_samples, weights, tolerance=0.001, maximum_iteration=10):
+    def geodesic_l2_mean(self, noisy_samples, weights, tolerance=0.00000001, maximum_iteration=10):
         mean_estimator = noisy_samples[0]
         mean_estimator_list = [mean_estimator]
         state_of_convergence = False
@@ -104,6 +103,9 @@ class RigidRotations(AbstractManifold):
 
     def average(self, values_to_average, weights, base=np.eye(3)):
         return self.geodesic_l2_mean(values_to_average, weights)[-1]
+
+    def _to_numbers(self, x):
+        return self.distance(x, np.eye(3))
 
 
 def main():

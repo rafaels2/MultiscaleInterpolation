@@ -12,7 +12,7 @@ I = np.eye(3)
 
 def _original_function(x, y):
     q = Quaternion(np.sin(5 * x - 4 *y), np.exp(-x**2-y**2), x*y, x**2 + y**2)
-    return r.exp(I, r._matrix_from_quaternion(q))
+    return r.exp(I, q)
 
 
 """
@@ -47,27 +47,27 @@ CONFIG = {
     "SCALING_FACTOR": _SCALING_FACTOR,
     "NAME": "temp",
     "OUTPUT_DIR": "results",
-    "EXECUTION_NAME": "SPDkarcher",
+    "EXECUTION_NAME": "RotationsTangent",
     "ORIGINAL_FUNCTION": _original_function,
     "MANIFOLD": RigidRotations(),
     "SCALED_INTERPOLATION_METHOD": quasi_scaled_interpolation,
     "NORM_VISUALIZATION": True,
-    "IS_APPROXIMATING_ON_TANGENT": False,
+    "IS_APPROXIMATING_ON_TANGENT": True,
     "MSE_LABEL":"Default Run",
 }
 
 
-# """
+"""
 DIFFS = [
-        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 2)
+        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
     ]
-# """
+"""
 
-# DIFFS = [
-#         {"MSE_LABEL": "Multiscale", "NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
-#     ] + [
-#         {"NAME": "single_scale_{}".format(i), 
-#          "MSE_LABEL": "Single scale",
-#          "NUMBER_OF_SCALES": 1,
-#          "SCALING_FACTOR": _SCALING_FACTOR ** i} for i in range(1, 5)
-#     ]
+DIFFS = [
+        {"MSE_LABEL": "Multiscale", "NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
+    ] + [
+        {"NAME": "single_scale_{}".format(i), 
+         "MSE_LABEL": "Single scale",
+         "NUMBER_OF_SCALES": 1,
+         "SCALING_FACTOR": _SCALING_FACTOR ** i} for i in range(1, 5)
+    ]
