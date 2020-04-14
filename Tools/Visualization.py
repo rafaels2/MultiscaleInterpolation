@@ -2,25 +2,52 @@
 inspired by https://stackoverflow.com/questions/41955492/
 how-to-plot-efficiently-a-large-number-of-3d-ellipsoids-with-matplotlib-axes3d
 """
+from abc import abstractmethod
 
 import numpy as np
 from numpy import linalg as la
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
+
 from matplotlib import cm
+import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+from mpl_toolkits.mplot3d import Axes3D
+
+from pytransform3d.rotations import plot_basis
 
 if __name__ == "__main__":
     from Manifolds.SymmetricPositiveDefinite import SymmetricPositiveDefinite
+    from Manifolds.RigidRotations import RigidRotations
 
 
-class ElipsoidVisualizer(object):
+class Visualizer(object):
     def __init__(self, matrices, centers):
         self.fig = plt.figure(figsize=(8,8))
         self.ax = self.fig.add_subplot(projection='3d')
         self.ax.view_init(azim=0, elev=90)
         self._matrices = matrices
         self._centers = centers
+
+    @abstractmethod
+    def _process_matrix(self, index):
+        pass
+
+    def save(self, filename, title):
+        for index in np.ndindex(self._matrices.shape):
+            self._process_matrix(index)
+        # Hide axes ticks
+        self.ax.set_xticks([])
+        self.ax.set_yticks([])
+        self.ax.set_zticks([])
+        # Add a color bar which maps values to colors.
+        # plt.colorbar()
+        plt.title(title)
+        plt.savefig(filename)
+        plt.close(self.fig)
+
+
+class ElipsoidVisualizer(Visualizer):
+    def __init__(self, matrices, centers):
+        super().__init__(matrices, centers)
         
         self._svd_matrices()
         self._calculate_normalizer()
@@ -45,7 +72,11 @@ class ElipsoidVisualizer(object):
         self._singular_values = singular_values
         self._rotations = rotations
 
-    def _process_matrix(self, center, radii, rotation):
+    def _process_matrix(self, index):
+        center = self._centers[index]
+        radii = self._singular_values[index]
+        rotation = self._rotations[index]
+
         # calculate cartesian coordinates for the ellipsoid surface
         u = np.linspace(0.0, 2.0 * np.pi, 60)
         v = np.linspace(0.0, np.pi, 60)
@@ -60,25 +91,30 @@ class ElipsoidVisualizer(object):
         self.ax.plot_surface(x, y, z,  rstride=3, cstride=3, linewidth=0.1, alpha=1, shade=True,
             cmap=cm.coolwarm)
 
-    def save(self, filename, title):
-        for index in np.ndindex(self._matrices.shape):
-            self._process_matrix(
-                self._centers[index], 
-                self._singular_values[index],
-                self._rotations[index]
-                )
-        # Hide axes ticks
-        self.ax.set_xticks([])
-        self.ax.set_yticks([])
-        self.ax.set_zticks([])
-        # Add a color bar which maps values to colors.
-        # plt.colorbar()
-        plt.title(title)
-        plt.savefig(filename)
-        plt.close(self.fig)
+
+class RotationVisualizer(Visualizer):
+    """docstring for RotationVisualizer"""
+    def __init__(self, matrices, centers):
+        super().__init__(matrices, centers)
+        min_lim, max_lim = self._get_lims()
+        plt.setp(self.ax, xlim=(min_lim, max_lim), ylim=(min_lim, max_lim), zlim=(min_lim, max_lim))
+
+    def _get_lims(self):
+        shape = list(self._centers.shape)
+        shape.append(3)
+        centers = np.zeros(shape)
+        for index in np.ndindex(centers.shape):
+            centers[index] = self._centers[index[:-1]][index[-1]]
+
+        return centers.min() - 1, centers.max() + 1
+
+    def _process_matrix(self, index):
+        center = self._centers[index]
+        matrix = self._matrices[index]
+        plot_basis(ax=self.ax, R=matrix, p=center, s=0.4)
 
 
-def main():
+def ellipsoids_main():
     print("start")
     spd = SymmetricPositiveDefinite()
     matrices = np.zeros((3, 3), dtype=object)
@@ -90,5 +126,18 @@ def main():
     ElipsoidVisualizer(matrices, centers).save("vis.png", "ellipsoids")
 
 
+def rotations_main():
+    print("start")
+    so_3 = RigidRotations()
+    matrices = np.zeros((3, 3), dtype=object)
+    centers = np.zeros_like(matrices)
+    for index in np.ndindex(matrices.shape):
+        centers[index] = np.array([index[0], index[1], 0])
+        matrices[index] = so_3.gen_point()
+
+    print("start to visualize")
+    RotationVisualizer(matrices, centers).save("rotations.png", "rotations")
+
+
 if __name__ == "__main__":
-    main()
+    rotations_main()

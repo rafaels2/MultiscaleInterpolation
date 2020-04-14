@@ -7,6 +7,7 @@ from scipy.stats import special_ortho_group
 from scipy.spatial.transform import Rotation
 
 from Tools.KarcherMean import KarcherMean
+from Tools.Visualization import RotationVisualizer
 
 from .AbstractManifold import AbstractManifold
 
@@ -106,6 +107,15 @@ class RigidRotations(AbstractManifold):
 
     def _to_numbers(self, x):
         return self.distance(x, np.eye(3))
+
+    def plot(self, data, title, filename, norm_visualization=False):
+        if norm_visualization:
+            return super().plot(data, title, filename)
+        centers = np.zeros_like(data, dtype=object)
+        for index in np.ndindex(data.shape):
+            centers[index] = np.array([index[0], index[1], 0])
+        print("start to visualize")
+        RotationVisualizer(data, centers).save(filename, title)
 
 
 def main():
