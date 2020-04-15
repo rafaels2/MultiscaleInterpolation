@@ -97,6 +97,11 @@ def wendland(x):
 
 @contextmanager
 def set_output_directory(path):
+    """ 
+    This is the easy implementation. 
+    The correct one should not change the working directory,
+    but keep it as a variable.
+    """
     if not os.path.isdir(path):
         os.mkdir(path)
     last_cwd = os.getcwd()
