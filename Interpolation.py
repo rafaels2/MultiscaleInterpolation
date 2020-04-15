@@ -12,8 +12,14 @@ from Config import CONFIG, DIFFS
 from Tools.Utils import *
 
 
-def multiscale_interpolation(manifold, number_of_scales, original_function, scaling_factor,
-    scaled_interpolation_method, is_approximating_on_tangent, **kwargs):
+def multiscale_interpolation(manifold, 
+                             original_function,
+                             grid_parameters,
+                             rbf,
+                             number_of_scales,
+                             scaled_interpolation_method,
+                             is_approximating_on_tangent):
+    scaling_factor = grid_parameters.scale
     f_j = manifold.zero_func
     e_j = act_on_functions(manifold.log, f_j, original_function)
     for scale_index in range(1, number_of_scales + 1):
@@ -25,13 +31,18 @@ def multiscale_interpolation(manifold, number_of_scales, original_function, scal
         else:
             function_to_interpolate = act_on_functions(manifold.exp, manifold.zero_func, e_j)
 
+        current_grid_parameters = GridParameters(
+            grid_parameters.size,
+            grid_parameters.resolution,
+            scale)
+
         s_j = scaled_interpolation_method(
             manifold,
-            scale,
             function_to_interpolate,
+            grid_parameters,
+            rbf,
             is_approximating_on_tangent=is_approximating_on_tangent,
-            **kwargs.copy(),
-        )
+        ).approximation
         print("interpolated!")
 
         if is_approximating_on_tangent:
@@ -78,13 +89,13 @@ def run_single_experiment(config, rbf, original_function):
         with open("config.pkl", "wb") as f:
             pkl.dump(config, f)
 
+        grid_parameters = GridParameters(grid_size, base_resolution, scaling_factor)
+
         interpolant = multiscale_interpolation(
             manifold,
             number_of_scales=number_of_scales,
             original_function=original_function,
-            grid_resolution=base_resolution,
-            grid_size=grid_size,
-            scaling_factor=scaling_factor,
+            grid_parameters = grid_parameters,
             rbf=rbf,
             scaled_interpolation_method=scaled_interpolation_method,
             is_approximating_on_tangent=is_approximating_on_tangent
@@ -104,10 +115,7 @@ def run_single_experiment(config, rbf, original_function):
             norm_visualization=norm_visualization
         )
 
-        try:
-            error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
-        except ValueError as e:
-            import ipdb; ipdb.set_trace()
+        error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
         plot_and_save(error, "difference map", "difference.png")
         
         mse = np.mean(error)

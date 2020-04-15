@@ -3,7 +3,7 @@ from Manifolds.SymmetricPositiveDefinite import SymmetricPositiveDefinite
 from Manifolds.RealNumbers import RealNumbers
 from Manifolds.Circle import Circle
 from Manifolds.RigidRotations import RigidRotations, Quaternion
-from ApproximationMethods.Quasi import quasi_scaled_interpolation
+from ApproximationMethods.Quasi import Quasi
 
 _SCALING_FACTOR = 0.7
 
@@ -23,11 +23,11 @@ def _original_function(x, y):
     return (z + np.transpose(z))
 """
 
-"""
-Real Numbers
+# """
+"""Real Numbers"""
 def _original_function(x, y):
     return np.sin(5*x) * np.cos(4*y) + np.sin(7*x*y) - x ** 2 - y ** 2
-"""
+# """
 
 """
 Circle
@@ -50,7 +50,7 @@ CONFIG = {
     "EXECUTION_NAME": "RotationsTangent",
     "ORIGINAL_FUNCTION": _original_function,
     "MANIFOLD": RigidRotations(),
-    "SCALED_INTERPOLATION_METHOD": quasi_scaled_interpolation,
+    "SCALED_INTERPOLATION_METHOD": Quasi,
     "NORM_VISUALIZATION": True,
     "IS_APPROXIMATING_ON_TANGENT": True,
     "MSE_LABEL":"Default Run",

@@ -1,12 +1,18 @@
-from cachetools import cached, LFUCache
-from contextlib import contextmanager
-from matplotlib import pyplot as plt
-from numpy import linalg as la
-from matplotlib import cm
-import numpy as np
 import os
+from collections import namedtuple
+from contextlib import contextmanager
+
+from cachetools import cached, LFUCache
+
+from matplotlib import cm
+from matplotlib import pyplot as plt
+
+import numpy as np
+from numpy import linalg as la
 
 num_of_caches_g = 0
+
+GridParameters = namedtuple('GridParameters', ['size', 'resolution', 'scale'])
 
 
 def generate_cache(maxsize=32):

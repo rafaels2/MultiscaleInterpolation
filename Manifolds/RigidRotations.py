@@ -91,6 +91,7 @@ class RigidRotations(AbstractManifold):
             return new_estimator, state_of_convergence
 
     def geodesic_l2_mean(self, noisy_samples, weights, tolerance=0.00000001, maximum_iteration=10):
+        """ L2 mean From my weiszfeld project, adapted to weighted averaging """
         mean_estimator = noisy_samples[0]
         mean_estimator_list = [mean_estimator]
         state_of_convergence = False

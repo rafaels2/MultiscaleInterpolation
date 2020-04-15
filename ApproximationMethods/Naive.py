@@ -1,3 +1,4 @@
+""" Currently deprecated """
 import numpy as np
 from numpy import linalg as la
 from Tools.Utils import generate_grid, generate_kernel, evaluate_on_grid
