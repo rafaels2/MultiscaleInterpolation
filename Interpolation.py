@@ -10,16 +10,18 @@ import matplotlib.pyplot as plt
 
 from Config import CONFIG, DIFFS
 from Tools.Utils import *
+from Tools.SamplingPoints import GridParameters
 
 
 def multiscale_interpolation(manifold, 
                              original_function,
-                             grid_parameters,
+                             grid_size,
+                             resolution,
+                             scaling_factor,
                              rbf,
                              number_of_scales,
                              scaled_interpolation_method,
                              is_approximating_on_tangent):
-    scaling_factor = grid_parameters.scale
     f_j = manifold.zero_func
     e_j = act_on_functions(manifold.log, f_j, original_function)
     for scale_index in range(1, number_of_scales + 1):
@@ -31,18 +33,20 @@ def multiscale_interpolation(manifold,
         else:
             function_to_interpolate = act_on_functions(manifold.exp, manifold.zero_func, e_j)
 
-        current_grid_parameters = GridParameters(
-            grid_parameters.size,
-            grid_parameters.resolution,
-            scale)
+        current_grid_parameters = [('Grid', GridParameters(
+            -grid_size,
+            grid_size,
+            -grid_size,
+            grid_size,
+            scale / resolution))]
 
         s_j = scaled_interpolation_method(
             manifold,
             function_to_interpolate,
-            grid_parameters,
+            current_grid_parameters,
             rbf,
-            is_approximating_on_tangent=is_approximating_on_tangent,
-        ).approximation
+            scale,
+            is_approximating_on_tangent).approximation
         print("interpolated!")
 
         if is_approximating_on_tangent:
@@ -89,13 +93,13 @@ def run_single_experiment(config, rbf, original_function):
         with open("config.pkl", "wb") as f:
             pkl.dump(config, f)
 
-        grid_parameters = GridParameters(grid_size, base_resolution, scaling_factor)
-
         interpolant = multiscale_interpolation(
             manifold,
             number_of_scales=number_of_scales,
             original_function=original_function,
-            grid_parameters = grid_parameters,
+            grid_size = grid_size,
+            resolution=base_resolution,
+            scaling_factor=scaling_factor,
             rbf=rbf,
             scaled_interpolation_method=scaled_interpolation_method,
             is_approximating_on_tangent=is_approximating_on_tangent

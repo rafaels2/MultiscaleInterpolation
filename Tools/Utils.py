@@ -12,8 +12,6 @@ from numpy import linalg as la
 
 num_of_caches_g = 0
 
-GridParameters = namedtuple('GridParameters', ['size', 'resolution', 'scale'])
-
 
 def generate_cache(maxsize=32):
     global num_of_caches_g
