@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 from Config import CONFIG, DIFFS
 from Tools.Utils import *
-from Tools.SamplingPoints import GridParameters
+from Tools.SamplingPoints import GridParameters, Grid
 
 
 def multiscale_interpolation(manifold, 
@@ -66,7 +66,7 @@ def run_single_experiment(config, rbf, original_function):
     plot_resolution_factor = config["PLOT_RESOLUTION_FACTOR"]
     scale = config["SCALE"]
     number_of_scales = config["NUMBER_OF_SCALES"]
-    test_scale = config["TEST_SCALE"]
+    test_mesh_norm = config["TEST_MESH_NORM"]
     scaling_factor = config["SCALING_FACTOR"]
     experiment_name = config["NAME"] or "temp"
     manifold = config["MANIFOLD"]
@@ -74,13 +74,8 @@ def run_single_experiment(config, rbf, original_function):
     norm_visualization = config["NORM_VISUALIZATION"]
     is_approximating_on_tangent = config["IS_APPROXIMATING_ON_TANGENT"]
 
-    true_values_on_grid = evaluate_on_grid(
-            original_function,
-            grid_size,
-            base_resolution,
-            test_scale,
-            should_log=True
-        )
+    grid_params = GridParameters(-grid_size, grid_size, -grid_size, grid_size, test_mesh_norm)
+    true_values_on_grid = Grid(1, original_function, grid_params).evaluation
 
     manifold.plot(
         true_values_on_grid,
@@ -105,13 +100,8 @@ def run_single_experiment(config, rbf, original_function):
             is_approximating_on_tangent=is_approximating_on_tangent
         )
 
-        approximated_values_on_grid = evaluate_on_grid(
-            interpolant, 
-            grid_size, 
-            base_resolution,
-            test_scale,
-            should_log=True
-        )
+        approximated_values_on_grid = Grid(1, interpolant, grid_params).evaluation
+
         manifold.plot(
             approximated_values_on_grid,
             "approximation",

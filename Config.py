@@ -45,7 +45,7 @@ CONFIG = {
     "PLOT_RESOLUTION_FACTOR": 2,
     "SCALE": 1,
     "NUMBER_OF_SCALES": 4,
-    "TEST_SCALE": _SCALING_FACTOR / 2,
+    "TEST_MESH_NORM": 0.12,
     "SCALING_FACTOR": _SCALING_FACTOR,
     "NAME": "temp",
     "OUTPUT_DIR": "results",

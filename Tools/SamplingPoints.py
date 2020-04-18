@@ -6,7 +6,7 @@ from Tools.Utils import generate_grid
 
 
 GridParameters = namedtuple('GridParameters', ['x_min', 'x_max', 'y_min', 'y_max', 'mesh_norm'])
-Point = namedtuple('Point', ['evaluation', 'phi'])
+Point = namedtuple('Point', ['evaluation', 'phi', 'x', 'y'])
 
 SAMPLING_POINTS_CLASSES = dict()
 
@@ -38,6 +38,7 @@ class Grid(SamplingPoints):
         self._x_len = (self._x_max - self._x_min)
         self._y_len = (self._y_max - self._y_min)
         self._mesh_norm = grid_parameters.mesh_norm
+        print("Mesh norm: ", self._mesh_norm)
         self._x, self._y = self._generate_grid()
         self._evaluation = self._evaluate_on_grid(function_to_evaluate)
         self._phi = None
@@ -56,22 +57,28 @@ class Grid(SamplingPoints):
         evaluation = np.zeros_like(self._x, dtype=object)
         
         for index in np.ndindex(self._x.shape):
+            if index[1] == 0:
+                print(index[0] / self._x.shape[0])
             evaluation[index] = func(self._x[index], self._y[index])
 
         return evaluation
 
     def points_in_radius(self, x, y):
         # Warning! There might be a bug, and I should want to replace x, and y.
-        x_0 = (x - self._x_min) / self._mesh_norm
-        y_0 = (y - self._y_min) / self._mesh_norm
-        index_0 = np.array([x_0, y_0])
-        radiud_array = np.array([self._radius_in_index + 1, self._radius_in_index + 1])
+        x_0 = int((x - self._x_min) / self._mesh_norm)
+        y_0 = int((y - self._y_min) / self._mesh_norm)
+        index_0 = np.array([y_0, x_0])
+        radius_array = np.array([self._radius_in_index + 1, self._radius_in_index + 1])
 
         for index in np.ndindex((2 * self._radius_in_index + 2, 2 * self._radius_in_index + 2)):
-            current_index = index_0 - radiud_array + index
+            current_index = tuple(index_0 - radius_array + np.array(index))
             if all([current_index[0] >= 0, current_index[1] >= 0, 
                     current_index[0] < self._x.shape[0], current_index[1] < self._y.shape[1]]):
-                yield Point(self._evaluation[index], self._phi[index])
+                yield Point(self._evaluation[current_index], self._phi[current_index], self._x[current_index], self._y[current_index])
+
+    @property
+    def evaluation(self):
+        return self._evaluation
 
 
 class SamplingPointsCollection(object):
