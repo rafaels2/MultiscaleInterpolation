@@ -10,9 +10,11 @@ _SCALING_FACTOR = 0.7
 r = RigidRotations()
 I = np.eye(3)
 
+"""
 def _original_function(x, y):
     q = Quaternion(np.sin(5 * x - 4 *y), np.exp(-x**2-y**2), x*y, x**2 + y**2)
     return r.exp(I, q)
+"""
 
 
 """
@@ -47,9 +49,9 @@ CONFIG = {
     "SCALING_FACTOR": _SCALING_FACTOR,
     "NAME": "temp",
     "OUTPUT_DIR": "results",
-    "EXECUTION_NAME": "RotationsTangent",
+    "EXECUTION_NAME": "Numbers",
     "ORIGINAL_FUNCTION": _original_function,
-    "MANIFOLD": RigidRotations(),
+    "MANIFOLD": RealNumbers(),
     "SCALED_INTERPOLATION_METHOD": Quasi,
     "NORM_VISUALIZATION": True,
     "IS_APPROXIMATING_ON_TANGENT": True,
@@ -57,12 +59,11 @@ CONFIG = {
 }
 
 
-"""
 DIFFS = [
-        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
+        {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 3)
     ]
-"""
 
+"""
 DIFFS = [
         {"MSE_LABEL": "Multiscale", "NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
     ] + [
@@ -71,3 +72,4 @@ DIFFS = [
          "NUMBER_OF_SCALES": 1,
          "SCALING_FACTOR": _SCALING_FACTOR ** i} for i in range(1, 5)
     ]
+"""

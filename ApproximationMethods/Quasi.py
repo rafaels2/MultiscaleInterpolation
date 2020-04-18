@@ -9,7 +9,7 @@ from Tools.SamplingPoints import SamplingPointsCollection
 
 
 class Quasi(ApproximationMethod):
-    def __init__(self, manifold, original_function, grids_parameters, rbf, 
+    def __init__(self, manifold, original_function, grid_parameters, rbf, 
                  scale, is_approximating_on_tangent):
         super().__init__(manifold, original_function, grid_parameters, rbf)
         self._is_approximating_on_tangent = is_approximating_on_tangent
