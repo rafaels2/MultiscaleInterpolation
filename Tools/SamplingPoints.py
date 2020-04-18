@@ -15,6 +15,7 @@ def add_sampling_class(name):
     def _register_decorator(cls):
         SAMPLING_POINTS_CLASSES[name] = cls
         return cls
+    return _register_decorator
 
 
 class SamplingPoints(object):
@@ -29,12 +30,11 @@ class SamplingPoints(object):
 
 @add_sampling_class('Grid')
 class Grid(SamplingPoints):
-    def __init__(self, rbf_radius, function_to_evaluate, grids_parameters, phi_generator=None):
-        self._x_min = grids_parameters.x_min
-        self._x_max = grids_parameters.x_max
-        self._y_min = grids_parameters.y_min
-        self._y_max = grids_parameters.y_max
-        self._max = grid_parameters.max_value
+    def __init__(self, rbf_radius, function_to_evaluate, grid_parameters, phi_generator=None):
+        self._x_min = grid_parameters.x_min
+        self._x_max = grid_parameters.x_max
+        self._y_min = grid_parameters.y_min
+        self._y_max = grid_parameters.y_max
         self._x_len = (self._x_max - self._x_min)
         self._y_len = (self._y_max - self._y_min)
         self._mesh_norm = grid_parameters.mesh_norm
@@ -48,8 +48,8 @@ class Grid(SamplingPoints):
         self._radius_in_index = int(np.ceil(rbf_radius / self._mesh_norm))
 
     def _generate_grid(self):
-        x = np.linspace(self._min, self._max, int(self._x_len / self._mesh_norm))
-        y = np.linspace(self._min, self._max, int(self._y_len / self._mesh_norm))
+        x = np.linspace(self._x_min, self._y_max, int(self._x_len / self._mesh_norm))
+        y = np.linspace(self._y_min, self._y_max, int(self._y_len / self._mesh_norm))
         return np.meshgrid(x, y)
 
     def _evaluate_on_grid(self, func):
@@ -70,7 +70,7 @@ class Grid(SamplingPoints):
         for index in np.ndindex((2 * self._radius_in_index + 2, 2 * self._radius_in_index + 2)):
             current_index = index_0 - radiud_array + index
             if all([current_index[0] >= 0, current_index[1] >= 0, 
-                    current_index[0] < self._x.shape, current_index[1] < self._y.shape]):
+                    current_index[0] < self._x.shape[0], current_index[1] < self._y.shape[1]]):
                 yield Point(self._evaluation[index], self._phi[index])
 
 
@@ -80,6 +80,23 @@ class SamplingPointsCollection(object):
                                                      function_to_evaluate, parameters, **kwargs) 
                        for name, parameters in grids_parameters]
 
-    def points_in_radius(self, x_0, y_0):
+    def points_in_radius(self, x, y):
         for grid in self._grids:
-            yield from grid.points_in_radius()
+            yield from grid.points_in_radius(x, y)
+
+
+def main():
+    def func(x, y):
+        return x
+    def phi(x, y):
+        def f(a, b):
+            return (a-x)**2 + (b-y)**2
+        return f
+    grid_parameters = GridParameters(-1, 1, -1, 1, 0.2)
+    collection_params = [('Grid', grid_parameters)]
+    smpl = SamplingPointsCollection(0.5, func, collection_params, phi_generator=phi)
+    return smpl
+
+
+if __name__ == '__main__':
+    smpl = main()
