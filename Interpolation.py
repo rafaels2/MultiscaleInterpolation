@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 from Config import CONFIG, DIFFS
 from Tools.Utils import *
-from Tools.SamplingPoints import GridParameters, Grid
+from Tools.SamplingPoints import GridParameters, Grid, symmetric_grid_params
 
 
 def multiscale_interpolation(manifold, 
@@ -33,12 +33,10 @@ def multiscale_interpolation(manifold,
         else:
             function_to_interpolate = act_on_functions(manifold.exp, manifold.zero_func, e_j)
 
-        current_grid_parameters = [('Grid', GridParameters(
-            -grid_size,
-            grid_size,
-            -grid_size,
-            grid_size,
-            scale / resolution))]
+        current_grid_parameters = [
+            ('Grid', symmetric_grid_params(grid_size, scale / resolution)),
+            # Can add here more grids (borders)
+        ]
 
         s_j = scaled_interpolation_method(
             manifold,
@@ -74,7 +72,7 @@ def run_single_experiment(config, rbf, original_function):
     norm_visualization = config["NORM_VISUALIZATION"]
     is_approximating_on_tangent = config["IS_APPROXIMATING_ON_TANGENT"]
 
-    grid_params = GridParameters(-grid_size, grid_size, -grid_size, grid_size, test_mesh_norm)
+    grid_params = symmetric_grid_params(grid_size, test_mesh_norm)
     true_values_on_grid = Grid(1, original_function, grid_params).evaluation
 
     manifold.plot(
@@ -144,7 +142,7 @@ def run_all_experiments(config, diffs, *args):
             t_f = datetime.now()
             calculation_time.append(t_f - t_0)
     
-        plot_lines(mses, "mses.png", "Error in different runs", "Iteration", "Error")
+        plot_lines(map(np.log, mses), "mses.png", "Error in different runs", "Iteration", "log(Error)")
 
     print("MSEs are: {}".format(mses))
     print("times are: {}".format(calculation_time))

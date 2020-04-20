@@ -11,6 +11,10 @@ Point = namedtuple('Point', ['evaluation', 'phi', 'x', 'y'])
 SAMPLING_POINTS_CLASSES = dict()
 
 
+def symmetric_grid_params(grid_size, mesh_norm):
+    return GridParameters(-grid_size, grid_size, -grid_size, grid_size, mesh_norm)
+
+
 def add_sampling_class(name):
     def _register_decorator(cls):
         SAMPLING_POINTS_CLASSES[name] = cls
@@ -27,6 +31,7 @@ class SamplingPoints(object):
     @abstractmethod
     def points_in_radius(self, x, y):
         pass
+
 
 @add_sampling_class('Grid')
 class Grid(SamplingPoints):
