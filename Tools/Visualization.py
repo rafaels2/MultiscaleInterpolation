@@ -44,6 +44,16 @@ class Visualizer(object):
         plt.savefig(filename)
         plt.close(self.fig)
 
+    def show(self):
+        for index in np.ndindex(self._matrices.shape):
+            self._process_matrix(index)
+        # Hide axes ticks
+        self.ax.set_xticks([])
+        self.ax.set_yticks([])
+        self.ax.set_zticks([])
+
+        plt.show()
+
 
 class ElipsoidVisualizer(Visualizer):
     def __init__(self, matrices, centers):
@@ -100,11 +110,15 @@ class RotationVisualizer(Visualizer):
         plt.setp(self.ax, xlim=(min_lim, max_lim), ylim=(min_lim, max_lim), zlim=(min_lim, max_lim))
 
     def _get_lims(self):
-        shape = list(self._centers.shape)
-        shape.append(3)
-        centers = np.zeros(shape)
-        for index in np.ndindex(centers.shape):
-            centers[index] = self._centers[index[:-1]][index[-1]]
+        if self._centers.dtype.kind == 'f':
+            centers = self._centers
+        else:
+            shape = list(self._centers.shape)
+            shape.append(3)
+            centers = np.zeros(shape)
+            if self._centers.dtype != np.float:
+                for index in np.ndindex(centers.shape):
+                    centers[index] = self._centers[index[:-1]][index[-1]]
 
         return centers.min() - 1, centers.max() + 1
 
