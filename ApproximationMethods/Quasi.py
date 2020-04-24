@@ -51,4 +51,4 @@ class Quasi(ApproximationMethod):
         if self._is_approximating_on_tangent:
             return sum(w_i * x_i for w_i, x_i in zip(weights, values_to_average))
 
-        return manifold.average(values_to_average, weights)
+        return self._manifold.average(values_to_average, weights)

@@ -134,7 +134,7 @@ def run_all_experiments(config, diffs, *args):
             current_config = config.copy()
             for k, v in diff.items():
                 current_config[k] = v
-            mse = run_single_experiment(current_config, *args)
+            mse = np.log(run_single_experiment(current_config, *args))
             mse_label = current_config["MSE_LABEL"]
             current_mses = mses.get(mse_label, list())
             current_mses.append(mse)
@@ -142,7 +142,7 @@ def run_all_experiments(config, diffs, *args):
             t_f = datetime.now()
             calculation_time.append(t_f - t_0)
     
-        plot_lines(map(np.log, mses), "mses.png", "Error in different runs", "Iteration", "log(Error)")
+        plot_lines(mses, "mses.png", "Error in different runs", "Iteration", "log(Error)")
 
     print("MSEs are: {}".format(mses))
     print("times are: {}".format(calculation_time))
