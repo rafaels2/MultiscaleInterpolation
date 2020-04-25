@@ -58,19 +58,31 @@ def multiscale_interpolation(manifold,
     return f_j
 
 
-def calculate_max_derivative(original_function, grid_params, m):
+def calculate_max_derivative(original_function, grid_params, manifold):
+    print("in")
     def derivative(x, y):
-        m = grid_params.mesh_norm
-        vals = [original_function(x+m, y+m),
-         original_function(x+m, y-m),
-         original_function(x-m, y+m),
-         original_function(x-m, y-m)]
+        m = grid_params.mesh_norm / 2
+        n = np.sqrt(2)
+        vals = [original_function(x+m/n, y+m/n),
+                original_function(x, y+m),
+                original_function(x, y-m),
+                original_function(x+m/n, y-m/n),
+                original_function(x+m, y),
+                original_function(x-m/n, y+m/n),
+                original_function(x-m, y),
+                original_function(x-m/n, y-m/n)]
+        xy = original_function(x, y)
 
-         xy = original_function(x, y)
+        return max([manifold.distance(val, xy)/m for val in vals])
 
-        return max([m.distance(val - xy) for val in vals])
+    print("eval")
+    evaluation = Grid(1, derivative, grid_params).evaluation
 
-    return Grid(1, derivative, grid_params).evaluation
+    result = np.zeros_like(evaluation, dtype=np.float32)
+    for index in np.ndindex(result.shape):
+        result[index] = evaluation[index]
+
+    return result
 
 
 def run_single_experiment(config, rbf, original_function):
@@ -97,10 +109,11 @@ def run_single_experiment(config, rbf, original_function):
         norm_visualization=norm_visualization
     )
 
+    print("before")
     plot_and_save(calculate_max_derivative(original_function, grid_params, manifold),
                   "max derivatives",
-                  "deriveatives.png",
-                  norm_visualization=True)
+                  "deriveatives.png")
+    print("after")
 
     with set_output_directory(experiment_name):
         with open("config.pkl", "wb") as f:

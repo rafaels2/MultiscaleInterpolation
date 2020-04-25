@@ -55,7 +55,7 @@ def evaluate_on_grid(func, *args, points=None, should_log=False):
     return z
 
 
-def plot_and_save(data, filename, title):
+def plot_and_save(data, title, filename):
     plt.figure()
     plt.title(title)
     plt.imshow(data)
