@@ -34,7 +34,7 @@ def multiscale_interpolation(manifold,
             function_to_interpolate = act_on_functions(manifold.exp, manifold.zero_func, e_j)
 
         current_grid_parameters = [
-            ('Grid', symmetric_grid_params(grid_size, scale / resolution)),
+            ('Grid', symmetric_grid_params(grid_size + 1, scale / resolution)),
             # Can add here more grids (borders)
         ]
 
@@ -116,16 +116,17 @@ def run_single_experiment(config, rbf, original_function):
                 "original_values": true_values_on_grid,
                 "approximation": approximated_values_on_grid,
                 "errors": error,
-                "mse": mse
+                "mse": mse,
             }
             pkl.dump(results, f)
 
-    return mse
+    return mse, interpolant
 
 
 def run_all_experiments(config, diffs, *args):
     mses = dict()
     calculation_time = list()
+    interpolants = list()
     execution_name = config["EXECUTION_NAME"]
     path = "{}_{}".format(execution_name, time.strftime("%Y%m%d__%H%M%S"))
     with set_output_directory(path):
@@ -134,19 +135,21 @@ def run_all_experiments(config, diffs, *args):
             current_config = config.copy()
             for k, v in diff.items():
                 current_config[k] = v
-            mse = np.log(run_single_experiment(current_config, *args))
+            mse, interpolant = run_single_experiment(current_config, *args)
+            mse = np.log(mse)
             mse_label = current_config["MSE_LABEL"]
             current_mses = mses.get(mse_label, list())
             current_mses.append(mse)
             mses[mse_label] = current_mses
             t_f = datetime.now()
             calculation_time.append(t_f - t_0)
+            interpolants.append(interpolant)
     
         plot_lines(mses, "mses.png", "Error in different runs", "Iteration", "log(Error)")
 
     print("MSEs are: {}".format(mses))
     print("times are: {}".format(calculation_time))
-    return mses
+    return mses, interpolants
 
 
 def main():
@@ -158,10 +161,10 @@ def main():
     diffs = DIFFS
 
     with set_output_directory(output_dir):
-        results = run_all_experiments(config, diffs, rbf, original_function)
+        results,interpolants = run_all_experiments(config, diffs, rbf, original_function)
 
-    return results
+    return results, interpolants
 
 
 if __name__ == "__main__":
-    main()
+    _, interpolants = main()
