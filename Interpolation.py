@@ -58,6 +58,21 @@ def multiscale_interpolation(manifold,
     return f_j
 
 
+def calculate_max_derivative(original_function, grid_params, m):
+    def derivative(x, y):
+        m = grid_params.mesh_norm
+        vals = [original_function(x+m, y+m),
+         original_function(x+m, y-m),
+         original_function(x-m, y+m),
+         original_function(x-m, y-m)]
+
+         xy = original_function(x, y)
+
+        return max([m.distance(val - xy) for val in vals])
+
+    return Grid(1, derivative, grid_params).evaluation
+
+
 def run_single_experiment(config, rbf, original_function):
     grid_size = config["GRID_SIZE"]
     base_resolution = config["BASE_RESOLUTION"]
@@ -81,6 +96,11 @@ def run_single_experiment(config, rbf, original_function):
         "original.png",
         norm_visualization=norm_visualization
     )
+
+    plot_and_save(calculate_max_derivative(original_function, grid_params, manifold),
+                  "max derivatives",
+                  "deriveatives.png",
+                  norm_visualization=True)
 
     with set_output_directory(experiment_name):
         with open("config.pkl", "wb") as f:
