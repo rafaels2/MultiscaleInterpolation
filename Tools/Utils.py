@@ -93,6 +93,30 @@ def wendland(x):
         return (1 + (4 * x)) * ((1 - x) ** 4)
 
 
+def calculate_max_derivative(original_function, grid_params, manifold):
+    def derivative(x, y):
+        delta = grid_params.mesh_norm / 2
+        evaluations_around = [original_function(x + (delta / np.sqrt(2)), y + (delta / np.sqrt(2))),
+                              original_function(x, y + delta),
+                              original_function(x, y - delta),
+                              original_function(x + (delta / np.sqrt(2)), y - (delta / np.sqrt(2))),
+                              original_function(x + delta, y),
+                              original_function(x - (delta / np.sqrt(2)), y + (delta / np.sqrt(2))),
+                              original_function(x - delta, y),
+                              original_function(x - (delta / np.sqrt(2)), y - (delta / np.sqrt(2)))]
+        f_0 = original_function(x, y)
+
+        return max([manifold.distance(direction, f_0)/delta for direction in evaluations_around])
+
+    evaluation = Grid(1, derivative, grid_params).evaluation
+
+    result = np.zeros_like(evaluation, dtype=np.float32)
+    for index in np.ndindex(result.shape):
+        result[index] = evaluation[index]
+
+    return result
+
+
 @contextmanager
 def set_output_directory(path):
     """ 
