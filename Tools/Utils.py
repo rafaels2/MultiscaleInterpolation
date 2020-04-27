@@ -10,6 +10,8 @@ from matplotlib import pyplot as plt
 import numpy as np
 from numpy import linalg as la
 
+from Tools.SamplingPoints import GridParameters, Grid, symmetric_grid_params, generate_grid
+
 num_of_caches_g = 0
 
 
@@ -25,17 +27,6 @@ def act_on_functions(action, a, b):
     def new_func(*args):
         return action(a(*args), b(*args))
     return new_func
-
-
-def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
-    print("creating a grid", 2 * resolution / scale)
-    y = np.linspace(-grid_size, grid_size, int(2 * resolution / scale))
-    x = np.linspace(-grid_size, grid_size, int(2 * resolution / scale))
-    x_matrix, y_matrix = np.meshgrid(x, y)
-    if should_ravel:
-        return x_matrix.ravel(), y_matrix.ravel()
-    else:
-         return x_matrix, y_matrix
 
 
 def evaluate_on_grid(func, *args, points=None, should_log=False):
