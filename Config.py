@@ -2,7 +2,7 @@ import numpy as np
 from Manifolds.SymmetricPositiveDefinite import SymmetricPositiveDefinite
 from Manifolds.RealNumbers import RealNumbers
 from Manifolds.Circle import Circle
-from Manifolds.RigidRotations import RigidRotations, Quaternion
+from Manifolds.RigidRotations import RigidRotations, Quaternion, Rotation
 from ApproximationMethods.Quasi import Quasi
 
 _SCALING_FACTOR = 0.75
@@ -13,6 +13,10 @@ I = np.eye(3)
 def _original_function(x, y):
     q = 0.5 * Quaternion(x, y, x * y, x**2 + y ** 2)
     return r.exp(I, q)
+
+
+def _original_function(x, y):
+    return Rotation.from_euler('xyz', [x/2, y/2, x*y/4]).as_matrix()
 
 """
 def _original_function(x, y):
@@ -45,11 +49,11 @@ def _original_function(x, y):
 
 CONFIG = {
     "GRID_SIZE": 1.5,
-    "BASE_RESOLUTION": 3,
+    "BASE_RESOLUTION": 2,
     "PLOT_RESOLUTION_FACTOR": 2,
     "SCALE": 1,
     "NUMBER_OF_SCALES": 4,
-    "TEST_MESH_NORM": 0.25,
+    "TEST_MESH_NORM": 0.1,
     "SCALING_FACTOR": _SCALING_FACTOR,
     "NAME": "temp",
     "OUTPUT_DIR": "results",
@@ -63,6 +67,7 @@ CONFIG = {
 }
 
 
+"""
 DIFFS = [
         {"NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(3, 4)
     ]
@@ -76,4 +81,4 @@ DIFFS = [
          "NUMBER_OF_SCALES": 1,
          "SCALING_FACTOR": _SCALING_FACTOR ** i} for i in range(1, 5)
     ]
-"""
+
