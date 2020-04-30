@@ -27,6 +27,7 @@ def parse_arguments():
     parser.add_argument('-n', '--number-of-scales', type=int, default=1)
     parser.add_argument('-b', '--base-index', type=int, help='The first number of scales', default=1)
     parser.add_argument('-sf', '--scaling-factor', type=float, default=_SCALING_FACTOR)
+    parser.add_argument('-e', '--execution-name', type=str, default='NoName')
     args = parser.parse_args()
 
     config = CONFIG.copy()
@@ -35,6 +36,8 @@ def parse_arguments():
     config['IS_APPROXIMATING_ON_TANGENT'] = args.tangent_approximation
     config['NORM_VISUALIZATION'] = args.norm_visualization
     config['SCALING_FACTOR'] = args.scaling_factor
+    is_tangent = "Tangent" if args.tangent_approximation else "Intrinsic"
+    config['EXECUTION_NAME'] = "{}_{}".format(args.manifold, is_tangent)
 
     diffs = [
         {
