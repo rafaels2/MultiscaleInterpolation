@@ -1,3 +1,4 @@
+""" Rotations """
 from Manifolds.RigidRotations import RigidRotations, Quaternion, Rotation
 
 
