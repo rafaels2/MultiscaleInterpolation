@@ -2,13 +2,22 @@ from abc import abstractmethod
 from collections import namedtuple
 import numpy as np
 
-from Tools.Utils import generate_grid
-
 
 GridParameters = namedtuple('GridParameters', ['x_min', 'x_max', 'y_min', 'y_max', 'mesh_norm'])
 Point = namedtuple('Point', ['evaluation', 'phi', 'x', 'y'])
 
 SAMPLING_POINTS_CLASSES = dict()
+
+
+def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
+    print("creating a grid", 2 * resolution / scale)
+    y = np.linspace(-grid_size, grid_size, int(2 * resolution / scale))
+    x = np.linspace(-grid_size, grid_size, int(2 * resolution / scale))
+    x_matrix, y_matrix = np.meshgrid(x, y)
+    if should_ravel:
+        return x_matrix.ravel(), y_matrix.ravel()
+    else:
+         return x_matrix, y_matrix
 
 
 def symmetric_grid_params(grid_size, mesh_norm):
