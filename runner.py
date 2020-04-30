@@ -31,7 +31,7 @@ def parse_arguments():
 
     config = CONFIG.copy()
     config['ORIGINAL_FUNCTION'] = importlib.import_module(args.function).original_function
-    config['MANIFOLD'] = MANIFOLDS[args.manifold]
+    config['MANIFOLD'] = MANIFOLDS[args.manifold]()
     config['IS_APPROXIMATING_ON_TANGENT'] = args.tangent_approximation
     config['NORM_VISUALIZATION'] = args.norm_visualization
     config['SCALING_FACTOR'] = args.scaling_factor
