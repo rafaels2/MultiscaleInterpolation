@@ -1,8 +1,16 @@
 # Multiscale Aproximation
 ## How to run?
+Install Requirements
 ```bash
 pip instasll -r requirements.txt
-python interpolation.py
+```
+And run `runner.py`:
+```bash
+# Approximate 3 scales both multiscale and single scale
+python runner.py -m rotations -f ExampleFunctions.euler -s -n 3
+
+# For help:
+python runner.py -h
 ```
 ## Multiscale Approximation
 The base of all this project is the following algorithm:
