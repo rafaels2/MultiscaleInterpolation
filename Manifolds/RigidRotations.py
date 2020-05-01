@@ -24,9 +24,7 @@ class RigidRotations(AbstractManifold):
         return np.eye(self.dim)
 
     def distance(self, x, y):
-        x_quat = self._quaternion_from_matrix(x)
-        y_quat = self._quaternion_from_matrix(y)
-        return Quaternion.distance(x_quat, y_quat)
+        return la.norm(self.log(x, y))
 
     def _quaternion_from_matrix(self, matrix):
         """
@@ -43,15 +41,10 @@ class RigidRotations(AbstractManifold):
         return Rotation.from_quat(quaternion.elements).as_matrix()
 
     def log(self, x, y):
-        x_quat = self._quaternion_from_matrix(x)
-        y_quat = self._quaternion_from_matrix(y)
-
-        return np.array(list(Quaternion.log_map(x_quat, y_quat)))
+        return scipy.linalg.logm(np.matmul(la.inv(x), y))
 
     def exp(self, x, y):
-        x_quat = self._quaternion_from_matrix(x)
-
-        return self._matrix_from_quaternion(Quaternion.exp_map(x_quat, Quaternion(y)))
+        return np.matmul(x, scipy.linalg.expm(y))
 
     def gen_point(self):
         matrix = np.array(special_ortho_group.rvs(self.dim))
@@ -127,6 +120,11 @@ def main():
     c = m.gen_point()
 
     d = m.average([a,b,c], [1,1,1])
+    e = m.log(a, b)
+    f = m.exp(a, e)
+    print("dist", m.distance(f, b))
+    print("dist", m.distance(a, b))
+    print("a, a", m.log(a, a))
     return a,b,c,d,m
 
 
