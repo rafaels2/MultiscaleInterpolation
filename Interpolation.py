@@ -54,8 +54,7 @@ def multiscale_interpolation(manifold,
 
         f_j = act_on_functions(manifold.exp, f_j, function_added_to_f_j)
         e_j = act_on_functions(manifold.log, f_j, original_function)
-
-    return f_j
+        yield f_j
 
 
 def run_single_experiment(config, rbf, original_function):
@@ -86,11 +85,7 @@ def run_single_experiment(config, rbf, original_function):
                   "max derivatives",
                   "deriveatives.png")
 
-    with set_output_directory(experiment_name):
-        with open("config.pkl", "wb") as f:
-            pkl.dump(config, f)
-
-        interpolant = multiscale_interpolation(
+    for i, interpolant in enumerate(multiscale_interpolation(
             manifold,
             number_of_scales=number_of_scales,
             original_function=original_function,
@@ -100,31 +95,34 @@ def run_single_experiment(config, rbf, original_function):
             rbf=rbf,
             scaled_interpolation_method=scaled_interpolation_method,
             is_approximating_on_tangent=is_approximating_on_tangent
-        )
+            )):    
+        with set_output_directory("{}_{}".format(experiment_name, i+1)):
+            with open("config.pkl", "wb") as f:
+                pkl.dump(config, f)
 
-        approximated_values_on_grid = Grid(1, interpolant, grid_params).evaluation
+            approximated_values_on_grid = Grid(1, interpolant, grid_params).evaluation
 
-        manifold.plot(
-            approximated_values_on_grid,
-            "approximation",
-            "approximation.png",
-            norm_visualization=norm_visualization
-        )
+            manifold.plot(
+                approximated_values_on_grid,
+                "approximation",
+                "approximation.png",
+                norm_visualization=norm_visualization
+            )
 
-        error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
-        plot_and_save(error, "difference map", "difference.png")
-        
-        mse = np.mean(error)
-        with open("results.pkl", "wb") as f:
-            results = {
-                "original_values": true_values_on_grid,
-                "approximation": approximated_values_on_grid,
-                "errors": error,
-                "mse": mse,
-            }
-            pkl.dump(results, f)
+            error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
+            plot_and_save(error, "difference map", "difference.png")
+            
+            mse = np.mean(error)
+            with open("results.pkl", "wb") as f:
+                results = {
+                    "original_values": true_values_on_grid,
+                    "approximation": approximated_values_on_grid,
+                    "errors": error,
+                    "mse": mse,
+                }
+                pkl.dump(results, f)
 
-    return mse, interpolant
+        yield mse
 
 
 def run_all_experiments(config, diffs, *args):
@@ -135,26 +133,28 @@ def run_all_experiments(config, diffs, *args):
     path = "{}_{}".format(execution_name, time.strftime("%Y%m%d__%H%M%S"))
     with set_output_directory(path):
         for diff in diffs:
-            t_0 = datetime.now()
             current_config = config.copy()
+
             for k, v in diff.items():
                 current_config[k] = v
-            mse, interpolant = run_single_experiment(current_config, *args)
-            mse = np.log(mse)
-            mse_label = current_config["MSE_LABEL"]
-            current_mses = mses.get(mse_label, list())
-            current_mses.append(mse)
-            mses[mse_label] = current_mses
-            t_f = datetime.now()
-            calculation_time.append(t_f - t_0)
-            interpolants.append(interpolant)
+
+            t_0 = datetime.now()
+
+            for mse in run_single_experiment(current_config, *args):
+                t_f = datetime.now()
+                calculation_time.append(t_f - t_0)
+                mse = np.log(mse)
+                mse_label = current_config["MSE_LABEL"]
+                current_mses = mses.get(mse_label, list())
+                current_mses.append(mse)
+                mses[mse_label] = current_mses
+                t_0 = datetime.now()
     
         plot_lines(mses, "mses.png", "Error in different runs", "Iteration", "log(Error)")
 
     print("MSEs are: {}".format(mses))
     print("times are: {}".format(calculation_time))
-    return mses, interpolants
-
+    return mses
 
 def main():
     rbf = wendland
@@ -165,7 +165,7 @@ def main():
     diffs = DIFFS
 
     with set_output_directory(output_dir):
-        results,interpolants = run_all_experiments(config, diffs, rbf, original_function)
+        results = run_all_experiments(config, diffs, rbf, original_function)
 
     return results, interpolants
 

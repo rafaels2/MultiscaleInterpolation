@@ -2,16 +2,9 @@ import argparse
 import importlib
 
 import Interpolation
-from Config import CONFIG, DIFFS, SymmetricPositiveDefinite, RealNumbers, Circle, RigidRotations, _SCALING_FACTOR
+from Config import CONFIG, _SCALING_FACTOR
 from Tools.Utils import set_output_directory, wendland
-
-
-MANIFOLDS = {
-    'spd': SymmetricPositiveDefinite,
-    'numbers': RealNumbers,
-    'circle': Circle,
-    'rotations': RigidRotations
-}
+from Manifolds import MANIFOLDS
 
 
 def parse_arguments():
@@ -41,10 +34,10 @@ def parse_arguments():
 
     diffs = [
         {
-            "NAME":"{}_scale".format(index),
-            "NUMBER_OF_SCALES": index,
+            "NAME":"multiscale",
+            "NUMBER_OF_SCALES": args.base_index + args.number_of_scales - 1,
             "MSE_LABEL": "Multi Scale"
-        } for index in range(args.base_index, args.base_index + args.number_of_scales)]
+        }]
 
     if args.single_scale:
         diffs = diffs + [
@@ -67,7 +60,7 @@ def main():
 
 
     with set_output_directory(output_dir):
-        results, interpolants = Interpolation.run_all_experiments(config, diffs, rbf, original_function)
+        results = Interpolation.run_all_experiments(config, diffs, rbf, original_function)
 
 
 if __name__ == "__main__":
