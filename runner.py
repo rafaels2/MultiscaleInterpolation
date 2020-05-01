@@ -2,16 +2,9 @@ import argparse
 import importlib
 
 import Interpolation
-from Config import CONFIG, DIFFS, SymmetricPositiveDefinite, RealNumbers, Circle, RigidRotations, _SCALING_FACTOR
+from Config import CONFIG, _SCALING_FACTOR
 from Tools.Utils import set_output_directory, wendland
-
-
-MANIFOLDS = {
-    'spd': SymmetricPositiveDefinite,
-    'numbers': RealNumbers,
-    'circle': Circle,
-    'rotations': RigidRotations
-}
+from Manifolds import MANIFOLDS
 
 
 def parse_arguments():
