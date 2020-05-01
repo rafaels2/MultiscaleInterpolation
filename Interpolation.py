@@ -96,7 +96,7 @@ def run_single_experiment(config, rbf, original_function):
             scaled_interpolation_method=scaled_interpolation_method,
             is_approximating_on_tangent=is_approximating_on_tangent
             )):    
-        with set_output_directory("{}_{}".format(experiment_name, i)):
+        with set_output_directory("{}_{}".format(experiment_name, i+1)):
             with open("config.pkl", "wb") as f:
                 pkl.dump(config, f)
 

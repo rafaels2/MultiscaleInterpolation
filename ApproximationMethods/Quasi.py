@@ -25,14 +25,14 @@ class Quasi(ApproximationMethod):
     def _calculate_phi(self, x_0, y_0):
         point = np.array([x_0, y_0])
 
-        @cached(cache=generate_cache(maxsize=10))
+        @cached(cache=generate_cache(maxsize=100))
         def phi(x, y):
             vector = np.array([x, y])
             return self._kernel(vector, point)
 
         return phi
     
-    @cached(cache=generate_cache(maxsize=10))
+    @cached(cache=generate_cache(maxsize=1000))
     def approximation(self, x, y):
         """ Average sampled points around (x, y), using phis as weights """
         values_to_average = list()

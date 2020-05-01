@@ -34,10 +34,10 @@ def parse_arguments():
 
     diffs = [
         {
-            "NAME":"{}_scale".format(index),
-            "NUMBER_OF_SCALES": index,
+            "NAME":"multiscale",
+            "NUMBER_OF_SCALES": args.base_index + args.number_of_scales - 1,
             "MSE_LABEL": "Multi Scale"
-        } for index in range(args.base_index, args.base_index + args.number_of_scales)]
+        }]
 
     if args.single_scale:
         diffs = diffs + [
@@ -60,7 +60,7 @@ def main():
 
 
     with set_output_directory(output_dir):
-        results, interpolants = Interpolation.run_all_experiments(config, diffs, rbf, original_function)
+        results = Interpolation.run_all_experiments(config, diffs, rbf, original_function)
 
 
 if __name__ == "__main__":
