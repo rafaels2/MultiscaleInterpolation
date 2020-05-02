@@ -32,7 +32,10 @@ def parse_arguments():
     config['SCALING_FACTOR'] = args.scaling_factor
     is_tangent = "Tangent" if args.tangent_approximation else "Intrinsic"
     config['EXECUTION_NAME'] = "{}_{}".format(args.manifold, is_tangent)
+    execution_name = args.execution_name if (args.execution_name != 'NoName') else "{}_{}".format(args.manifold, is_tangent)
+    config['EXECUTION_NAME'] = execution_name
     config['IS_ADAPTIVE'] = args.adaptive
+
 
     diffs = [
         {
