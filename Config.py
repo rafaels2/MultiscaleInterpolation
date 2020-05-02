@@ -64,6 +64,7 @@ CONFIG = {
     "NORM_VISUALIZATION": False,
     "IS_APPROXIMATING_ON_TANGENT": False,
     "MSE_LABEL":"Default Run",
+    "IS_ADAPTIVE": False,
 }
 
 

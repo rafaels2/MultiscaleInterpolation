@@ -21,7 +21,8 @@ def multiscale_interpolation(manifold,
                              rbf,
                              number_of_scales,
                              scaled_interpolation_method,
-                             is_approximating_on_tangent):
+                             is_approximating_on_tangent,
+                             is_adaptive):
     f_j = manifold.zero_func
     e_j = act_on_functions(manifold.log, f_j, original_function)
     for scale_index in range(1, number_of_scales + 1):
@@ -30,6 +31,8 @@ def multiscale_interpolation(manifold,
 
         if is_approximating_on_tangent:
             function_to_interpolate = e_j
+        elif is_adaptive:
+            function_to_interpolate = (e_j, act_on_functions(manifold.exp, manifold.zero_func, e_j))
         else:
             function_to_interpolate = act_on_functions(manifold.exp, manifold.zero_func, e_j)
 
@@ -47,7 +50,7 @@ def multiscale_interpolation(manifold,
             is_approximating_on_tangent).approximation
         print("interpolated!")
 
-        if is_approximating_on_tangent:
+        if is_approximating_on_tangent or is_adaptive:
             function_added_to_f_j = s_j
         else:
             function_added_to_f_j = act_on_functions(manifold.log, manifold.zero_func, s_j)
@@ -70,6 +73,7 @@ def run_single_experiment(config, rbf, original_function):
     scaled_interpolation_method=config["SCALED_INTERPOLATION_METHOD"]
     norm_visualization = config["NORM_VISUALIZATION"]
     is_approximating_on_tangent = config["IS_APPROXIMATING_ON_TANGENT"]
+    is_adaptive = config["IS_ADAPTIVE"]
 
     grid_params = symmetric_grid_params(grid_size, test_mesh_norm)
     true_values_on_grid = Grid(1, original_function, grid_params).evaluation
@@ -94,7 +98,8 @@ def run_single_experiment(config, rbf, original_function):
             scaling_factor=scaling_factor,
             rbf=rbf,
             scaled_interpolation_method=scaled_interpolation_method,
-            is_approximating_on_tangent=is_approximating_on_tangent
+            is_approximating_on_tangent=is_approximating_on_tangent,
+            is_adaptive=is_adaptive
             )):    
         with set_output_directory("{}_{}".format(experiment_name, i+1)):
             with open("config.pkl", "wb") as f:
