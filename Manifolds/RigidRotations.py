@@ -10,13 +10,13 @@ from Tools.KarcherMean import KarcherMean
 from Tools.Visualization import RotationVisualizer
 
 from .AbstractManifold import AbstractManifold
-from . import register_manifold
+from Tools.Registry import MANIFOLDS
 
 SPECIAL_TOLERANCE = 0.001
 ORTHOGONAL_TOLERANCE = 0.001
 
 
-@register_manifold("rotations")
+@MANIFOLDS.register("rotations")
 class RigidRotations(AbstractManifold):
     def __init__(self, dim=3):
         super().__init__()

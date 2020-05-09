@@ -1,11 +1,7 @@
-MANIFOLDS = {}
+from Tools.Registry import Registry
 
 
-def register_manifold(name):
-	def _cls(cls):
-		MANIFOLDS[name] = cls
-		return cls
-	return _cls
+MANIFOLDS = Registry()
 
 
 from . import Circle

@@ -1,10 +1,10 @@
 import numpy as np
 
 from .AbstractManifold import AbstractManifold
-from . import register_manifold
+from Tools.Registry import MANIFOLDS
 
 
-@register_manifold("numbers")
+@MANIFOLDS.register("numbers")
 class RealNumbers(AbstractManifold):
     def exp(self, x, y):
         return x + y

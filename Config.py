@@ -4,6 +4,7 @@ from Manifolds.RealNumbers import RealNumbers
 from Manifolds.Circle import Circle
 from Manifolds.RigidRotations import RigidRotations, Quaternion, Rotation
 from ApproximationMethods.Quasi import Quasi
+from MultiscaleMethods import *
 
 _SCALING_FACTOR = 0.75
 
@@ -62,9 +63,8 @@ CONFIG = {
     "MANIFOLD": RigidRotations(),
     "SCALED_INTERPOLATION_METHOD": Quasi,
     "NORM_VISUALIZATION": False,
-    "IS_APPROXIMATING_ON_TANGENT": False,
     "MSE_LABEL":"Default Run",
-    "IS_ADAPTIVE": False,
+    "MULTISCALE_METHOD": Intrinsic
 }
 
 

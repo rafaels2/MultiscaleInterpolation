@@ -2,10 +2,10 @@ import numpy as np
 from numpy import linalg as la
 
 from .AbstractManifold import AbstractManifold
-from . import register_manifold
+from Tools.Registry import MANIFOLDS
 
 
-@register_manifold("circle")
+@MANIFOLDS.register("circle")
 class Circle(AbstractManifold):
     """
     S2 retraction pairs

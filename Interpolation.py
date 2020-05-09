@@ -4,6 +4,7 @@ import pickle as pkl
 import numpy as np
 import time
 import os
+import abc
 
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
@@ -11,53 +12,6 @@ import matplotlib.pyplot as plt
 from Config import CONFIG, DIFFS
 from Tools.Utils import *
 from Tools.SamplingPoints import GridParameters, Grid, symmetric_grid_params
-
-
-def multiscale_interpolation(manifold, 
-                             original_function,
-                             grid_size,
-                             resolution,
-                             scaling_factor,
-                             rbf,
-                             number_of_scales,
-                             scaled_interpolation_method,
-                             is_approximating_on_tangent,
-                             is_adaptive):
-    f_j = manifold.zero_func
-    e_j = act_on_functions(manifold.log, f_j, original_function)
-    for scale_index in range(1, number_of_scales + 1):
-        scale = scaling_factor ** scale_index
-        print("NEW SCALE: {}".format(scale))
-
-        if is_approximating_on_tangent:
-            function_to_interpolate = e_j
-        elif is_adaptive:
-            function_to_interpolate = (e_j, act_on_functions(manifold.exp, manifold.zero_func, e_j))
-        else:
-            function_to_interpolate = act_on_functions(manifold.exp, manifold.zero_func, e_j)
-
-        current_grid_parameters = [
-            ('Grid', symmetric_grid_params(grid_size + 1, scale / resolution)),
-            # Can add here more grids (borders)
-        ]
-
-        s_j = scaled_interpolation_method(
-            manifold,
-            function_to_interpolate,
-            current_grid_parameters,
-            rbf,
-            scale,
-            is_approximating_on_tangent).approximation
-        print("interpolated!")
-
-        if is_approximating_on_tangent or is_adaptive:
-            function_added_to_f_j = s_j
-        else:
-            function_added_to_f_j = act_on_functions(manifold.log, manifold.zero_func, s_j)
-
-        f_j = act_on_functions(manifold.exp, f_j, function_added_to_f_j)
-        e_j = act_on_functions(manifold.log, f_j, original_function)
-        yield f_j
 
 
 def run_single_experiment(config, rbf, original_function):
@@ -74,6 +28,7 @@ def run_single_experiment(config, rbf, original_function):
     norm_visualization = config["NORM_VISUALIZATION"]
     is_approximating_on_tangent = config["IS_APPROXIMATING_ON_TANGENT"]
     is_adaptive = config["IS_ADAPTIVE"]
+    multiscale_method = config["MULTISCALE_METHOD"]
 
     grid_params = symmetric_grid_params(grid_size, test_mesh_norm)
     true_values_on_grid = Grid(1, original_function, grid_params).evaluation
@@ -89,18 +44,14 @@ def run_single_experiment(config, rbf, original_function):
                   "max derivatives",
                   "deriveatives.png")
 
-    for i, interpolant in enumerate(multiscale_interpolation(
-            manifold,
-            number_of_scales=number_of_scales,
-            original_function=original_function,
-            grid_size = grid_size,
-            resolution=base_resolution,
-            scaling_factor=scaling_factor,
-            rbf=rbf,
-            scaled_interpolation_method=scaled_interpolation_method,
-            is_approximating_on_tangent=is_approximating_on_tangent,
-            is_adaptive=is_adaptive
-            )):    
+    for i, interpolant in enumerate(multiscale_method(
+             manifold,
+             original_function,
+             grid_size,
+             resolution,
+             rbf,
+             number_of_scales,
+             scaled_interpolation_method).run_all_scales()):    
         with set_output_directory("{}_{}".format(experiment_name, i+1)):
             with open("config.pkl", "wb") as f:
                 pkl.dump(config, f)

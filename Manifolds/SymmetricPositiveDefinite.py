@@ -8,12 +8,12 @@ from Tools.KarcherMean import KarcherMean
 from Tools.Visualization import ElipsoidVisualizer
 
 from .AbstractManifold import AbstractManifold
-from . import register_manifold
+from Tools.Registry import MANIFOLDS
 
 SYMMETRIC_ERROR = 10 ** -5
 
 
-@register_manifold("spd")
+@MANIFOLDS.register("spd")
 class SymmetricPositiveDefinite(AbstractManifold):
     def __init__(self, dim=3):
         super().__init__()
