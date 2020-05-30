@@ -23,6 +23,13 @@ class RealNumbers(AbstractManifold):
             return x + (y - x) * (1 - t)
         return line
 
+
+@register_manifold("numbers_no_normalization")
+class RealNumbersNoNormalization(RealNumbers):
+    def average(self, values_to_average, weights):
+        return sum(v_i * w_i for v_i, w_i in zip(values_to_average, weights))
+
+
 class PositiveNumbers(RealNumbers):
     def exp(self, x, y):
         return x ** y

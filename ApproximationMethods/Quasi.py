@@ -41,6 +41,15 @@ class Quasi(ApproximationMethod):
             return self._kernel(vector, point)
 
         return phi
+
+    @staticmethod
+    def calculate_normalizer(weights):
+        normalizer = sum(weights)
+
+        if normalizer == 0:
+            normalizer = 0.00001
+
+        return normalizer
     
     @cached(cache=generate_cache(maxsize=1000))
     def approximation(self, x, y):
@@ -58,10 +67,7 @@ class Quasi(ApproximationMethod):
                 values_to_average.append(point.evaluation)
             weights.append(point.phi(x, y))
 
-        normalizer = sum(weights)
-
-        if normalizer == 0:
-            normalizer = 0.00001
+        normalizer = sef.calculate_normalizer(weights)
 
         weights = [w_i / normalizer for w_i in weights]
         if self._is_approximating_on_tangent:
@@ -71,3 +77,9 @@ class Quasi(ApproximationMethod):
             return self._manifold.log(base, self._manifold.average(values_to_average, weights))
         
         return self._manifold.average(values_to_average, weights)
+
+
+class QuasiNoNormatlization(Quasi):
+    @staticmethod
+    def calculate_normalizer(weights):
+        return 1
