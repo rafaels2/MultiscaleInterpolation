@@ -67,7 +67,7 @@ class Quasi(ApproximationMethod):
                 values_to_average.append(point.evaluation)
             weights.append(point.phi(x, y))
 
-        normalizer = sef.calculate_normalizer(weights)
+        normalizer = self.calculate_normalizer(weights)
 
         weights = [w_i / normalizer for w_i in weights]
         if self._is_approximating_on_tangent:
@@ -79,7 +79,7 @@ class Quasi(ApproximationMethod):
         return self._manifold.average(values_to_average, weights)
 
 
-class QuasiNoNormatlization(Quasi):
+class QuasiNoNormalization(Quasi):
     @staticmethod
     def calculate_normalizer(weights):
         return 1

@@ -21,6 +21,13 @@ The base of all this project is the following algorithm:
  4. $s_j=Approximate(e_j,\delta^{j})$
  5. $f_{j+1}=f_j+s_j$
  6. $e_{j+1}=f-f_{j+1}$
+ 
+## Terminology
+- `scale` - The RBF radius of quasi approximation.
+- `mesh norm` - The distance between neighbours on the grid.
+- `resolution` - ~sqrt(How many points should be sampled in the support of the RBF)
+- `scaling factor`
+- `grid size` - The grid is symmetric square [-x, x]^2.
 
 ## Modules 
 - `Interpolation.py` is the main module. It runs the multiscale logic on a specific method.
