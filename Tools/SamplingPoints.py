@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from collections import namedtuple
 import numpy as np
+from tqdm import tqdm
 
 
 GridParameters = namedtuple('GridParameters', ['x_min', 'x_max', 'y_min', 'y_max', 'mesh_norm'])
@@ -70,9 +71,7 @@ class Grid(SamplingPoints):
     def _evaluate_on_grid(self, func):
         evaluation = np.zeros_like(self._x, dtype=object)
         
-        for index in np.ndindex(self._x.shape):
-            if index[1] == 0:
-                print(index[0] / self._x.shape[0])
+        for index in tqdm(np.ndindex(self._x.shape)):
             evaluation[index] = func(self._x[index], self._y[index])
 
         return evaluation

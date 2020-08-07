@@ -137,6 +137,7 @@ def run_single_experiment(config, rbf_generator, original_function):
 
 def run_all_experiments(config, diffs, *args):
     mses = dict()
+    x_data_sets = dict()
     calculation_time = list()
     execution_name = config["EXECUTION_NAME"]
     path = "{}_{}".format(execution_name, time.strftime("%Y%m%d__%H%M%S"))
@@ -155,11 +156,14 @@ def run_all_experiments(config, diffs, *args):
                 mse = np.log(mse)
                 mse_label = current_config["MSE_LABEL"]
                 current_mses = mses.get(mse_label, list())
+                current_x_data = x_data_sets.get(mse_label, list())
                 current_mses.append(mse)
+                current_x_data.append(np.log(current_config["SCALING_FACTOR"]))
                 mses[mse_label] = current_mses
+                x_data_sets[mse_label] = current_x_data
                 t_0 = datetime.now()
 
-        plot_lines(mses, "mses.png", "Error in different runs", "Iteration", "log(Error)")
+        plot_lines(mses, "mses.png", "Error in different runs", "Log Scaling factor", "log(Error)", x_data=x_data_sets)
 
     print("MSEs are: {}".format(mses))
     print("times are: {}".format(calculation_time))

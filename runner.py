@@ -5,17 +5,18 @@ import Interpolation
 from Config import CONFIG, _SCALING_FACTOR
 from Tools.Utils import set_output_directory, generate_wendland
 from Manifolds import MANIFOLDS
+from ExampleFunctions.numbers_gauss import original_function
 
 
 def parse_arguments():
     parser = argparse.ArgumentParser("RBF Approximation Scrtipt")
     parser.add_argument('-f', '--function', type=str, help='Original function file', required=True)
     parser.add_argument('-m', '--manifold', choices=MANIFOLDS.keys(), required=True)
-    parser.add_argument('-t', '--tangent-approximation', action='store_true', 
+    parser.add_argument('-t', '--tangent-approximation', action='store_true',
                         help='Should approximate using tangent averaging?')
     parser.add_argument('-nv', '--norm-visualization', action='store_true',
                         help='Should visualize quickly using norm visualization')
-    parser.add_argument('-s', '--single-scale', action='store_true', 
+    parser.add_argument('-s', '--single-scale', action='store_true',
                         help='Should approximate the single scale case?')
     parser.add_argument('-n', '--number-of-scales', type=int, default=1)
     parser.add_argument('-b', '--base-index', type=int, help='The first number of scales', default=1)
@@ -32,14 +33,14 @@ def parse_arguments():
     config['SCALING_FACTOR'] = args.scaling_factor
     is_tangent = "Tangent" if args.tangent_approximation else "Intrinsic"
     config['EXECUTION_NAME'] = "{}_{}".format(args.manifold, is_tangent)
-    execution_name = args.execution_name if (args.execution_name != 'NoName') else "{}_{}".format(args.manifold, is_tangent)
+    execution_name = args.execution_name if (args.execution_name != 'NoName') else "{}_{}".format(args.manifold,
+                                                                                                  is_tangent)
     config['EXECUTION_NAME'] = execution_name
     config['IS_ADAPTIVE'] = args.adaptive
 
-
     diffs = [
         {
-            "NAME":"multiscale",
+            "NAME": "multiscale",
             "NUMBER_OF_SCALES": args.base_index + args.number_of_scales - 1,
             "MSE_LABEL": "Multi Scale"
         }]
@@ -57,16 +58,51 @@ def parse_arguments():
     return config, diffs
 
 
-def main():
-    config, diffs = parse_arguments()
+def main(config=None, diffs=None):
+    if config is None and diffs is None:
+        config, diffs = parse_arguments()
+
     rbf_generator = generate_wendland
-    original_function = config['ORIGINAL_FUNCTION']
+    current_original_function = config['ORIGINAL_FUNCTION']
     output_dir = CONFIG["OUTPUT_DIR"]
 
-
     with set_output_directory(output_dir):
-        results = Interpolation.run_all_experiments(config, diffs, rbf_generator, original_function)
+        results = Interpolation.run_all_experiments(config, diffs, rbf_generator, current_original_function)
+
+    return results
+
+
+def generate_run_parameters(base_scaling_factor, n_sf, base_kernel_normalizer, n_kn):
+    for i in range(n_sf):
+        for j in range(n_kn):
+            scaling_factor = base_scaling_factor ** (1 + (i / 2))
+            kernel_normalizer = base_kernel_normalizer * (5 ** (-j))
+            yield scaling_factor, kernel_normalizer
+
+
+def run_no_normalization_tests():
+    config = CONFIG.copy()
+
+    config['ORIGINAL_FUNCTION'] = original_function
+    config['MANIFOLD'] = MANIFOLDS["numbers_no_normalization"]()
+    config['IS_APPROXIMATING_ON_TANGENT'] = False
+    config['NORM_VISUALIZATION'] = False
+    config['SCALING_FACTOR'] = 1
+    config['EXECUTION_NAME'] = "NoNormalization"
+    config['IS_ADAPTIVE'] = False
+
+    diffs = [
+        {
+            "NAME": f"sf_{scaling_factor}_kernel_normalizer_{kernel_normalizer}",
+            "MSE_LABEL": f"kernel_normalizer_{kernel_normalizer}",
+            "NUMBER_OF_SCALES": 1,
+            "SCALING_FACTOR":scaling_factor,
+            "KERNEL_NORMALIZER": kernel_normalizer
+        } for scaling_factor, kernel_normalizer in generate_run_parameters(0.8, 7, 0.05, 7)
+    ]
+
+    main(config, diffs)
 
 
 if __name__ == "__main__":
-    main()
+    run_no_normalization_tests()

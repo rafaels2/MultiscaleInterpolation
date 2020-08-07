@@ -6,6 +6,8 @@ from cachetools import cached, LFUCache
 
 from matplotlib import cm
 from matplotlib import pyplot as plt
+import matplotlib as mpl
+mpl.rc('figure', max_open_warning = 0)
 
 import numpy as np
 from numpy import linalg as la
@@ -55,13 +57,16 @@ def plot_and_save(data, title, filename):
     cb.remove()
 
 
-def plot_lines(lines, filename, title, xlabel, ylabel):
+def plot_lines(lines, filename, title, xlabel, ylabel, x_data=None):
     fig = plt.figure()
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     for line_name, line_dots in lines.items():
-        plt.plot(line_dots, label=line_name)
+        if x_data is None:
+            plt.plot(line_dots, label=line_name)
+        else:
+            plt.plot(x_data[line_name], line_dots, label=line_name)
     plt.legend(lines.keys())
     plt.savefig(filename)
     plt.close(fig)
