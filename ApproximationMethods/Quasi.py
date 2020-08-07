@@ -7,15 +7,17 @@ from Tools.Utils import generate_grid, generate_kernel, evaluate_on_grid, genera
 from .ApproximationMethod import ApproximationMethod
 from Tools.SamplingPoints import SamplingPointsCollection
 
+
 def combine(a, b):
     def func(x, y):
         return a(x, y), b(x, y)
+
     return func
 
 
 class Quasi(ApproximationMethod):
-    def __init__(self, manifold, original_function, grid_parameters, rbf, 
-                 scale, is_approximating_on_tangent):
+    def __init__(self, manifold, original_function, grid_parameters, rbf,
+                 scale, is_approximating_on_tangent, kernel_normalizer):
         if isinstance(original_function, tuple):
             original_function = combine(*original_function)
             self._is_adaptive = True
@@ -24,13 +26,13 @@ class Quasi(ApproximationMethod):
         super().__init__(manifold, original_function, grid_parameters, rbf)
         self._is_approximating_on_tangent = is_approximating_on_tangent
         rbf_radius = scale
-        
-        self._grid = SamplingPointsCollection(rbf_radius, 
-            original_function,
-            grid_parameters,
-            phi_generator=self._calculate_phi)
 
-        self._kernel = generate_kernel(self._rbf, rbf_radius)
+        self._grid = SamplingPointsCollection(rbf_radius,
+                                              original_function,
+                                              grid_parameters,
+                                              phi_generator=self._calculate_phi)
+
+        self._kernel = generate_kernel(self._rbf, rbf_radius, kernel_normalizer)
 
     def _calculate_phi(self, x_0, y_0):
         point = np.array([x_0, y_0])
@@ -50,7 +52,7 @@ class Quasi(ApproximationMethod):
             normalizer = 0.00001
 
         return normalizer
-    
+
     @cached(cache=generate_cache(maxsize=1000))
     def approximation(self, x, y):
         """ Average sampled points around (x, y), using phis as weights """
@@ -75,7 +77,7 @@ class Quasi(ApproximationMethod):
 
         if self._is_adaptive:
             return self._manifold.log(base, self._manifold.average(values_to_average, weights))
-        
+
         return self._manifold.average(values_to_average, weights)
 
 

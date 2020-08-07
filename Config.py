@@ -26,6 +26,7 @@ CONFIG = {
     "IS_APPROXIMATING_ON_TANGENT": False,
     "MSE_LABEL":"Default Run",
     "IS_ADAPTIVE": False,
+    "KERNEL_NORMALIZER": 0.01,
 }
 
 

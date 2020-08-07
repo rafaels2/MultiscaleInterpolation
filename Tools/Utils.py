@@ -67,21 +67,23 @@ def plot_lines(lines, filename, title, xlabel, ylabel):
     plt.close(fig)
 
 
-def generate_kernel(rbf, scale=1):
+def generate_kernel(rbf, scale=1, normalizer=0.01):
     def kernel(x, y):
-        ans = (1 / scale ** 2) * rbf(la.norm(x-y) / scale)
+        ans = normalizer * ((1 / scale) ** 2) * rbf(la.norm(x-y) / scale)
         return ans
 
     return kernel
 
 
-def wendland(x):
-    if x < 0:
-        raise ValueError("x should be > 0, not {}".format(x))
-    if x > 1:
-        return 0
-    else:
-        return (1 + (4 * x)) * ((1 - x) ** 4)
+def generate_wendland(resolution):
+    def wendland(x):
+        if x < 0:
+            raise ValueError("x should be > 0, not {}".format(x))
+        if x > resolution:
+            return 0
+        else:
+            return (1 + (4 * x)) * ((1 - x) ** 4)
+    return wendland
 
 
 def calculate_max_derivative(original_function, grid_params, manifold):

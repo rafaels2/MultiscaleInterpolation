@@ -3,7 +3,7 @@ import importlib
 
 import Interpolation
 from Config import CONFIG, _SCALING_FACTOR
-from Tools.Utils import set_output_directory, wendland
+from Tools.Utils import set_output_directory, generate_wendland
 from Manifolds import MANIFOLDS
 
 
@@ -59,13 +59,13 @@ def parse_arguments():
 
 def main():
     config, diffs = parse_arguments()
-    rbf = wendland
+    rbf_generator = generate_wendland
     original_function = config['ORIGINAL_FUNCTION']
     output_dir = CONFIG["OUTPUT_DIR"]
 
 
     with set_output_directory(output_dir):
-        results = Interpolation.run_all_experiments(config, diffs, rbf, original_function)
+        results = Interpolation.run_all_experiments(config, diffs, rbf_generator, original_function)
 
 
 if __name__ == "__main__":
