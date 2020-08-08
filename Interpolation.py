@@ -20,8 +20,11 @@ def multiscale_interpolation(manifold,
                              kernel_normalizer):
     f_j = manifold.zero_func
     e_j = act_on_functions(manifold.log, f_j, original_function)
-    for scale_index in range(1, number_of_scales + 1):
-        scale = scaling_factor ** scale_index
+    for scale, kernel_normalizer in [(0.75 ** 4, 1/108.7)]:
+        # for scale, kernel_normalizer in [(0.75, 1 / 16.6), (0.75 ** 2, 1 / 30.4), (0.75 ** 3, 1 / 58.4),
+        #                                  (0.75 ** 4, 1 / 108.7)]:
+        # for scale_index in range(1, number_of_scales + 1):
+        #     scale = scaling_factor ** scale_index
         print("NEW SCALE: {}".format(scale))
 
         if is_approximating_on_tangent:
