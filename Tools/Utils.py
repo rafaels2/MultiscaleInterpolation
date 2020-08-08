@@ -85,7 +85,8 @@ def generate_wendland(resolution):
         if x > resolution:
             return 0
         else:
-            return (1 + (4 * x)) * ((1 - x) ** 4)
+            # return (1 + (4 * x)) * ((1 - x) ** 4)
+            return np.exp(-x ** 2)
     return wendland
 
 

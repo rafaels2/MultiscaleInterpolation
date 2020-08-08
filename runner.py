@@ -98,7 +98,7 @@ def run_no_normalization_tests():
             "NUMBER_OF_SCALES": 1,
             "SCALING_FACTOR": scaling_factor,
             "KERNEL_NORMALIZER": kernel_normalizer
-        } for scaling_factor, kernel_normalizer in generate_run_parameters(0.95, 7, 0.02, 7)
+        } for scaling_factor, kernel_normalizer in generate_run_parameters(0.95, 7, 0.3, 7)
     ]
 
     main(config, diffs)
