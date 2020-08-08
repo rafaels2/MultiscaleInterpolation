@@ -145,17 +145,18 @@ def run_all_experiments(config, diffs, *args):
             for mse in run_single_experiment(current_config, *args):
                 t_f = datetime.now()
                 calculation_time.append(t_f - t_0)
-                mse = np.log(mse)
+                # mse = np.log(mse)
                 mse_label = current_config["MSE_LABEL"]
                 current_mses = mses.get(mse_label, list())
                 current_x_data = x_data_sets.get(mse_label, list())
                 current_mses.append(mse)
-                current_x_data.append(np.log(current_config["SCALING_FACTOR"]))
+                # current_x_data.append(np.log(current_config["SCALING_FACTOR"]))
+                current_x_data.append((current_config["SCALING_FACTOR"]))
                 mses[mse_label] = current_mses
                 x_data_sets[mse_label] = current_x_data
                 t_0 = datetime.now()
 
-        plot_lines(mses, "mses.png", "Error in different runs", "Log Scaling factor", "log(Error)", x_data=x_data_sets)
+        plot_lines(mses, "mses.png", "Error in different runs", "Scaling factor", "Error", x_data=x_data_sets)
 
     print("MSEs are: {}".format(mses))
     print("times are: {}".format(calculation_time))
