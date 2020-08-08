@@ -76,7 +76,7 @@ def generate_run_parameters(base_scaling_factor, n_sf, base_kernel_normalizer, n
     for i in range(n_sf):
         for j in range(n_kn):
             scaling_factor = base_scaling_factor ** (1 + (i / 2))
-            kernel_normalizer = base_kernel_normalizer * (5 ** (-j))
+            kernel_normalizer = base_kernel_normalizer * (1 - 0.1 * j)
             yield scaling_factor, kernel_normalizer
 
 
@@ -98,7 +98,7 @@ def run_no_normalization_tests():
             "NUMBER_OF_SCALES": 1,
             "SCALING_FACTOR": scaling_factor,
             "KERNEL_NORMALIZER": kernel_normalizer
-        } for scaling_factor, kernel_normalizer in generate_run_parameters(0.8, 7, 0.05, 7)
+        } for scaling_factor, kernel_normalizer in generate_run_parameters(0.95, 7, 0.02, 7)
     ]
 
     main(config, diffs)
