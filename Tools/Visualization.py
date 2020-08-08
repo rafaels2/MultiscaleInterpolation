@@ -55,7 +55,7 @@ class Visualizer(object):
         plt.show()
 
 
-class ElipsoidVisualizer(Visualizer):
+class EllipsoidVisualizer(Visualizer):
     def __init__(self, matrices, centers):
         super().__init__(matrices, centers)
         
@@ -137,7 +137,7 @@ def ellipsoids_main():
         matrices[index] = spd.gen_point()
         centers[index] = np.array([index[0], index[1], 0])
     print("start to visualize")
-    ElipsoidVisualizer(matrices, centers).save("vis.png", "ellipsoids")
+    EllipsoidVisualizer(matrices, centers).save("vis.png", "ellipsoids")
 
 
 def rotations_main():

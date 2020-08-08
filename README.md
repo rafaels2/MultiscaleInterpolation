@@ -1,4 +1,4 @@
-# Multiscale Aproximation
+# Multiscale Approximation
 ## How to run?
 Install Requirements
 ```bash
@@ -33,7 +33,7 @@ The base of all this project is the following algorithm:
 - `Interpolation.py` is the main module. It runs the multiscale logic on a specific method.
 	- Implements the multi scale algorithm.
 -  `Config.py` configures the run.
-	- `IS_APPROXIMATING_ON_TANGENT` - should use the tnagent averaging algorithm or the intrinsic average?
+	- `IS_APPROXIMATING_ON_TANGENT` - should use the tangent averaging algorithm or the intrinsic average?
 	- `NORM_VISUALIZATION` - should visualize naively with $|m|$ or use the more complex visualization?
 	- `SCALING_FACTOR` - the $\delta$ of multi scale
 ### Approximation Methods

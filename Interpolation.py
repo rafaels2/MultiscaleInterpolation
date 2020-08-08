@@ -1,16 +1,10 @@
-from datetime import datetime
-import numpy.linalg as la
 import pickle as pkl
-import numpy as np
 import time
-import os
-
-from mpl_toolkits import mplot3d
-import matplotlib.pyplot as plt
+from datetime import datetime
 
 from Config import CONFIG, DIFFS
+from Tools.SamplingPoints import Grid, symmetric_grid_params
 from Tools.Utils import *
-from Tools.SamplingPoints import GridParameters, Grid, symmetric_grid_params
 
 
 def multiscale_interpolation(manifold,
@@ -66,8 +60,6 @@ def multiscale_interpolation(manifold,
 def run_single_experiment(config, rbf_generator, original_function):
     grid_size = config["GRID_SIZE"]
     base_resolution = config["BASE_RESOLUTION"]
-    plot_resolution_factor = config["PLOT_RESOLUTION_FACTOR"]
-    scale = config["SCALE"]
     number_of_scales = config["NUMBER_OF_SCALES"]
     test_mesh_norm = config["TEST_MESH_NORM"]
     scaling_factor = config["SCALING_FACTOR"]
@@ -91,7 +83,7 @@ def run_single_experiment(config, rbf_generator, original_function):
 
     plot_and_save(calculate_max_derivative(original_function, grid_params, manifold),
                   "max derivatives",
-                  "deriveatives.png")
+                  "derivatives.png")
 
     for i, interpolant in enumerate(multiscale_interpolation(
             manifold,
@@ -174,7 +166,6 @@ def main():
     rbf_generator = generate_wendland
     original_function = CONFIG["ORIGINAL_FUNCTION"]
     config = CONFIG
-    scaling_factor = CONFIG["SCALING_FACTOR"]
     output_dir = CONFIG["OUTPUT_DIR"]
     diffs = DIFFS
 

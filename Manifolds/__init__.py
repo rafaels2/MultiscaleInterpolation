@@ -2,10 +2,11 @@ MANIFOLDS = {}
 
 
 def register_manifold(name):
-	def _cls(cls):
-		MANIFOLDS[name] = cls
-		return cls
-	return _cls
+    def _cls(cls):
+        MANIFOLDS[name] = cls
+        return cls
+
+    return _cls
 
 
 from . import Circle

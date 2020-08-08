@@ -1,5 +1,5 @@
 from Manifolds.RigidRotations import RigidRotations, Rotation
-from ApproximationMethods.Quasi import Quasi, QuasiNoNormalization
+from ApproximationMethods.Quasi import QuasiNoNormalization
 
 _SCALING_FACTOR = 0.75
 
@@ -24,7 +24,7 @@ CONFIG = {
     "SCALED_INTERPOLATION_METHOD": QuasiNoNormalization,
     "NORM_VISUALIZATION": False,
     "IS_APPROXIMATING_ON_TANGENT": False,
-    "MSE_LABEL":"Default Run",
+    "MSE_LABEL": "Default Run",
     "IS_ADAPTIVE": False,
     "KERNEL_NORMALIZER": 0.01,
 }

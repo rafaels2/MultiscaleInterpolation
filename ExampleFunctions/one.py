@@ -1,2 +1,2 @@
-def original_function(x, y):
+def original_function(_, _):
     return 1

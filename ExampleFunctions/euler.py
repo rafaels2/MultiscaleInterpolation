@@ -1,5 +1,5 @@
 """ Rotations """
-from Manifolds.RigidRotations import RigidRotations, Quaternion, Rotation
+from Manifolds.RigidRotations import Rotation
 
 
 def original_function(x, y):

@@ -1,18 +1,16 @@
 import os
-from collections import namedtuple
 from contextlib import contextmanager
 
-from cachetools import cached, LFUCache
-
-from matplotlib import cm
-from matplotlib import pyplot as plt
 import matplotlib as mpl
+from cachetools import cached, LFUCache
+from matplotlib import pyplot as plt
+
 mpl.rc('figure', max_open_warning = 0)
 
 import numpy as np
 from numpy import linalg as la
 
-from Tools.SamplingPoints import GridParameters, Grid, symmetric_grid_params, generate_grid
+from Tools.SamplingPoints import Grid, generate_grid
 
 num_of_caches_g = 0
 

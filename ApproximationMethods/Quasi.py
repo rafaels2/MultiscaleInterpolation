@@ -1,11 +1,9 @@
 import numpy as np
 from cachetools import cached
-from numpy import linalg as la
-from collections import namedtuple
-from Tools.Utils import generate_grid, generate_kernel, evaluate_on_grid, generate_cache
 
-from .ApproximationMethod import ApproximationMethod
 from Tools.SamplingPoints import SamplingPointsCollection
+from Tools.Utils import generate_kernel, generate_cache
+from .ApproximationMethod import ApproximationMethod
 
 
 def combine(a, b):
@@ -58,6 +56,7 @@ class Quasi(ApproximationMethod):
         """ Average sampled points around (x, y), using phis as weights """
         values_to_average = list()
         weights = list()
+        base = None
 
         if self._is_adaptive:
             base = self._original_function(x, y)[1]

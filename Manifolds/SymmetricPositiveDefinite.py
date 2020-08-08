@@ -5,7 +5,7 @@ from scipy.linalg import expm, logm, sqrtm
 from sklearn.datasets import make_spd_matrix
 
 from Tools.KarcherMean import KarcherMean
-from Tools.Visualization import ElipsoidVisualizer
+from Tools.Visualization import EllipsoidVisualizer
 
 from .AbstractManifold import AbstractManifold
 from . import register_manifold
@@ -19,7 +19,8 @@ class SymmetricPositiveDefinite(AbstractManifold):
         super().__init__()
         self.dim = dim
 
-    def is_in_manifold(self, x):
+    @staticmethod
+    def is_in_manifold(x):
         return all([
             (la.norm(x - np.transpose(x)) < SYMMETRIC_ERROR),
             (all(x > 0 for x in la.eig(x)[0]))
@@ -30,7 +31,8 @@ class SymmetricPositiveDefinite(AbstractManifold):
         exp_param = self._calculate_log_param(x, y)
         return np.matmul(np.matmul(sqrt_x, expm(exp_param)), sqrt_x)
 
-    def _calculate_log_param(self, x, y):
+    @staticmethod
+    def _calculate_log_param(x, y):
         sqrt_x = sqrtm(x)
         inv_sqrt_x = la.inv(sqrt_x) 
         return np.matmul(np.matmul(inv_sqrt_x, y), inv_sqrt_x)
@@ -75,7 +77,7 @@ class SymmetricPositiveDefinite(AbstractManifold):
         for index in np.ndindex(data.shape):
             centers[index] = np.array([index[0], index[1], 0])
         print("start to visualize")
-        ElipsoidVisualizer(data, centers).save(filename, title)
+        EllipsoidVisualizer(data, centers).save(filename, title)
 
 
 def main():

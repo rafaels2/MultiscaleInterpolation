@@ -9,7 +9,7 @@ from ExampleFunctions.numbers_gauss import original_function
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser("RBF Approximation Scrtipt")
+    parser = argparse.ArgumentParser("RBF Approximation Script")
     parser.add_argument('-f', '--function', type=str, help='Original function file', required=True)
     parser.add_argument('-m', '--manifold', choices=MANIFOLDS.keys(), required=True)
     parser.add_argument('-t', '--tangent-approximation', action='store_true',
@@ -96,7 +96,7 @@ def run_no_normalization_tests():
             "NAME": f"sf_{scaling_factor}_kernel_normalizer_{kernel_normalizer}",
             "MSE_LABEL": f"kernel_normalizer_{kernel_normalizer}",
             "NUMBER_OF_SCALES": 1,
-            "SCALING_FACTOR":scaling_factor,
+            "SCALING_FACTOR": scaling_factor,
             "KERNEL_NORMALIZER": kernel_normalizer
         } for scaling_factor, kernel_normalizer in generate_run_parameters(0.8, 7, 0.05, 7)
     ]

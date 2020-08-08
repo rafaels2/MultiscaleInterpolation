@@ -1,16 +1,13 @@
-import scipy
 import numpy as np
+import scipy
 from numpy import linalg as la
-
 from pyquaternion import Quaternion
-from scipy.stats import special_ortho_group
 from scipy.spatial.transform import Rotation
+from scipy.stats import special_ortho_group
 
-from Tools.KarcherMean import KarcherMean
 from Tools.Visualization import RotationVisualizer
-
-from .AbstractManifold import AbstractManifold
 from . import register_manifold
+from .AbstractManifold import AbstractManifold
 
 SPECIAL_TOLERANCE = 0.001
 ORTHOGONAL_TOLERANCE = 0.001
@@ -28,14 +25,16 @@ class RigidRotations(AbstractManifold):
     def distance(self, x, y):
         return la.norm(self.log(x, y))
 
-    def _quaternion_from_matrix(self, matrix):
+    @staticmethod
+    def _quaternion_from_matrix(matrix):
         """
         :param matrix: Rotation matrix.
         :return: Quaternion representation of the given matrix.
         """
         return Quaternion(Rotation.from_matrix(matrix).as_quat())
 
-    def _matrix_from_quaternion(self, quaternion):
+    @staticmethod
+    def _matrix_from_quaternion(quaternion):
         """
         :param quaternion: Quaternion representation of a given rotation matrix.
         :return: The rotation matrix.
@@ -68,8 +67,9 @@ class RigidRotations(AbstractManifold):
             print(matrix, is_special, is_orthogonal)
         return answer
 
-    def geodesic_l2_mean_step(self, current_estimator, noisy_samples, weights, tolerance=0.00000001):
-        projected_diff_samples = [w_i * scipy.linalg.logm(np.matmul(np.linalg.inv(current_estimator), noisy_sample)) 
+    @staticmethod
+    def geodesic_l2_mean_step(current_estimator, noisy_samples, weights, tolerance=0.00000001):
+        projected_diff_samples = [w_i * scipy.linalg.logm(np.matmul(np.linalg.inv(current_estimator), noisy_sample))
                                   for w_i, noisy_sample in
                                   zip(weights, noisy_samples)]
         matrices_sum = np.zeros(projected_diff_samples[0].shape, dtype='complex128')
@@ -121,14 +121,14 @@ def main():
     b = m.gen_point()
     c = m.gen_point()
 
-    d = m.average([a,b,c], [1,1,1])
+    d = m.average([a, b, c], [1, 1, 1])
     e = m.log(a, b)
     f = m.exp(a, e)
     print("dist", m.distance(f, b))
     print("dist", m.distance(a, b))
     print("a, a", m.log(a, a))
-    return a,b,c,d,m
+    return a, b, c, d, m
 
 
 if __name__ == '__main__':
-    a,b,c,d,m = main()
+    a, b, c, d, m = main()

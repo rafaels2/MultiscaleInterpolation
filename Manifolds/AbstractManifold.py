@@ -10,6 +10,9 @@ SYMMETRIC_ERROR = 10 ** -5
 
 
 class AbstractManifold(object):
+    def __init__(self):
+        self.fig = None
+
     @abstractmethod
     def exp(self, x, y):
         pass
@@ -88,7 +91,7 @@ class AbstractManifold(object):
             return self._geodesic_average(values_to_average, weights)
 
     @abstractmethod
-    def _karcher_mean(self, values_to_average, weights, base=None, iterations=0):
+    def _karcher_mean(self, values_to_average, weights, base=None):
         pass
 
     def average(self, values_to_average, weights):

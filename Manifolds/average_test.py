@@ -1,9 +1,6 @@
 from collections import namedtuple
 
 import numpy as np
-from numpy import linalg as la
-
-from pyquaternion import Quaternion
 from scipy.spatial.transform import Rotation
 
 from Tools.Visualization import RotationVisualizer

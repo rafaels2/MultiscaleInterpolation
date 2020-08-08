@@ -46,6 +46,7 @@ class SamplingPoints(object):
 @add_sampling_class('Grid')
 class Grid(SamplingPoints):
     def __init__(self, rbf_radius, function_to_evaluate, grid_parameters, phi_generator=None):
+        super().__init__(rbf_radius, function_to_evaluate)
         self._x_min = grid_parameters.x_min
         self._x_max = grid_parameters.x_max
         self._y_min = grid_parameters.y_min
@@ -106,8 +107,9 @@ class SamplingPointsCollection(object):
 
 
 def main():
-    def func(x, y):
+    def func(x, _):
         return x
+
     def phi(x, y):
         def f(a, b):
             return (a-x)**2 + (b-y)**2
