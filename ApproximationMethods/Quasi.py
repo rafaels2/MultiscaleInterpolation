@@ -23,6 +23,7 @@ class Quasi(ApproximationMethod):
             self._is_adaptive = False
         super().__init__(manifold, original_function, grid_parameters, rbf)
         self._is_approximating_on_tangent = is_approximating_on_tangent
+        self._histogram = dict()
         rbf_radius = scale
 
         self._grid = SamplingPointsCollection(rbf_radius,
@@ -31,6 +32,10 @@ class Quasi(ApproximationMethod):
                                               phi_generator=self._calculate_phi)
 
         self._kernel = generate_kernel(self._rbf, rbf_radius, kernel_normalizer)
+
+    @property
+    def grid_histogram(self):
+        return self._histogram
 
     def _calculate_phi(self, x_0, y_0):
         point = np.array([x_0, y_0])
@@ -76,6 +81,9 @@ class Quasi(ApproximationMethod):
 
         if self._is_adaptive:
             return self._manifold.log(base, self._manifold.average(values_to_average, weights))
+
+        number_of_nonzero = len([w for w in weights if w > 0])
+        self._histogram[number_of_nonzero] = self._histogram.get(number_of_nonzero, 0) + 1
 
         return self._manifold.average(values_to_average, weights)
 

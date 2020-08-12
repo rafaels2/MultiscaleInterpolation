@@ -20,9 +20,9 @@ def multiscale_interpolation(manifold,
                              kernel_normalizer):
     f_j = manifold.zero_func
     e_j = act_on_functions(manifold.log, f_j, original_function)
-    for scale, kernel_normalizer in [(0.75 ** 4, 1/108.7)]:
-        # for scale, kernel_normalizer in [(0.75, 1 / 16.6), (0.75 ** 2, 1 / 30.4), (0.75 ** 3, 1 / 58.4),
-        #                                  (0.75 ** 4, 1 / 108.7)]:
+    # for scale, kernel_normalizer in [(0.75 ** 4, 1/108.7)]:
+    for scale, kernel_normalizer in [(0.75, 1 / 16.6), (0.75 ** 2, 1 / 30.4), (0.75 ** 3, 1 / 58.4),
+                                     (0.75 ** 4, 1 / 108.7)]:
         # for scale_index in range(1, number_of_scales + 1):
         #     scale = scaling_factor ** scale_index
         print("NEW SCALE: {}".format(scale))
@@ -39,7 +39,7 @@ def multiscale_interpolation(manifold,
             # Can add here more grids (borders)
         ]
 
-        s_j = scaled_interpolation_method(
+        method = scaled_interpolation_method(
             manifold,
             function_to_interpolate,
             current_grid_parameters,
@@ -47,7 +47,8 @@ def multiscale_interpolation(manifold,
             scale / resolution,
             is_approximating_on_tangent,
             kernel_normalizer
-        ).approximation
+        )
+        s_j = method.approximation
         print("interpolated!")
 
         if is_approximating_on_tangent or is_adaptive:
@@ -57,7 +58,7 @@ def multiscale_interpolation(manifold,
 
         f_j = act_on_functions(manifold.exp, f_j, function_added_to_f_j)
         e_j = act_on_functions(manifold.log, f_j, original_function)
-        yield f_j
+        yield f_j, method
 
 
 def run_single_experiment(config, rbf_generator, original_function):
@@ -88,7 +89,7 @@ def run_single_experiment(config, rbf_generator, original_function):
                   "max derivatives",
                   "derivatives.png")
 
-    for i, interpolant in enumerate(multiscale_interpolation(
+    for i, (interpolant, method) in enumerate(multiscale_interpolation(
             manifold,
             number_of_scales=number_of_scales,
             original_function=original_function,
@@ -106,6 +107,7 @@ def run_single_experiment(config, rbf_generator, original_function):
                 pkl.dump(config, f)
 
             approximated_values_on_grid = Grid(1, interpolant, grid_params).evaluation
+            print(f"Histogram: {method.grid_histogram}")
 
             manifold.plot(
                 approximated_values_on_grid,

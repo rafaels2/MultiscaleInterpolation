@@ -58,6 +58,7 @@ class Grid(SamplingPoints):
         self._x, self._y = self._generate_grid()
         self._evaluation = self._evaluate_on_grid(function_to_evaluate)
         self._phi = None
+        self.sampled_points = dict()
 
         if phi_generator is not None:
             self._phi = self._evaluate_on_grid(phi_generator)
@@ -84,11 +85,18 @@ class Grid(SamplingPoints):
         index_0 = np.array([y_0, x_0])
         radius_array = np.array([self._radius_in_index + 1, self._radius_in_index + 1])
 
+        number_of_sampled_points = 0
+
         for index in np.ndindex((2 * self._radius_in_index + 2, 2 * self._radius_in_index + 2)):
             current_index = tuple(index_0 - radius_array + np.array(index))
             if all([current_index[0] >= 0, current_index[1] >= 0, 
                     current_index[0] < self._x.shape[0], current_index[1] < self._y.shape[1]]):
+                # if self._phi[current_index] > 0.01:
+                #     number_of_sampled_points += 1
                 yield Point(self._evaluation[current_index], self._phi[current_index], self._x[current_index], self._y[current_index])
+
+        self.sampled_points[number_of_sampled_points] = \
+            self.sampled_points.get(number_of_sampled_points, 0) + 1
 
     @property
     def evaluation(self):
@@ -100,6 +108,10 @@ class SamplingPointsCollection(object):
         self._grids = [SAMPLING_POINTS_CLASSES[name](rbf_radius, 
                                                      function_to_evaluate, parameters, **kwargs) 
                        for name, parameters in grids_parameters]
+
+    @property
+    def sampled_points(self):
+        return [grid.sampled_points for grid in self._grids]
 
     def points_in_radius(self, x, y):
         for grid in self._grids:
