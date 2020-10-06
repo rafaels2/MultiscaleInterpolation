@@ -1,8 +1,11 @@
 import argparse
 import importlib
 
+import numpy as np
 import Interpolation
 from Config import CONFIG, _SCALING_FACTOR
+from DataSetParser import NRRDParser
+from InputInterface import DTMRIDataSet
 from Tools.Utils import set_output_directory, wendland
 from Manifolds import MANIFOLDS
 
@@ -68,5 +71,15 @@ def main():
         results = Interpolation.run_all_experiments(config, diffs, rbf, original_function)
 
 
+def get_nrrd_as_function(path):
+    parser = NRRDParser(path)
+    data, resolution = parser.parse()
+    print(f"Resolution is: {resolution}")
+    original_function = DTMRIDataSet(data, np.array([1, 1, 1]), resolution)
+    return original_function
+
+
 if __name__ == "__main__":
-    main()
+    # main()
+    orig = get_nrrd_as_function('input_data\\dt-helix.nhdr')
+    print(orig(np.array([0.03, 0.03, 0.03])))
