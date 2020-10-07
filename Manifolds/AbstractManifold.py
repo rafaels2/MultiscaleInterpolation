@@ -41,12 +41,12 @@ class AbstractManifold(object):
         return cb
 
     def plot(self, data, title, filename, **kwargs):
-        self.fig = plt.figure()
+        temp_fig = plt.figure()
         plt.title(title)
         cb = self._visualize(plt, data)
         plt.savefig(filename)
         cb.remove()
-        plt.close(self.fig)
+        plt.close(temp_fig)
 
     def zero_func(self, x_0, x_1):
         return 0
@@ -86,10 +86,6 @@ class AbstractManifold(object):
             return values_to_average[0]
         else:
             return self._geodesic_average(values_to_average, weights)
-
-    @abstractmethod
-    def _karcher_mean(self, values_to_average, weights, base=None, iterations=0):
-        pass
 
     def average(self, values_to_average, weights):
         """
