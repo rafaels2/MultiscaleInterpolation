@@ -9,8 +9,6 @@ from numpy import linalg as la
 
 from matplotlib import cm
 import matplotlib.pyplot as plt
-import matplotlib.colors as colors
-from mpl_toolkits.mplot3d import Axes3D
 
 from pytransform3d.rotations import plot_basis
 
@@ -21,7 +19,7 @@ if __name__ == "__main__":
 
 class Visualizer(object):
     def __init__(self, matrices, centers):
-        self.fig = plt.figure(figsize=(8,8))
+        self.fig = plt.figure(figsize=(8, 8))
         self.ax = self.fig.add_subplot(projection='3d')
         self.ax.view_init(azim=0, elev=90)
         self._matrices = matrices
@@ -55,10 +53,10 @@ class Visualizer(object):
         plt.show()
 
 
-class ElipsoidVisualizer(Visualizer):
+class EllipsoidVisualizer(Visualizer):
     def __init__(self, matrices, centers):
         super().__init__(matrices, centers)
-        
+
         self._svd_matrices()
         self._calculate_normalizer()
 
@@ -96,20 +94,21 @@ class ElipsoidVisualizer(Visualizer):
 
         for i in range(len(x)):
             for j in range(len(x)):
-                [x[i,j],y[i,j],z[i,j]] = np.dot([x[i,j],y[i,j],z[i,j]], rotation) + center
-        
-        self.ax.plot_surface(x, y, z,  rstride=3, cstride=3, linewidth=0.1, alpha=1, shade=True,
-            cmap=cm.coolwarm)
+                [x[i, j], y[i, j], z[i, j]] = np.dot([x[i, j], y[i, j], z[i, j]], rotation) + center
+
+        self.ax.plot_surface(x, y, z, rstride=3, cstride=3, linewidth=0.1, alpha=1, shade=True,
+                             cmap=cm.coolwarm)
 
 
 class RotationVisualizer(Visualizer):
     """docstring for RotationVisualizer"""
+
     def __init__(self, matrices, centers):
         super().__init__(matrices, centers)
-        min_lim, max_lim = self._get_lims()
+        min_lim, max_lim = self._get_limits()
         plt.setp(self.ax, xlim=(min_lim, max_lim), ylim=(min_lim, max_lim), zlim=(min_lim, max_lim))
 
-    def _get_lims(self):
+    def _get_limits(self):
         if self._centers.dtype.kind == 'f':
             centers = self._centers
         else:
@@ -120,6 +119,7 @@ class RotationVisualizer(Visualizer):
                 for index in np.ndindex(centers.shape):
                     centers[index] = self._centers[index[:-1]][index[-1]]
 
+        # noinspection PyArgumentList
         return centers.min() - 1, centers.max() + 1
 
     def _process_matrix(self, index):
@@ -137,7 +137,7 @@ def ellipsoids_main():
         matrices[index] = spd.gen_point()
         centers[index] = np.array([index[0], index[1], 0])
     print("start to visualize")
-    ElipsoidVisualizer(matrices, centers).save("vis.png", "ellipsoids")
+    EllipsoidVisualizer(matrices, centers).save("vis.png", "ellipsoids")
 
 
 def rotations_main():
