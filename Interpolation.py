@@ -19,6 +19,7 @@ def multiscale_interpolation(manifold,
     f_j = manifold.zero_func
     e_j = act_on_functions(manifold.log, f_j, original_function)
     for scale_index in range(1, number_of_scales + 1):
+        # TODO: here we see why scale and resolution are needed.
         scale = scaling_factor ** scale_index
         print("NEW SCALE: {}".format(scale))
 
@@ -29,6 +30,8 @@ def multiscale_interpolation(manifold,
         else:
             function_to_interpolate = act_on_functions(manifold.exp, manifold.zero_func, e_j)
 
+        # TODO: change from Grid the new generic one. It's enough and we don't need to think of something else.
+        # TODO: The grid should know how to optimize data acquirement most efficiently.
         current_grid_parameters = [
             ('Grid', symmetric_grid_params(grid_size + 1, scale / resolution)),
             # Can add here more grids (borders)
@@ -66,6 +69,8 @@ def run_single_experiment(config, rbf, original_function):
     is_approximating_on_tangent = config["IS_APPROXIMATING_ON_TANGENT"]
     is_adaptive = config["IS_ADAPTIVE"]
 
+    # TODO: calculate the correct test_mesh_norm according to given gird.
+    # TODO: we should know a point (like mins and maxs), and max resolution, to plan.
     grid_params = symmetric_grid_params(grid_size, test_mesh_norm)
     # TODO: we should get here also the centers.
     true_values_on_grid = Grid(1, original_function, grid_params).evaluation
