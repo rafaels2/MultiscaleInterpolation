@@ -56,8 +56,8 @@ class InputDataSet(AbstractInputInterface):
         return self._data_set[multi_index]
 
 
-class UnconfidenceError(KeyError):
-    # TODO: create a meaningfull error message.
+class ConfidenceError(KeyError):
+    # TODO: create a meaningful error message.
     pass
 
 
