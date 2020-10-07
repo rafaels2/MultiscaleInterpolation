@@ -82,4 +82,3 @@ DIFFS = [
          "NUMBER_OF_SCALES": 1,
          "SCALING_FACTOR": _SCALING_FACTOR ** i} for i in range(1, 5)
     ]
-
