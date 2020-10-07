@@ -5,12 +5,18 @@ from scipy.linalg import expm, logm, sqrtm
 from sklearn.datasets import make_spd_matrix
 
 from Tools.KarcherMean import KarcherMean
-from Tools.Visualization import ElipsoidVisualizer
+from Tools.Visualization import EllipsoidVisualizer
 
 from .AbstractManifold import AbstractManifold
 from . import register_manifold
 
 SYMMETRIC_ERROR = 10 ** -5
+
+
+def _calculate_log_param(x, y):
+    sqrt_x = sqrtm(x)
+    inv_sqrt_x = la.inv(sqrt_x)
+    return np.matmul(np.matmul(inv_sqrt_x, y), inv_sqrt_x)
 
 
 @register_manifold("spd")
@@ -27,21 +33,16 @@ class SymmetricPositiveDefinite(AbstractManifold):
 
     def exp(self, x, y):
         sqrt_x = sqrtm(x)
-        exp_param = self._calculate_log_param(x, y)
+        exp_param = _calculate_log_param(x, y)
         return np.matmul(np.matmul(sqrt_x, expm(exp_param)), sqrt_x)
 
-    def _calculate_log_param(self, x, y):
-        sqrt_x = sqrtm(x)
-        inv_sqrt_x = la.inv(sqrt_x) 
-        return np.matmul(np.matmul(inv_sqrt_x, y), inv_sqrt_x)
-        
     def log(self, x, y):
         sqrt_x = sqrtm(x)
-        log_param = self._calculate_log_param(x, y)
+        log_param = _calculate_log_param(x, y)
         return np.matmul(np.matmul(sqrt_x, logm(log_param)), sqrt_x)
 
     def distance(self, x, y):
-        log_param = self._calculate_log_param(x, y)
+        log_param = _calculate_log_param(x, y)
         return la.norm(logm(log_param))
 
     def _to_numbers(self, x):
@@ -55,14 +56,14 @@ class SymmetricPositiveDefinite(AbstractManifold):
 
     def _get_geodetic_line(self, x, y):
         sqrt_x = sqrtm(x)
-        log_param = self._calculate_log_param(x, y)
+        log_param = _calculate_log_param(x, y)
 
         def line(t):
             return sqrt_x * logm(t * log_param) * sqrt_x
 
         return line
 
-    def _karcher_mean(self, values_to_average, weights, base=None):
+    def _karcher_mean(self, values_to_average, weights):
         return KarcherMean(self, values_to_average, weights).get_average()
 
     def average(self, values_to_average, weights):
@@ -75,7 +76,7 @@ class SymmetricPositiveDefinite(AbstractManifold):
         for index in np.ndindex(data.shape):
             centers[index] = np.array([index[0], index[1], 0])
         print("start to visualize")
-        ElipsoidVisualizer(data, centers).save(filename, title)
+        EllipsoidVisualizer(data, centers).save(filename, title)
 
 
 def main():
@@ -83,7 +84,7 @@ def main():
     a = m.gen_point()
     b = m.gen_point()
     e = m.gen_point()
-    f = m.gen_point ()
+    f = m.gen_point()
     # s = m.average([a, b], [1, 1])
     # print("s: ", np.arctan2(s[1], s[0]))
     c = m.log(a, b)
