@@ -113,6 +113,7 @@ class RigidRotations(AbstractManifold):
             return super().plot(data, title, filename)
         centers = np.zeros_like(data, dtype=object)
         for index in np.ndindex(data.shape):
+            # TODO locate the centers as the grid says. Receive the locations as a parameter.
             centers[index] = np.array([index[0], index[1], 0])
         print("start to visualize")
         RotationVisualizer(data, centers).save(filename, title)

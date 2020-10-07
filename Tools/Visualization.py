@@ -21,6 +21,7 @@ class Visualizer(object):
     def __init__(self, matrices, centers):
         self.fig = plt.figure(figsize=(8, 8))
         self.ax = self.fig.add_subplot(projection='3d')
+        # TODO: change this when visualizing 3D.
         self.ax.view_init(azim=0, elev=90)
         self._matrices = matrices
         self._centers = centers
@@ -69,6 +70,7 @@ class EllipsoidVisualizer(Visualizer):
 
         print("Max Radius is ", max_radius)
 
+        # TODO: normalize according to min fill distance
         self._normalizer = max_radius * 2
 
     def _svd_matrices(self):

@@ -47,6 +47,7 @@ def _original_function(x, y):
 """
 
 
+# TODO: consider adding dimension to config
 CONFIG = {
     "GRID_SIZE": 1.5,
     "BASE_RESOLUTION": 2,

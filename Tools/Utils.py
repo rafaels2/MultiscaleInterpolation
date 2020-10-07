@@ -30,6 +30,7 @@ def act_on_functions(action, a, b):
 
 
 def evaluate_on_grid(func, *args, points=None, should_log=False):
+    # Only used in interpolation
     if points is not None:
         x, y = points
     else:
@@ -69,6 +70,7 @@ def plot_lines(lines, filename, title, xlabel, ylabel):
 
 def generate_kernel(rbf, scale=1):
     def kernel(x, y):
+        # TODO: change to kernel(p). make sure to replace 2 to d
         ans = (1 / scale ** 2) * rbf(la.norm(x-y) / scale)
         return ans
 
@@ -86,6 +88,7 @@ def wendland(x):
 
 def calculate_max_derivative(original_function, grid_params, manifold):
     def derivative(x, y):
+        # TODO: change (x, y) to p and write the derivatives in a more generic way.
         delta = grid_params.mesh_norm / 2
         evaluations_around = [original_function(x + (delta / np.sqrt(2)), y + (delta / np.sqrt(2))),
                               original_function(x, y + delta),

@@ -32,10 +32,14 @@ class AbstractManifold(object):
         pass
 
     def _visualize(self, plt, data):
+        # TODO: we can decide to fix this distortion.
+        print("Using the norm visualizer. Output might look distorted because we treat"
+              " all directions as the same distances")
         visualization = np.zeros_like(data, dtype=np.float32)
         for index in np.ndindex(visualization.shape):
             x = data[index]
             visualization[index] = self._to_numbers(x)
+        # TODO: if data is 3D we can return slices. Starting with a single.
         plt.imshow(visualization)
         cb = plt.colorbar()
         return cb

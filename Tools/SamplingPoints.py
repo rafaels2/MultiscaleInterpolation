@@ -2,8 +2,9 @@ from abc import abstractmethod
 from collections import namedtuple
 import numpy as np
 
-
+# TODO mesh_norm is the max value distance to closest point. We should raise an exception if we can't make it.
 GridParameters = namedtuple('GridParameters', ['x_min', 'x_max', 'y_min', 'y_max', 'mesh_norm'])
+# TODO the point location should be represented by p(:=(x,y,z,...)) and not specifically x,y.
 Point = namedtuple('Point', ['evaluation', 'phi', 'x', 'y'])
 
 SAMPLING_POINTS_CLASSES = dict()
@@ -52,6 +53,9 @@ class SamplingPoints(object):
         pass
 
 
+# TODO: This class should be renamed to 2D stepped grid
+# TODO: Create a more generic class that will be the grid for the data sets.
+# TODO: Create a class that handles ConfidenceError - if there is an error find a better option.
 @add_sampling_class('Grid')
 class Grid(SamplingPoints):
     def __init__(self, rbf_radius, function_to_evaluate, grid_parameters, phi_generator=None, *args, **kwargs):

@@ -67,8 +67,10 @@ def run_single_experiment(config, rbf, original_function):
     is_adaptive = config["IS_ADAPTIVE"]
 
     grid_params = symmetric_grid_params(grid_size, test_mesh_norm)
+    # TODO: we should get here also the centers.
     true_values_on_grid = Grid(1, original_function, grid_params).evaluation
 
+    # TODO: plot has to get the centers
     manifold.plot(
         true_values_on_grid,
         "original",

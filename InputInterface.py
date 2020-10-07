@@ -62,6 +62,7 @@ class ConfidenceError(KeyError):
 
 
 class DTMRIDecoder(object):
+    # TODO: in order to deal with Confidence error, we should have a "find nearest" function.
     def __init__(self, data, confidence_threshold=DEFAULT_CONFIDENCE_THRESHOLD):
         self._data = data
         self._confidence_threshold = confidence_threshold
@@ -70,7 +71,7 @@ class DTMRIDecoder(object):
     def __getitem__(self, index):
         item = DTMRIVoxel(*self._data[[slice(0, 7)] + index])
         if item.confidence < self._confidence_threshold:
-            raise UnconfidenceError(f'item is: p{item}')
+            raise ConfidenceError(f'item is: p{item}')
 
         return np.array([[item.xx, item.xy, item. xz],
                          [item.xy, item.yy, item.yz],
@@ -82,3 +83,6 @@ class DTMRIDataSet(InputDataSet):
                  confidence_threshold=DEFAULT_CONFIDENCE_THRESHOLD):
         data_set = DTMRIDecoder(data_set, confidence_threshold)
         super().__init__(data_set, grid_offset, resolution)
+
+
+# TODO: write a unittest here.

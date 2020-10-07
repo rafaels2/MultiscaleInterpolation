@@ -8,6 +8,7 @@ from .ApproximationMethod import ApproximationMethod
 
 def combine(a, b):
     def func(x, y):
+        # TODO: replace x, y to p
         return a(x, y), b(x, y)
 
     return func
@@ -33,10 +34,12 @@ class Quasi(ApproximationMethod):
         self._kernel = generate_kernel(self._rbf, rbf_radius)
 
     def _calculate_phi(self, x_0, y_0):
+        # TODO: replace to p_0
         point = np.array([x_0, y_0])
 
         @cached(cache=generate_cache(maxsize=100))
         def phi(x, y):
+            # TODO: replace p
             vector = np.array([x, y])
             return self._kernel(vector, point)
 
@@ -45,6 +48,7 @@ class Quasi(ApproximationMethod):
     @cached(cache=generate_cache(maxsize=1000))
     def approximation(self, x, y):
         """ Average sampled points around (x, y), using phis as weights """
+        # TODO: change to (x, y) to p
         values_to_average = list()
         weights = list()
         base = None
