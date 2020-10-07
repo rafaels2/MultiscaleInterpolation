@@ -1,19 +1,12 @@
-from datetime import datetime
-import numpy.linalg as la
 import pickle as pkl
-import numpy as np
 import time
-import os
-
-from mpl_toolkits import mplot3d
-import matplotlib.pyplot as plt
+from datetime import datetime
 
 from Config import CONFIG, DIFFS
 from Tools.Utils import *
-from Tools.SamplingPoints import GridParameters, Grid, symmetric_grid_params
 
 
-def multiscale_interpolation(manifold, 
+def multiscale_interpolation(manifold,
                              original_function,
                              grid_size,
                              resolution,
@@ -63,14 +56,12 @@ def multiscale_interpolation(manifold,
 def run_single_experiment(config, rbf, original_function):
     grid_size = config["GRID_SIZE"]
     base_resolution = config["BASE_RESOLUTION"]
-    plot_resolution_factor = config["PLOT_RESOLUTION_FACTOR"]
-    scale = config["SCALE"]
     number_of_scales = config["NUMBER_OF_SCALES"]
     test_mesh_norm = config["TEST_MESH_NORM"]
     scaling_factor = config["SCALING_FACTOR"]
     experiment_name = config["NAME"] or "temp"
     manifold = config["MANIFOLD"]
-    scaled_interpolation_method=config["SCALED_INTERPOLATION_METHOD"]
+    scaled_interpolation_method = config["SCALED_INTERPOLATION_METHOD"]
     norm_visualization = config["NORM_VISUALIZATION"]
     is_approximating_on_tangent = config["IS_APPROXIMATING_ON_TANGENT"]
     is_adaptive = config["IS_ADAPTIVE"]
@@ -87,21 +78,21 @@ def run_single_experiment(config, rbf, original_function):
 
     plot_and_save(calculate_max_derivative(original_function, grid_params, manifold),
                   "max derivatives",
-                  "deriveatives.png")
+                  "derivatives.png")
 
     for i, interpolant in enumerate(multiscale_interpolation(
             manifold,
             number_of_scales=number_of_scales,
             original_function=original_function,
-            grid_size = grid_size,
+            grid_size=grid_size,
             resolution=base_resolution,
             scaling_factor=scaling_factor,
             rbf=rbf,
             scaled_interpolation_method=scaled_interpolation_method,
             is_approximating_on_tangent=is_approximating_on_tangent,
             is_adaptive=is_adaptive
-            )):    
-        with set_output_directory("{}_{}".format(experiment_name, i+1)):
+    )):
+        with set_output_directory("{}_{}".format(experiment_name, i + 1)):
             with open("config.pkl", "wb") as f:
                 pkl.dump(config, f)
 
@@ -116,7 +107,7 @@ def run_single_experiment(config, rbf, original_function):
 
             error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
             plot_and_save(error, "difference map", "difference.png")
-            
+
             mse = np.mean(error)
             with open("results.pkl", "wb") as f:
                 results = {
@@ -133,7 +124,6 @@ def run_single_experiment(config, rbf, original_function):
 def run_all_experiments(config, diffs, *args):
     mses = dict()
     calculation_time = list()
-    interpolants = list()
     execution_name = config["EXECUTION_NAME"]
     path = "{}_{}".format(execution_name, time.strftime("%Y%m%d__%H%M%S"))
     with set_output_directory(path):
@@ -154,18 +144,18 @@ def run_all_experiments(config, diffs, *args):
                 current_mses.append(mse)
                 mses[mse_label] = current_mses
                 t_0 = datetime.now()
-    
+
         plot_lines(mses, "mses.png", "Error in different runs", "Iteration", "log(Error)")
 
     print("MSEs are: {}".format(mses))
     print("times are: {}".format(calculation_time))
     return mses
 
+
 def main():
     rbf = wendland
     original_function = CONFIG["ORIGINAL_FUNCTION"]
     config = CONFIG
-    scaling_factor = CONFIG["SCALING_FACTOR"]
     output_dir = CONFIG["OUTPUT_DIR"]
     diffs = DIFFS
 
