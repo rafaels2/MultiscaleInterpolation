@@ -98,7 +98,7 @@ def calculate_max_derivative(original_function, grid_params, manifold):
 
         return max([manifold.distance(direction, f_0)/delta for direction in evaluations_around])
 
-    evaluation = Grid(1, derivative, grid_params).evaluation
+    evaluation, centers = Grid(1, derivative, grid_params).evaluation
 
     result = np.zeros_like(evaluation, dtype=np.float32)
     for index in np.ndindex(result.shape):

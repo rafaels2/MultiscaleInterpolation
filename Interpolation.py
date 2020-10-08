@@ -74,7 +74,7 @@ def run_single_experiment(config, rbf, original_function):
     # TODO: we should know a point (like mins and maxs), and max resolution, to plan.
     grid_params = symmetric_grid_params(grid_size, test_mesh_norm)
     # TODO: we should get here also the centers.
-    true_values_on_grid = Grid(1, original_function, grid_params).evaluation
+    true_values_on_grid, centers = Grid(1, original_function, grid_params).evaluation
 
     # TODO: plot has to get the centers
     # TODO: instead of centers, we can fill with zeros.
@@ -105,7 +105,7 @@ def run_single_experiment(config, rbf, original_function):
             with open("config.pkl", "wb") as f:
                 pkl.dump(config, f)
 
-            approximated_values_on_grid = Grid(1, interpolant, grid_params).evaluation
+            approximated_values_on_grid, centers = Grid(1, interpolant, grid_params).evaluation
 
             manifold.plot(
                 approximated_values_on_grid,

@@ -20,9 +20,9 @@ if __name__ == "__main__":
 class Visualizer(object):
     def __init__(self, matrices, centers):
         self.fig = plt.figure(figsize=(8, 8))
-        self.ax = self.fig.add_subplot(projection='3d')
+        # TODO: self.ax = self.fig.add_subplot(projection='3d')
         # TODO: change this when visualizing 3D.
-        self.ax.view_init(azim=0, elev=90)
+        # TODO: self.ax.view_init(azim=0, elev=90)
         self._matrices = matrices
         self._centers = centers
 
@@ -33,23 +33,31 @@ class Visualizer(object):
     def save(self, filename, title):
         for index in np.ndindex(self._matrices.shape):
             self._process_matrix(index)
+        self._post_process()
         # Hide axes ticks
         self.ax.set_xticks([])
         self.ax.set_yticks([])
+        # TODO: clean
+        """ 
         self.ax.set_zticks([])
+        """
         # Add a color bar which maps values to colors.
         # plt.colorbar()
         plt.title(title)
         plt.savefig(filename)
         plt.close(self.fig)
 
+    def _post_process(self):
+        pass
+
     def show(self):
         for index in np.ndindex(self._matrices.shape):
             self._process_matrix(index)
+        self._post_process()
         # Hide axes ticks
-        self.ax.set_xticks([])
-        self.ax.set_yticks([])
-        self.ax.set_zticks([])
+        # self.ax.set_xticks([])
+        # self.ax.set_yticks([])
+        # TODO: self.ax.set_zticks([])
 
         plt.show()
 
@@ -100,6 +108,56 @@ class EllipsoidVisualizer(Visualizer):
 
         self.ax.plot_surface(x, y, z, rstride=3, cstride=3, linewidth=0.1, alpha=1, shade=True,
                              cmap=cm.coolwarm)
+
+
+def _calculate_direction(radii, rotation):
+    axis = np.zeros((3, ))
+    axis[radii.argmax()] = 1
+    return np.matmul(rotation, axis)
+
+
+def _calculate_fa(radii):
+    mean_diffusivity = sum(radii) / 3
+    num = la.norm(radii - mean_diffusivity * np.ones((3,)), 2)
+    den = la.norm(radii, 2)
+    return np.sqrt(3/2) * num / den
+
+
+class BrainVisualizer(EllipsoidVisualizer):
+    def __init__(self, matrices, centers, max_size, paint_radius):
+        self._max_size = max_size
+        centers = centers.astype(int)
+        self._color_map = np.zeros((max_size, max_size, 3))
+        self._counter = np.zeros((max_size, max_size), dtype=int)
+        self._paint_radius = int(paint_radius)
+        super(BrainVisualizer, self).__init__(matrices, centers)
+
+    def _paint(self, center, color):
+        self._color_map[center] = color
+        self._counter[center] = -1
+        for index in np.ndindex((self._paint_radius, self._paint_radius)):
+            current_index = tuple(center + index)
+            if any(i < 0 or i >= self._max_size for i in current_index):
+                continue
+            if self._counter[current_index] < 0:
+                continue
+
+            self._counter[current_index] += 1
+            den = float(self._counter[current_index])
+
+            self._color_map[current_index] = (self._color_map[current_index] * (self._counter[current_index] - 1) +
+                                                  color) / den
+
+    def _process_matrix(self, index):
+        center = self._centers[index]
+        radii = self._singular_values[index]
+        rotation = self._rotations[index]
+
+        color = (_calculate_fa(radii) * _calculate_direction(radii, rotation) + 1) / 2
+        self._paint(center, color)
+
+    def _post_process(self):
+        plt.imshow(self._color_map)
 
 
 class RotationVisualizer(Visualizer):

@@ -41,9 +41,9 @@ class InputDataSet(AbstractInputInterface):
         self._grid_offset = grid_offset
         self._resolution = resolution
 
-    def __call__(self, p):
+    def _get_index_from_point(self, p):
         relative_location = p - self._grid_offset
-        multi_index = np.zeros_like(self._grid_offset, dtype=np.int32)
+        multi_index = np.zeros_like(self._grid_offset, dtype=int)
 
         for axis in np.ndindex(self._grid_offset.shape):
             index = relative_location[axis] * self._resolution[axis]
@@ -53,7 +53,11 @@ class InputDataSet(AbstractInputInterface):
             assert multi_index[axis] >= 0, \
                 f"The point {p} is out of range"
 
-        return self._data_set[multi_index]
+        return multi_index
+
+    def __call__(self, p):
+        multi_index = self._get_index_from_point(p)
+        return self._data_set[tuple(multi_index)]
 
 
 class ConfidenceError(KeyError):
@@ -69,7 +73,8 @@ class DTMRIDecoder(object):
 
     @cached(cache=LFUCache(maxsize=100000))
     def __getitem__(self, index):
-        item = DTMRIVoxel(*self._data[[slice(0, 7)] + index])
+        index = list(index)
+        item = DTMRIVoxel(*self._data[tuple([slice(0, 7)] + index)])
         if item.confidence < self._confidence_threshold:
             raise ConfidenceError(f'item is: p{item}')
 
@@ -81,8 +86,14 @@ class DTMRIDecoder(object):
 class DTMRIDataSet(InputDataSet):
     def __init__(self, data_set, grid_offset, resolution,
                  confidence_threshold=DEFAULT_CONFIDENCE_THRESHOLD):
+        self._raw_data_set = data_set
         data_set = DTMRIDecoder(data_set, confidence_threshold)
         super().__init__(data_set, grid_offset, resolution)
 
+    def confidence(self, p):
+        multi_index = self._get_index_from_point(p)
+        # TODO: debug this
+        index = tuple([0] + list(multi_index))
+        return self._raw_data_set[index]
 
 # TODO: write a unittest here.

@@ -22,8 +22,8 @@ class NRRDParser(AbstractDataSetParser):
     def parse(self):
         # TODO: add mins, maxs - it's good for grid initialization.
         reader, header = nrrd.read(self._path)
-        min_axis = np.array(header['axis mins'][1:])
-        max_axis = np.array(header['axis maxs'][1:])
-        sizes = np.array(header['sizes'][1:])
-        resolution = (max_axis - min_axis - np.ones_like(max_axis)) / sizes
-        return DataSet(reader, resolution)
+        # min_axis = np.array(header['axis mins'][1:])
+        # max_axis = np.array(header['axis maxs'][1:])
+        # sizes = np.array(header['sizes'][1:])
+        # resolution = (max_axis - min_axis - np.ones_like(max_axis)) / sizes
+        return reader
