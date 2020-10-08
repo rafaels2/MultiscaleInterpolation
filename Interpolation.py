@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 
 from Config import CONFIG, DIFFS
+from Tools.SamplingPoints import symmetric_grid_params
 from Tools.Utils import *
 
 
@@ -76,6 +77,7 @@ def run_single_experiment(config, rbf, original_function):
     true_values_on_grid = Grid(1, original_function, grid_params).evaluation
 
     # TODO: plot has to get the centers
+    # TODO: instead of centers, we can fill with zeros.
     manifold.plot(
         true_values_on_grid,
         "original",

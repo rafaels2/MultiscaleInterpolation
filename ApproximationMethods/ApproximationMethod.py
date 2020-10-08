@@ -12,4 +12,3 @@ class ApproximationMethod(object):
 	def approximation(self, x, y):
 		# TODO: change (x, y) to p.
 		pass
-	
