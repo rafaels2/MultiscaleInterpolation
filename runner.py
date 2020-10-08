@@ -11,14 +11,14 @@ from Manifolds import MANIFOLDS
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser("RBF Approximation Scrtipt")
+    parser = argparse.ArgumentParser("RBF Approximation Script")
     parser.add_argument('-f', '--function', type=str, help='Original function file', required=True)
     parser.add_argument('-m', '--manifold', choices=MANIFOLDS.keys(), required=True)
-    parser.add_argument('-t', '--tangent-approximation', action='store_true', 
+    parser.add_argument('-t', '--tangent-approximation', action='store_true',
                         help='Should approximate using tangent averaging?')
     parser.add_argument('-nv', '--norm-visualization', action='store_true',
                         help='Should visualize quickly using norm visualization')
-    parser.add_argument('-s', '--single-scale', action='store_true', 
+    parser.add_argument('-s', '--single-scale', action='store_true',
                         help='Should approximate the single scale case?')
     parser.add_argument('-n', '--number-of-scales', type=int, default=1)
     parser.add_argument('-b', '--base-index', type=int, help='The first number of scales', default=1)
@@ -35,14 +35,14 @@ def parse_arguments():
     config['SCALING_FACTOR'] = args.scaling_factor
     is_tangent = "Tangent" if args.tangent_approximation else "Intrinsic"
     config['EXECUTION_NAME'] = "{}_{}".format(args.manifold, is_tangent)
-    execution_name = args.execution_name if (args.execution_name != 'NoName') else "{}_{}".format(args.manifold, is_tangent)
+    execution_name = args.execution_name if (args.execution_name != 'NoName') else "{}_{}".format(args.manifold,
+                                                                                                  is_tangent)
     config['EXECUTION_NAME'] = execution_name
     config['IS_ADAPTIVE'] = args.adaptive
 
-
     diffs = [
         {
-            "NAME":"multiscale",
+            "NAME": "multiscale",
             "NUMBER_OF_SCALES": args.base_index + args.number_of_scales - 1,
             "MSE_LABEL": "Multi Scale"
         }]
@@ -66,9 +66,8 @@ def main():
     original_function = config['ORIGINAL_FUNCTION']
     output_dir = CONFIG["OUTPUT_DIR"]
 
-
     with set_output_directory(output_dir):
-        results = Interpolation.run_all_experiments(config, diffs, rbf, original_function)
+        _ = Interpolation.run_all_experiments(config, diffs, rbf, original_function)
 
 
 def get_nrrd_as_function(path):
@@ -80,6 +79,6 @@ def get_nrrd_as_function(path):
 
 
 if __name__ == "__main__":
-    # main()
-    orig = get_nrrd_as_function('input_data\\dt-helix.nhdr')
-    print(orig(np.array([0.03, 0.03, 0.03])))
+    main()
+    # orig = get_nrrd_as_function('input_data\\dt-helix.nhdr')
+    # print(orig(np.array([0.03, 0.03, 0.03])))
