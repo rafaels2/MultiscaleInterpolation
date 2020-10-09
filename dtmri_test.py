@@ -13,9 +13,9 @@ def _slice(func, index):
 
 
 def main():
-    # raw_data = NRRDParser('input_data\gk2-rcc-mask.nhdr').parse()
-    raw_data = NRRDParser('input_data\dt-helix.nhdr').parse()
-    slice_index = 20
+    raw_data = NRRDParser('input_data\gk2-rcc-mask.nhdr').parse()
+    # raw_data = NRRDParser('input_data\dt-helix.nhdr').parse()
+    slice_index = 105
     original = DTMRIDataSet(raw_data, np.array([0, 0, 0]), np.array([1, 1, 1]))
     confidence = original.confidence
     grid_params = GridParameters(0, raw_data.shape[1] - 1, 0, raw_data.shape[2] - 1, 1)

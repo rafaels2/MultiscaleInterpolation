@@ -133,8 +133,9 @@ class BrainVisualizer(EllipsoidVisualizer):
         super(BrainVisualizer, self).__init__(matrices, centers)
 
     def _paint(self, center, color):
-        self._color_map[center] = color
-        self._counter[center] = -1
+        center_index = tuple(center)
+        self._color_map[center_index] = color
+        self._counter[center_index] = -1
         for index in np.ndindex((self._paint_radius, self._paint_radius)):
             current_index = tuple(center + index)
             if any(i < 0 or i >= self._max_size for i in current_index):
