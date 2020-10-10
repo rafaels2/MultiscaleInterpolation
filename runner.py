@@ -8,11 +8,12 @@ from DataSetParser import NRRDParser
 from InputInterface import DTMRIDataSet
 from Tools.Utils import set_output_directory, wendland
 from Manifolds import MANIFOLDS
+from dtmri_test import get_orig_confidence_and_size
 
 
 def parse_arguments():
     parser = argparse.ArgumentParser("RBF Approximation Script")
-    parser.add_argument('-f', '--function', type=str, help='Original function file', required=True)
+    # parser.add_argument('-f', '--function', type=str, help='Original function file', required=True)
     parser.add_argument('-m', '--manifold', choices=MANIFOLDS.keys(), required=True)
     parser.add_argument('-t', '--tangent-approximation', action='store_true',
                         help='Should approximate using tangent averaging?')
@@ -21,6 +22,7 @@ def parse_arguments():
     parser.add_argument('-s', '--single-scale', action='store_true',
                         help='Should approximate the single scale case?')
     parser.add_argument('-n', '--number-of-scales', type=int, default=1)
+    parser.add_argument('-sl', '--slice', type=int, default=50)
     parser.add_argument('-b', '--base-index', type=int, help='The first number of scales', default=1)
     parser.add_argument('-sf', '--scaling-factor', type=float, default=_SCALING_FACTOR)
     parser.add_argument('-e', '--execution-name', type=str, default='NoName')
@@ -28,7 +30,8 @@ def parse_arguments():
     args = parser.parse_args()
 
     config = CONFIG.copy()
-    config['ORIGINAL_FUNCTION'] = importlib.import_module(args.function).original_function
+    # config['ORIGINAL_FUNCTION'] = importlib.import_module(args.function).original_function
+    config['ORIGINAL_FUNCTION'], config['CONFIDENCE'], config['GRID_SIZE'] = get_orig_confidence_and_size(args.slice)
     config['MANIFOLD'] = MANIFOLDS[args.manifold]()
     config['IS_APPROXIMATING_ON_TANGENT'] = args.tangent_approximation
     config['NORM_VISUALIZATION'] = args.norm_visualization

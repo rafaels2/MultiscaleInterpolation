@@ -35,8 +35,8 @@ class Visualizer(object):
             self._process_matrix(index)
         self._post_process()
         # Hide axes ticks
-        self.ax.set_xticks([])
-        self.ax.set_yticks([])
+        # self.ax.set_xticks([])
+        # self.ax.set_yticks([])
         # TODO: clean
         """ 
         self.ax.set_zticks([])
@@ -124,11 +124,11 @@ def _calculate_fa(radii):
 
 
 class BrainVisualizer(EllipsoidVisualizer):
-    def __init__(self, matrices, centers, max_size, paint_radius):
-        self._max_size = max_size
+    def __init__(self, matrices, centers, paint_radius=4):
+        self._max_size = centers.max() + 1
         centers = centers.astype(int)
-        self._color_map = np.zeros((max_size, max_size, 3))
-        self._counter = np.zeros((max_size, max_size), dtype=int)
+        self._color_map = np.zeros((self._max_size, self._max_size, 3))
+        self._counter = np.zeros((self._max_size, self._max_size), dtype=int)
         self._paint_radius = int(paint_radius)
         super(BrainVisualizer, self).__init__(matrices, centers)
 

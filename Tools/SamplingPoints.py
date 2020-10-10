@@ -3,6 +3,7 @@ from collections import namedtuple
 
 import numpy as np
 from numpy import linalg as la
+from tqdm import tqdm
 
 GridParameters = namedtuple('GridParameters', ['x_min', 'x_max', 'y_min', 'y_max', 'mesh_norm'])
 Point = namedtuple('Point', ['evaluation', 'phi', 'x', 'y'])
@@ -64,7 +65,6 @@ class Grid(SamplingPoints):
         self._y_min = grid_parameters.y_min
         self._y_max = grid_parameters.y_max
         self._mesh_norm = grid_parameters.mesh_norm
-        print("Mesh norm: ", self._mesh_norm)
         self._x, self._y = self._generate_grid()
         self._evaluation = self.evaluate_on_grid(function_to_evaluate)
         self._phi = None
@@ -75,14 +75,18 @@ class Grid(SamplingPoints):
         self._radius_in_index = int(np.ceil(rbf_radius / self._mesh_norm))
 
     def _generate_grid(self):
-        x = np.linspace(self._x_min, self._x_max, int((self._x_max - self._x_min) / self._mesh_norm) + 1)
-        y = np.linspace(self._y_min, self._y_max, int((self._y_max - self._y_min) / self._mesh_norm) + 1)
+        try:
+            x = np.linspace(self._x_min, self._x_max, int((self._x_max - self._x_min) / self._mesh_norm) + 1)
+            y = np.linspace(self._y_min, self._y_max, int((self._y_max - self._y_min) / self._mesh_norm) + 1)
+        except:
+            import ipdb; ipdb.set_trace()
         return np.meshgrid(x, y)
 
     def evaluate_on_grid(self, func):
         evaluation = np.zeros_like(self._x, dtype=object)
 
-        for index in np.ndindex(self._x.shape):
+        print(f"X shape: {self._x.shape}")
+        for index in tqdm(np.ndindex(self._x.shape)):
             if index[- 1] == 0:
                 print(index[0] / self._x.shape[0])
             evaluation[index] = func(self._x[index], self._y[index])
@@ -160,13 +164,13 @@ class DynamicGrid(Grid):
     def _init_sub_domains(self, ):
         sub_x = self._x[::self._radius_in_index, ::self._radius_in_index]
         sub_y = self._y[::self._radius_in_index, ::self._radius_in_index]
-        sub_domains = np.zeros_like(sub_x, dtype=object)
-        for index in np.ndindex(sub_x.shape):
+        sub_domains = np.zeros(tuple(np.array(sub_x.shape) - np.array([1, 1])), dtype=object)
+        for index in np.ndindex(tuple(np.array(sub_x.shape) - np.array([1, 1]))):
             # TODO: Debug this - [0, 1] can be [1, 0].
             grid_parameters = GridParameters(sub_x[index],
-                                             sub_x[index + np.array([0, 1])],
+                                             sub_x[tuple(np.array(index) + np.array([0, 1]))],
                                              sub_y[index],
-                                             sub_y[index + np.array([1, 0])],
+                                             sub_y[tuple(np.array(index) + np.array([1, 0]))],
                                              self._mesh_norm)
             sub_domains[index] = SubDomain(self._confidence_score, self._rbf_radius, self._function_to_evaluate,
                                            grid_parameters, phi_generator=self._phi_generator)
@@ -176,7 +180,7 @@ class DynamicGrid(Grid):
     def evaluate_on_grid(self, func):
         # TODO: implement dynamic grid evaluation
         # Split to boxes and hold lists of areas + boundary
-        raise NotImplemented()
+        return None
 
     def points_in_radius(self, x, y):
         # Warning! There might be a bug, and I should want to replace x, and y.
@@ -186,8 +190,8 @@ class DynamicGrid(Grid):
         # 3X3 around a radius sized square is enough.
         radius_array = np.array([3, 3])
 
-        for index in np.ndindex(radius_array):
-            current_index = tuple(index_0 - radius_array + np.array(index))
+        for index in np.ndindex(tuple(radius_array)):
+            current_index = tuple(index_0 - np.array([1, 1]) + np.array(index))
             # TODO: debug this
             if all([current_index[0] >= 0, current_index[1] >= 0,
                     current_index[0] < self._sub_domains.shape[0],
@@ -200,8 +204,9 @@ class DynamicGrid(Grid):
 
 
 class SamplingPointsCollection(object):
-    def __init__(self, rbf_radius, function_to_evaluate, grids_parameters, **kwargs):
-        self._grids = [SAMPLING_POINTS_CLASSES[name](rbf_radius,
+    def __init__(self, rbf_radius, function_to_evaluate, confidence, grids_parameters, **kwargs):
+        # TODO: use confidence inside grid_parameters
+        self._grids = [SAMPLING_POINTS_CLASSES[name](confidence, rbf_radius,
                                                      function_to_evaluate, parameters, **kwargs)
                        for name, parameters in grids_parameters]
 

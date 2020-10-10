@@ -108,9 +108,9 @@ class RigidRotations(AbstractManifold):
     def _to_numbers(self, x):
         return self.distance(x, np.eye(3))
 
-    def plot(self, data, title, filename, norm_visualization=False):
+    def plot(self, data, centers, title, filename, norm_visualization=False):
         if norm_visualization:
-            return super().plot(data, title, filename)
+            return super().plot(data, centers, title, filename)
         centers = np.zeros_like(data, dtype=object)
         for index in np.ndindex(data.shape):
             # TODO locate the centers as the grid says. Receive the locations as a parameter.

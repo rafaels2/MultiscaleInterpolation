@@ -31,7 +31,7 @@ class AbstractManifold(object):
     def _to_numbers(self, x):
         pass
 
-    def _visualize(self, plt, data):
+    def _visualize(self, plt, data, _):
         # TODO: we should decide to fix this distortion.
         print("Using the norm visualizer. Output might look distorted because we treat"
               " all directions as the same distances")
@@ -44,10 +44,10 @@ class AbstractManifold(object):
         cb = plt.colorbar()
         return cb
 
-    def plot(self, data, title, filename, **kwargs):
+    def plot(self, data, centers, title, filename, **kwargs):
         temp_fig = plt.figure()
         plt.title(title)
-        cb = self._visualize(plt, data)
+        cb = self._visualize(plt, data, centers)
         plt.savefig(filename)
         cb.remove()
         plt.close(temp_fig)

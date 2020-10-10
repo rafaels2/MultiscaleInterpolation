@@ -5,7 +5,7 @@ from scipy.linalg import expm, logm, sqrtm
 from sklearn.datasets import make_spd_matrix
 
 from Tools.KarcherMean import KarcherMean
-from Tools.Visualization import EllipsoidVisualizer
+from Tools.Visualization import EllipsoidVisualizer, BrainVisualizer
 
 from .AbstractManifold import AbstractManifold
 from . import register_manifold
@@ -25,10 +25,13 @@ class SymmetricPositiveDefinite(AbstractManifold):
         super().__init__()
         self.dim = dim
 
+    def _is_positive(self, x):
+        return abs(np.imag(x)) < 10**-5 and np.real(x) > (-0.5)
+
     def is_in_manifold(self, x):
         return all([
             (la.norm(x - np.transpose(x)) < SYMMETRIC_ERROR),
-            (all(x > 0 for x in la.eig(x)[0]))
+            (all(self._is_positive(x) for x in la.eig(x)[0]))
         ])
 
     def exp(self, x, y):
@@ -69,16 +72,17 @@ class SymmetricPositiveDefinite(AbstractManifold):
     def average(self, values_to_average, weights):
         return self._karcher_mean(values_to_average, weights)
 
-    def plot(self, data, title, filename, norm_visualization=False):
+    def plot(self, data, centers, title, filename, norm_visualization=False):
         # TODO: duplication, consider to generalize
         if norm_visualization:
-            return super().plot(data, title, filename)
-        centers = np.zeros_like(data, dtype=object)
-        for index in np.ndindex(data.shape):
-            # TODO locate the centers as the grid says. Receive the locations as a parameter.
-            centers[index] = np.array([index[0], index[1], 0])
+            return super().plot(data, centers, title, filename)
+        if centers is None:
+            centers = np.zeros_like(data, dtype=object)
+            for index in np.ndindex(data.shape):
+                # TODO locate the centers as the grid says. Receive the locations as a parameter.
+                centers[index] = np.array([index[0], index[1], 0])
         print("start to visualize")
-        EllipsoidVisualizer(data, centers).save(filename, title)
+        BrainVisualizer(data, centers).save(filename, title)
 
 
 def main():

@@ -15,8 +15,8 @@ def combine(a, b):
 
 
 class Quasi(ApproximationMethod):
-    def __init__(self, manifold, original_function, grid_parameters, rbf,
-                 scale, is_approximating_on_tangent):
+    def __init__(self, manifold, original_function, confidence, grid_parameters, rbf,
+                 rbf_radius, is_approximating_on_tangent):
         if isinstance(original_function, tuple):
             original_function = combine(*original_function)
             self._is_adaptive = True
@@ -24,10 +24,12 @@ class Quasi(ApproximationMethod):
             self._is_adaptive = False
         super().__init__(manifold, original_function, grid_parameters, rbf)
         self._is_approximating_on_tangent = is_approximating_on_tangent
-        rbf_radius = scale
 
+        self._confidence = confidence
+        self._rbf_radius = rbf_radius
         self._grid = SamplingPointsCollection(rbf_radius,
                                               original_function,
+                                              confidence,
                                               grid_parameters,
                                               phi_generator=self._calculate_phi)
 
@@ -75,4 +77,6 @@ class Quasi(ApproximationMethod):
         if self._is_adaptive:
             return self._manifold.log(base, self._manifold.average(values_to_average, weights))
 
+        if len(values_to_average) == 0:
+            import ipdb; ipdb.set_trace()
         return self._manifold.average(values_to_average, weights)

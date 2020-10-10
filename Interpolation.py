@@ -3,12 +3,13 @@ import time
 from datetime import datetime
 
 from Config import CONFIG, DIFFS
-from Tools.SamplingPoints import symmetric_grid_params
+from Tools.SamplingPoints import symmetric_grid_params, SubDomain, GridParameters
 from Tools.Utils import *
 
 
 def multiscale_interpolation(manifold,
                              original_function,
+                             confidence,
                              grid_size,
                              resolution,
                              scaling_factor,
@@ -33,17 +34,19 @@ def multiscale_interpolation(manifold,
 
         # TODO: change from Grid the new generic one. It's enough and we don't need to think of something else.
         # TODO: The grid should know how to optimize data acquirement most efficiently.
+        print(f"Mesh is {scale / resolution}")
         current_grid_parameters = [
-            ('Grid', symmetric_grid_params(grid_size + 1, scale / resolution)),
+            ('DynamicGrid', GridParameters(0, grid_size[0], 0, grid_size[1], scale / resolution)),
             # Can add here more grids (borders)
         ]
 
         s_j = scaled_interpolation_method(
             manifold,
             function_to_interpolate,
+            confidence,
             current_grid_parameters,
             rbf,
-            scale,
+            10 * scale,
             is_approximating_on_tangent).approximation
         print("interpolated!")
 
@@ -69,30 +72,30 @@ def run_single_experiment(config, rbf, original_function):
     norm_visualization = config["NORM_VISUALIZATION"]
     is_approximating_on_tangent = config["IS_APPROXIMATING_ON_TANGENT"]
     is_adaptive = config["IS_ADAPTIVE"]
+    confidence = config["CONFIDENCE"]
 
-    # TODO: calculate the correct test_mesh_norm according to given gird.
-    # TODO: we should know a point (like mins and maxs), and max resolution, to plan.
-    grid_params = symmetric_grid_params(grid_size, test_mesh_norm)
-    # TODO: we should get here also the centers.
-    true_values_on_grid, centers = Grid(1, original_function, grid_params).evaluation
+    grid_params = GridParameters(0, grid_size[0], 0, grid_size[1], test_mesh_norm)
+    evaluation_grid = SubDomain(confidence, 1, original_function, grid_params)
+    true_values_on_grid, centers = evaluation_grid.evaluation
 
-    # TODO: plot has to get the centers
-    # TODO: instead of centers, we can fill with zeros.
     manifold.plot(
         true_values_on_grid,
+        centers,
         "original",
         "original.png",
         norm_visualization=norm_visualization
     )
 
-    plot_and_save(calculate_max_derivative(original_function, grid_params, manifold),
-                  "max derivatives",
-                  "derivatives.png")
+    # import ipdb; ipdb.set_trace()
+    # plot_and_save(calculate_max_derivative(original_function, confidence, grid_params, manifold),
+    #               "max derivatives",
+    #               "derivatives.png")
 
     for i, interpolant in enumerate(multiscale_interpolation(
             manifold,
             number_of_scales=number_of_scales,
             original_function=original_function,
+            confidence=confidence,
             grid_size=grid_size,
             resolution=base_resolution,
             scaling_factor=scaling_factor,
@@ -103,19 +106,23 @@ def run_single_experiment(config, rbf, original_function):
     )):
         with set_output_directory("{}_{}".format(experiment_name, i + 1)):
             with open("config.pkl", "wb") as f:
-                pkl.dump(config, f)
+                save_config = config.copy()
+                save_config.pop('CONFIDENCE')
+                save_config.pop('ORIGINAL_FUNCTION')
+                pkl.dump(save_config, f)
 
-            approximated_values_on_grid, centers = Grid(1, interpolant, grid_params).evaluation
+            approximated_values_on_grid = evaluation_grid.evaluate_on_grid(interpolant)
 
             manifold.plot(
                 approximated_values_on_grid,
+                centers,
                 "approximation",
                 "approximation.png",
                 norm_visualization=norm_visualization
             )
 
             error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
-            plot_and_save(error, "difference map", "difference.png")
+            plot_and_save(error, "difference map", "difference.png", centers)
 
             mse = np.mean(error)
             with open("results.pkl", "wb") as f:

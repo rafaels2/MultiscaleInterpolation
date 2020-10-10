@@ -14,8 +14,17 @@ class KarcherMean(object):
         self._values_to_average = values_to_average
         self._weights = weights
         assert all(w_i >= 0 for w_i in weights), "All weights should be non-negative"
-        assert all(manifold.is_in_manifold(a_i)
+        try:
+            assert all(manifold.is_in_manifold(a_i)
                    for a_i in values_to_average), "Not all values_to_average in manifold"
+        except AssertionError:
+            out_of_manifold = list()
+            for a_i in values_to_average:
+                if not manifold.is_in_manifold(a_i):
+                    print(a_i)
+                    out_of_manifold.append(a_i)
+            print("continuing")
+            # import ipdb; ipdb.set_trace()
 
     def _get_start_point(self):
         return sum(w_i * a_i for a_i, w_i in zip(self._values_to_average, self._weights))
