@@ -2,9 +2,13 @@ import argparse
 import importlib
 
 import Interpolation
+from ApproximationMethods.Naive import Naive
+from ApproximationMethods.Quasi import Quasi
 from Config import CONFIG, _SCALING_FACTOR
 from Tools.Utils import set_output_directory, wendland
 from Manifolds import MANIFOLDS
+
+METHODS = {'naive': Naive, 'quasi': Quasi}
 
 
 def parse_arguments():
@@ -22,6 +26,8 @@ def parse_arguments():
     parser.add_argument('-sf', '--scaling-factor', type=float, default=_SCALING_FACTOR)
     parser.add_argument('-e', '--execution-name', type=str, default='NoName')
     parser.add_argument('-a', '--adaptive', action='store_true', help='is adaptive m0')
+    parser.add_argument('-mt', '--method', choices=METHODS.keys(), default='quasi', help='approximation method')
+    parser.add_argument('-ci', '--compare-to-interpolation', action='store_true')
     args = parser.parse_args()
 
     config = CONFIG.copy()
@@ -35,6 +41,7 @@ def parse_arguments():
     execution_name = args.execution_name if (args.execution_name != 'NoName') else "{}_{}".format(args.manifold, is_tangent)
     config['EXECUTION_NAME'] = execution_name
     config['IS_ADAPTIVE'] = args.adaptive
+    config['SCALED_INTERPOLATION_METHOD'] = METHODS[args.method]
 
 
     diffs = [
@@ -53,6 +60,16 @@ def parse_arguments():
                 "SCALING_FACTOR": args.scaling_factor ** index
             } for index in range(args.base_index, args.base_index + args.number_of_scales)
         ]
+
+    if args.compare_to_interpolation:
+        print('Comparing')
+        diffs_copy = diffs.copy()
+        for item in diffs_copy:
+            new_item = item.copy()
+            new_item['NAME'] = '_'.join([item['NAME'], 'interpolation'])
+            new_item['MSE_LABEL'] = ' '.join(['Interpolated', item['MSE_LABEL']])
+            new_item['SCALED_INTERPOLATION_METHOD'] = Naive
+            diffs.append(new_item)
 
     return config, diffs
 

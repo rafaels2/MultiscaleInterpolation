@@ -94,6 +94,14 @@ class Grid(SamplingPoints):
     def evaluation(self):
         return self._evaluation
 
+    @property
+    def x(self):
+        return self._x
+
+    @property
+    def y(self):
+        return self._y
+
 
 class SamplingPointsCollection(object):
     def __init__(self, rbf_radius, function_to_evaluate, grids_parameters, **kwargs):
