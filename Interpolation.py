@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 
 from Config import CONFIG, DIFFS
-from Tools.SamplingPoints import symmetric_grid_params, SubDomain, GridParameters
+from Tools.SamplingPoints import GridParameters
 from Tools.Utils import *
 
 
