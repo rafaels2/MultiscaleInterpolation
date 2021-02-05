@@ -1,11 +1,10 @@
 import numpy as np
 from cachetools import cached
-from numpy import linalg as la
-from collections import namedtuple
-from Tools.Utils import generate_grid, generate_kernel, evaluate_on_grid, generate_cache
 
-from .ApproximationMethod import ApproximationMethod
 from Tools.SamplingPoints import SamplingPointsCollection
+from Tools.Utils import generate_kernel, generate_cache
+from .ApproximationMethod import ApproximationMethod
+
 
 def combine(a, b):
     def func(x, y):
@@ -14,8 +13,8 @@ def combine(a, b):
 
 
 class Quasi(ApproximationMethod):
-    def __init__(self, manifold, original_function, grid_parameters, rbf, 
-                 scale, is_approximating_on_tangent):
+    def __init__(self, manifold, original_function, confidence, grid_parameters, rbf,
+                 rbf_radius, is_approximating_on_tangent):
         if isinstance(original_function, tuple):
             original_function = combine(*original_function)
             self._is_adaptive = True
@@ -23,20 +22,33 @@ class Quasi(ApproximationMethod):
             self._is_adaptive = False
         super().__init__(manifold, original_function, grid_parameters, rbf)
         self._is_approximating_on_tangent = is_approximating_on_tangent
-        rbf_radius = scale
-        
-        self._grid = SamplingPointsCollection(rbf_radius, 
-            original_function,
-            grid_parameters,
-            phi_generator=self._calculate_phi)
+
+        self._confidence = confidence
+        self._rbf_radius = rbf_radius
+        self._grid = SamplingPointsCollection(rbf_radius,
+                                              original_function,
+                                              confidence,
+                                              grid_parameters,
+                                              phi_generator=self._calculate_phi)
 
         self._kernel = generate_kernel(self._rbf, rbf_radius)
 
+    def _calculate_phi(self, x_0, y_0):
+        point = np.array([x_0, y_0])
+
+        @cached(cache=generate_cache(maxsize=100))
+        def phi(x, y):
+            vector = np.array([x, y])
+            return self._kernel(vector, point)
+
+        return phi
+    
     @cached(cache=generate_cache(maxsize=1000))
     def approximation(self, x, y):
         """ Average sampled points around (x, y), using phis as weights """
         values_to_average = list()
         weights = list()
+        base = None
 
         if self._is_adaptive:
             base = self._original_function(x, y)[1]

@@ -1,16 +1,13 @@
 import os
-from collections import namedtuple
 from contextlib import contextmanager
 
-from cachetools import cached, LFUCache
-
-from matplotlib import cm
-from matplotlib import pyplot as plt
-
 import numpy as np
+from cachetools import cached, LFUCache
+from matplotlib import pyplot as plt
 from numpy import linalg as la
 
-from Tools.SamplingPoints import GridParameters, Grid, symmetric_grid_params, generate_grid
+from InputInterface import ConfidenceError
+from Tools.SamplingPoints import generate_grid, SubDomain
 
 num_of_caches_g = 0
 
@@ -26,15 +23,17 @@ def act_on_functions(action, a, b):
     @cached(cache=generate_cache(maxsize=100))
     def new_func(*args):
         return action(a(*args), b(*args))
+
     return new_func
 
 
 def evaluate_on_grid(func, *args, points=None, should_log=False):
+    # Only used in interpolation
     if points is not None:
         x, y = points
     else:
         x, y = generate_grid(*args, should_ravel=False)
-    
+
     z = np.zeros(x.shape, dtype=object)
     print("Z shape", z.shape)
 
@@ -46,7 +45,16 @@ def evaluate_on_grid(func, *args, points=None, should_log=False):
     return z
 
 
-def plot_and_save(data, title, filename):
+def paint(data, centers):
+    color_map = np.zeros((centers[:, 0].max()+1, centers[:, 1].max()+1))
+    for index in np.ndindex(data.shape):
+        color_map[tuple(centers[index])] = data[index]
+    return color_map
+
+
+def plot_and_save(data, title, filename, centers=None):
+    if centers is not None:
+        data = paint(data, centers)
     plt.figure()
     plt.title(title)
     plt.imshow(data)
@@ -69,7 +77,8 @@ def plot_lines(lines, filename, title, xlabel, ylabel):
 
 def generate_kernel(rbf, scale=1):
     def kernel(x, y):
-        ans = (1 / scale ** 2) * rbf(la.norm(x-y) / scale)
+        # TODO: change to kernel(p). make sure to replace 2 to d
+        ans = (1 / scale ** 2) * rbf(la.norm(x - y) / scale)
         return ans
 
     return kernel
@@ -84,22 +93,27 @@ def wendland(x):
         return (1 + (4 * x)) * ((1 - x) ** 4)
 
 
-def calculate_max_derivative(original_function, grid_params, manifold):
+def calculate_max_derivative(original_function, confidence, grid_params, manifold):
     def derivative(x, y):
-        delta = grid_params.mesh_norm / 2
-        evaluations_around = [original_function(x + (delta / np.sqrt(2)), y + (delta / np.sqrt(2))),
-                              original_function(x, y + delta),
-                              original_function(x, y - delta),
-                              original_function(x + (delta / np.sqrt(2)), y - (delta / np.sqrt(2))),
-                              original_function(x + delta, y),
-                              original_function(x - (delta / np.sqrt(2)), y + (delta / np.sqrt(2))),
-                              original_function(x - delta, y),
-                              original_function(x - (delta / np.sqrt(2)), y - (delta / np.sqrt(2)))]
-        f_0 = original_function(x, y)
+        # TODO: change (x, y) to p and write the derivatives in a more generic way.
+        # delta = grid_params.mesh_norm / 2
+        center = np.array([1, 1])
+        evaluations_around = list()
+        for _index in np.ndindex((3, 3)):
+            current_index = 3 * (_index - center)
+            if current_index[0] == 0 and current_index[1] == 0:
+                continue
+            try:
+                evaluations_around.append(
+                    manifold.distance(original_function(x + current_index[0], y + current_index[1]),
+                                      original_function(x, y)) / la.norm(current_index, 2))
+            except ConfidenceError:
+                print("Skipped confidence")
+                continue
 
-        return max([manifold.distance(direction, f_0)/delta for direction in evaluations_around])
+        return max(evaluations_around)
 
-    evaluation = Grid(1, derivative, grid_params).evaluation
+    evaluation, centers = SubDomain(confidence, 1, derivative, grid_params).evaluation
 
     result = np.zeros_like(evaluation, dtype=np.float32)
     for index in np.ndindex(result.shape):

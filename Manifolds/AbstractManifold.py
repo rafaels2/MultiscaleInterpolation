@@ -31,22 +31,26 @@ class AbstractManifold(object):
     def _to_numbers(self, x):
         pass
 
-    def _visualize(self, plt, data):
+    def _visualize(self, plt, data, _):
+        # TODO: we should decide to fix this distortion.
+        print("Using the norm visualizer. Output might look distorted because we treat"
+              " all directions as the same distances")
         visualization = np.zeros_like(data, dtype=np.float32)
         for index in np.ndindex(visualization.shape):
             x = data[index]
             visualization[index] = self._to_numbers(x)
+        # TODO: if data is 3D we can return slices. Starting with a single.
         plt.imshow(visualization)
         cb = plt.colorbar()
         return cb
 
-    def plot(self, data, title, filename, **kwargs):
-        self.fig = plt.figure()
+    def plot(self, data, centers, title, filename, **kwargs):
+        temp_fig = plt.figure()
         plt.title(title)
-        cb = self._visualize(plt, data)
+        cb = self._visualize(plt, data, centers)
         plt.savefig(filename)
         cb.remove()
-        plt.close(self.fig)
+        plt.close(temp_fig)
 
     def zero_func(self, x_0, x_1):
         return 0
@@ -86,10 +90,6 @@ class AbstractManifold(object):
             return values_to_average[0]
         else:
             return self._geodesic_average(values_to_average, weights)
-
-    @abstractmethod
-    def _karcher_mean(self, values_to_average, weights, base=None, iterations=0):
-        pass
 
     def average(self, values_to_average, weights):
         """

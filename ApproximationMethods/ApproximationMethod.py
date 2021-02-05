@@ -10,10 +10,13 @@ class ApproximationMethod(object):
 		self._original_function = original_function
 		self._grid_parameters = grid_parameters
 		self._rbf = rbf
-		self._manifold = manifold
+        self._manifold = manifold
+		# TODO: where do we get the kernel?
+        self._kernel = None
 
 	@abstractmethod
 	def approximation(self, x, y):
+		# TODO: change (x, y) to p.
 		pass
 
 	def _calculate_phi(self, x_0, y_0):
