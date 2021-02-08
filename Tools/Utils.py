@@ -55,14 +55,14 @@ def plot_and_save(data, title, filename):
     cb.remove()
 
 
-def plot_lines(lines, filename, title, xlabel, ylabel):
+def plot_lines(x_values, y_values, filename, title, x_label, y_label):
     fig = plt.figure()
     plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    for line_name, line_dots in lines.items():
-        plt.plot(line_dots, label=line_name)
-    plt.legend(lines.keys())
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    for line_name in x_values.keys():
+        plt.plot(x_values[line_name], y_values[line_name], label=line_name)
+    plt.legend(x_values.keys())
     plt.savefig(filename)
     plt.close(fig)
 
@@ -75,13 +75,40 @@ def generate_kernel(rbf, scale=1):
     return kernel
 
 
-def wendland(x):
+def wendland_3_1(x):
     if x < 0:
         raise ValueError("x should be > 0, not {}".format(x))
     if x > 1:
         return 0
     else:
         return (1 + (4 * x)) * ((1 - x) ** 4)
+
+
+def wendland_3_0(x):
+    if x < 0:
+        raise ValueError("x should be > 0, not {}".format(x))
+    if x > 1:
+        return 0
+    else:
+        return (1 - x) ** 2
+
+
+def wendland_3_2(x):
+    if x < 0:
+        raise ValueError("x should be > 0, not {}".format(x))
+    if x > 1:
+        return 0
+    else:
+        return (35 * (x ** 2) + 18 * x + 3) * (1 - x) ** 6
+
+
+def wendland_1_0(x):
+    if x < 0:
+        raise ValueError("x should be > 0, not {}".format(x))
+    if x > 1:
+        return 0
+    else:
+        return 1 - x
 
 
 def calculate_max_derivative(original_function, grid_params, manifold):

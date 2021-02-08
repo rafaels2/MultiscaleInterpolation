@@ -4,6 +4,7 @@ from Manifolds.RealNumbers import RealNumbers
 from Manifolds.Circle import Circle
 from Manifolds.RigidRotations import RigidRotations, Quaternion, Rotation
 from ApproximationMethods.Quasi import Quasi
+from Tools.Utils import wendland_3_1
 
 _SCALING_FACTOR = 0.75
 
@@ -48,12 +49,13 @@ def _original_function(x, y):
 
 
 CONFIG = {
+    "RBF": wendland_3_1,
     "GRID_SIZE": 1.5,
     "BASE_RESOLUTION": 2,
     "PLOT_RESOLUTION_FACTOR": 2,
     "SCALE": 1,
     "NUMBER_OF_SCALES": 4,
-    "TEST_MESH_NORM": 0.1,
+    "TEST_MESH_NORM": 0.05,
     "SCALING_FACTOR": _SCALING_FACTOR,
     "NAME": "temp",
     "OUTPUT_DIR": "results",

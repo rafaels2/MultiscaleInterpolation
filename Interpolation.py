@@ -57,10 +57,11 @@ def multiscale_interpolation(manifold,
 
         f_j = act_on_functions(manifold.exp, f_j, function_added_to_f_j)
         e_j = act_on_functions(manifold.log, f_j, original_function)
-        yield f_j
+        yield scale / resolution, f_j
 
 
-def run_single_experiment(config, rbf, original_function):
+def run_single_experiment(config, original_function):
+    rbf = config["RBF"]
     grid_size = config["GRID_SIZE"]
     base_resolution = config["BASE_RESOLUTION"]
     plot_resolution_factor = config["PLOT_RESOLUTION_FACTOR"]
@@ -89,7 +90,7 @@ def run_single_experiment(config, rbf, original_function):
                   "max derivatives",
                   "deriveatives.png")
 
-    for i, interpolant in enumerate(multiscale_interpolation(
+    for i, (mesh_norm, interpolant) in enumerate(multiscale_interpolation(
             manifold,
             number_of_scales=number_of_scales,
             original_function=original_function,
@@ -116,22 +117,24 @@ def run_single_experiment(config, rbf, original_function):
 
             error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
             plot_and_save(error, "difference map", "difference.png")
-            
-            mse = np.mean(error)
+
+            mse = la.norm(error)
             with open("results.pkl", "wb") as f:
                 results = {
                     "original_values": true_values_on_grid,
                     "approximation": approximated_values_on_grid,
                     "errors": error,
                     "mse": mse,
+                    "mesh_norm": mesh_norm
                 }
                 pkl.dump(results, f)
 
-        yield mse
+        yield mse, mesh_norm
 
 
 def run_all_experiments(config, diffs, *args):
     mses = dict()
+    mesh_norms = dict()
     calculation_time = list()
     interpolants = list()
     execution_name = config["EXECUTION_NAME"]
@@ -145,24 +148,27 @@ def run_all_experiments(config, diffs, *args):
 
             t_0 = datetime.now()
 
-            for mse in run_single_experiment(current_config, *args):
+            for mse, mesh_norm in run_single_experiment(current_config, *args):
                 t_f = datetime.now()
                 calculation_time.append(t_f - t_0)
                 mse = np.log(mse)
                 mse_label = current_config["MSE_LABEL"]
                 current_mses = mses.get(mse_label, list())
+                current_mesh_norms = mesh_norms.get(mse_label, list())
                 current_mses.append(mse)
+                current_mesh_norms.append(np.log(mesh_norm))
                 mses[mse_label] = current_mses
+                mesh_norms[mse_label] = current_mesh_norms
                 t_0 = datetime.now()
     
-        plot_lines(mses, "mses.png", "Error in different runs", "Iteration", "log(Error)")
+        plot_lines(mesh_norms, mses, "mses.png", "Error in different runs", "log(h_x)", "log(Error)")
 
     print("MSEs are: {}".format(mses))
     print("times are: {}".format(calculation_time))
     return mses
 
 def main():
-    rbf = wendland
+    rbf = wendland_3_0
     original_function = CONFIG["ORIGINAL_FUNCTION"]
     config = CONFIG
     scaling_factor = CONFIG["SCALING_FACTOR"]

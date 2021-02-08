@@ -5,7 +5,7 @@ import Interpolation
 from ApproximationMethods.Naive import Naive
 from ApproximationMethods.Quasi import Quasi
 from Config import CONFIG, _SCALING_FACTOR
-from Tools.Utils import set_output_directory, wendland
+from Tools.Utils import set_output_directory, wendland_3_0, wendland_3_1, wendland_3_2, wendland_1_0
 from Manifolds import MANIFOLDS
 
 METHODS = {'naive': Naive, 'quasi': Quasi}
@@ -43,7 +43,6 @@ def parse_arguments():
     config['IS_ADAPTIVE'] = args.adaptive
     config['SCALED_INTERPOLATION_METHOD'] = METHODS[args.method]
 
-
     diffs = [
         {
             "NAME":"multiscale",
@@ -74,15 +73,36 @@ def parse_arguments():
     return config, diffs
 
 
+def run_different_rbfs(config, diffs):
+    old_diffs = diffs.copy()
+    diffs = list()
+
+    wendlands = {
+       "1_0": wendland_1_0,
+       "3_0": wendland_3_0,
+       "3_1": wendland_3_1,
+       "3_2": wendland_3_2,
+    }
+
+    for name, wendland in wendlands.items():
+        for diff in old_diffs:
+            current_diff = diff.copy()
+            current_diff["NAME"] = f"{name}_{current_diff['NAME']}"
+            current_diff["MSE_LABEL"] = f"{name}_{current_diff['MSE_LABEL']}"
+            current_diff["RBF"] = wendland
+            diffs.append(current_diff)
+
+    return config, diffs
+
 def main():
     config, diffs = parse_arguments()
-    rbf = wendland
     original_function = config['ORIGINAL_FUNCTION']
     output_dir = CONFIG["OUTPUT_DIR"]
 
+    config, diffs = run_different_rbfs(config, diffs)
 
     with set_output_directory(output_dir):
-        results = Interpolation.run_all_experiments(config, diffs, rbf, original_function)
+        results = Interpolation.run_all_experiments(config, diffs, original_function)
 
 
 if __name__ == "__main__":
