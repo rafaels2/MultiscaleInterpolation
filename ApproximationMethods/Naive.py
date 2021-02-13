@@ -3,14 +3,16 @@ import numpy as np
 from numpy import linalg as la
 
 from ApproximationMethods.ApproximationMethod import ApproximationMethod
-from Tools.SamplingPoints import SamplingPointsCollection, Grid
-from Tools.Utils import generate_grid, generate_kernel, evaluate_on_grid
+from Tools.GridUtils import evaluate_on_grid
+from Tools.SamplingPoints import Grid, generate_grid
+from Tools.Utils import generate_kernel
 
 
 class Naive(ApproximationMethod):
     def __init__(self, manifold, original_function, grid_parameters, rbf,
                  scale, is_approximating_on_tangent):
         super().__init__(manifold, original_function, grid_parameters, rbf)
+        self.is_approximating_on_tangent = is_approximating_on_tangent
         rbf_radius = scale
 
         self._grid = Grid(rbf_radius,

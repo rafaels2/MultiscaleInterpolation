@@ -2,13 +2,15 @@ import argparse
 import importlib
 
 import Interpolation
+from ApproximationMethods.AdaptiveQuasi import AdaptiveQuasi
+from ApproximationMethods.MovingLeastSquares import MovingLeastSquares
 from ApproximationMethods.Naive import Naive
 from ApproximationMethods.Quasi import Quasi
 from Config import CONFIG, _SCALING_FACTOR
 from Tools.Utils import set_output_directory, wendland_3_0, wendland_3_1, wendland_3_2, wendland_1_0
 from Manifolds import MANIFOLDS
 
-METHODS = {'naive': Naive, 'quasi': Quasi}
+METHODS = {'naive': Naive, 'quasi': Quasi, 'adaptive': AdaptiveQuasi, 'moving': MovingLeastSquares}
 
 
 def parse_arguments():
@@ -28,6 +30,7 @@ def parse_arguments():
     parser.add_argument('-a', '--adaptive', action='store_true', help='is adaptive m0')
     parser.add_argument('-mt', '--method', choices=METHODS.keys(), default='quasi', help='approximation method')
     parser.add_argument('-ci', '--compare-to-interpolation', action='store_true')
+    parser.add_argument('-dm', '--dont-multi', action='store_true')
     args = parser.parse_args()
 
     config = CONFIG.copy()
@@ -43,12 +46,15 @@ def parse_arguments():
     config['IS_ADAPTIVE'] = args.adaptive
     config['SCALED_INTERPOLATION_METHOD'] = METHODS[args.method]
 
-    diffs = [
-        {
-            "NAME":"multiscale",
-            "NUMBER_OF_SCALES": args.base_index + args.number_of_scales - 1,
-            "MSE_LABEL": "Multi Scale"
-        }]
+    if args.dont_multi:
+        diffs = []
+    else:
+        diffs = [
+            {
+                "NAME":"multiscale",
+                "NUMBER_OF_SCALES": args.base_index + args.number_of_scales - 1,
+                "MSE_LABEL": "Multi Scale"
+            }]
 
     if args.single_scale:
         diffs = diffs + [

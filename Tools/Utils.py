@@ -7,10 +7,7 @@ from cachetools import cached, LFUCache
 from matplotlib import cm
 from matplotlib import pyplot as plt
 
-import numpy as np
 from numpy import linalg as la
-
-from Tools.SamplingPoints import GridParameters, Grid, symmetric_grid_params, generate_grid
 
 num_of_caches_g = 0
 
@@ -27,23 +24,6 @@ def act_on_functions(action, a, b):
     def new_func(*args):
         return action(a(*args), b(*args))
     return new_func
-
-
-def evaluate_on_grid(func, *args, points=None, should_log=False):
-    if points is not None:
-        x, y = points
-    else:
-        x, y = generate_grid(*args, should_ravel=False)
-    
-    z = np.zeros(x.shape, dtype=object)
-    print("Z shape", z.shape)
-
-    for index in np.ndindex(x.shape):
-        if index[1] == 0 and should_log:
-            print("current percentage: ", index[0] / x.shape[0])
-        z[index] = func(x[index], y[index])
-
-    return z
 
 
 def plot_and_save(data, title, filename):
@@ -109,30 +89,6 @@ def wendland_1_0(x):
         return 0
     else:
         return 1 - x
-
-
-def calculate_max_derivative(original_function, grid_params, manifold):
-    def derivative(x, y):
-        delta = grid_params.mesh_norm / 2
-        evaluations_around = [original_function(x + (delta / np.sqrt(2)), y + (delta / np.sqrt(2))),
-                              original_function(x, y + delta),
-                              original_function(x, y - delta),
-                              original_function(x + (delta / np.sqrt(2)), y - (delta / np.sqrt(2))),
-                              original_function(x + delta, y),
-                              original_function(x - (delta / np.sqrt(2)), y + (delta / np.sqrt(2))),
-                              original_function(x - delta, y),
-                              original_function(x - (delta / np.sqrt(2)), y - (delta / np.sqrt(2)))]
-        f_0 = original_function(x, y)
-
-        return max([manifold.distance(direction, f_0)/delta for direction in evaluations_around])
-
-    evaluation = Grid(1, derivative, grid_params).evaluation
-
-    result = np.zeros_like(evaluation, dtype=np.float32)
-    for index in np.ndindex(result.shape):
-        result[index] = evaluation[index]
-
-    return result
 
 
 @contextmanager

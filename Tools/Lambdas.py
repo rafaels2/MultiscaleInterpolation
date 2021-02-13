@@ -1,0 +1,60 @@
+import os
+import pickle as pkl
+
+import numpy as np
+from numpy import linalg as la
+
+
+class Lambdas(object):
+    def __init__(self, grid, filename='cache.pkl'):
+        self.grid = grid
+        self.polynomial_coefficients = [
+            np.array([[1, 0], [0, 0]]),
+            np.array([[0, 0], [1, 0]]),
+            np.array([[0, 0], [0, 1]])
+        ]
+        self._filename = filename
+
+        if os.path.exists(filename):
+            with open(filename, 'rb') as f:
+                self._lambdas = pkl.load(f)
+        else:
+            self._lambdas = {}
+
+    def _calculate(self, x, y):
+        polynomials_in_radius = np.array([
+            [np.polynomial.polynomial.polyval2d(x_i.x, x_i.y, c_j) for c_j in
+             self.polynomial_coefficients] for x_i in self.grid.points_in_radius(x, y)
+        ])
+
+        kernel = np.diag([x_i.phi(x, y) for x_i in self.grid.points_in_radius(x, y)])
+
+        polynomials_at_point = np.array([
+            [np.polynomial.polynomial.polyval2d(x, y, c_j)] for
+            c_j in self.polynomial_coefficients
+        ])
+
+        return 2 * np.matmul(la.inv(
+            np.matmul(np.matmul(np.transpose(polynomials_in_radius), kernel), polynomials_in_radius)),
+            polynomials_at_point)
+
+    def calculate(self, x, y):
+        value = self._lambdas.get((x, y), None)
+        if value is None:
+            print(f'calculating {x}, {y}')
+            value = self._calculate(x, y)
+            self._lambdas[(x, y)] = value
+
+        return value
+
+    def update(self):
+        with open(self._filename, 'wb') as f:
+            pkl.dump(self._lambdas, f, protocol=pkl.HIGHEST_PROTOCOL)
+
+    def weight_for_grid(self, x_j, y_j):
+        def weight(x, y):
+            return np.inner(self.calculate(x, y),
+                            np.array([np.polynomial.polynomial.polyval2d(x_j, y_j, c_j)
+                                      for c_j in self.polynomial_coefficients]))
+
+        return weight

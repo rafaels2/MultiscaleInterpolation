@@ -9,6 +9,7 @@ from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
 from Config import CONFIG, DIFFS
+from Tools.GridUtils import calculate_max_derivative
 from Tools.Utils import *
 from Tools.SamplingPoints import GridParameters, Grid, symmetric_grid_params
 
