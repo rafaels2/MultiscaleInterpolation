@@ -90,15 +90,23 @@ def run_different_rbfs(config, diffs):
        "3_2": wendland_3_2,
     }
 
+    methods = {
+        "moving": MovingLeastSquares,
+        "quasi": Quasi
+    }
+
     for name, wendland in wendlands.items():
-        for diff in old_diffs:
-            current_diff = diff.copy()
-            current_diff["NAME"] = f"{name}_{current_diff['NAME']}"
-            current_diff["MSE_LABEL"] = f"{name}_{current_diff['MSE_LABEL']}"
-            current_diff["RBF"] = wendland
-            diffs.append(current_diff)
+        for method_name, method in methods.items():
+            for diff in old_diffs:
+                current_diff = diff.copy()
+                current_diff["NAME"] = f"{method_name}_{name}_{current_diff['NAME']}"
+                current_diff["MSE_LABEL"] = f"{method_name}_{name}_{current_diff['MSE_LABEL']}"
+                current_diff["RBF"] = wendland
+                current_diff["SCALED_INTERPOLATION_METHOD"] = method
+                diffs.append(current_diff)
 
     return config, diffs
+
 
 def main():
     config, diffs = parse_arguments()

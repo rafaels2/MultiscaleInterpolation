@@ -97,11 +97,13 @@ class Grid(SamplingPoints):
             current_index = tuple(index_0 - radius_array + np.array(index))
             if all([current_index[0] >= 0, current_index[1] >= 0, 
                     current_index[0] < self._x.shape[0], current_index[1] < self._y.shape[1]]):
-                yield Point(self._evaluation[current_index],
-                            self._phi[current_index],
-                            self._x[current_index],
-                            self._y[current_index],
-                            self._lambdas[current_index])
+                # This is important to avoid singular matrices.
+                if self._phi[current_index](x, y) != 0:
+                    yield Point(self._evaluation[current_index],
+                                self._phi[current_index],
+                                self._x[current_index],
+                                self._y[current_index],
+                                self._lambdas[current_index])
 
     @property
     def evaluation(self):

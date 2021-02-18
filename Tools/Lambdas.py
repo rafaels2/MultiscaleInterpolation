@@ -22,12 +22,16 @@ class Lambdas(object):
             self._lambdas = {}
 
     def _calculate(self, x, y):
+        points_in_radius = [points for points in self.grid.points_in_radius(x, y)]
+        if len(points_in_radius) <= 3:
+            import ipdb;
+            ipdb.set_trace()
         polynomials_in_radius = np.array([
             [np.polynomial.polynomial.polyval2d(x_i.x, x_i.y, c_j) for c_j in
-             self.polynomial_coefficients] for x_i in self.grid.points_in_radius(x, y)
+             self.polynomial_coefficients] for x_i in points_in_radius
         ])
 
-        kernel = np.diag([x_i.phi(x, y) for x_i in self.grid.points_in_radius(x, y)])
+        kernel = np.diag([x_i.phi(x, y) for x_i in points_in_radius])
 
         polynomials_at_point = np.array([
             [np.polynomial.polynomial.polyval2d(x, y, c_j)] for
@@ -53,7 +57,8 @@ class Lambdas(object):
 
     def weight_for_grid(self, x_j, y_j):
         def weight(x, y):
-            return np.inner(self.calculate(x, y),
+            # TODO: Debug!!! why did i need to transpose??
+            return np.inner(np.transpose(self.calculate(x, y)),
                             np.array([np.polynomial.polynomial.polyval2d(x_j, y_j, c_j)
                                       for c_j in self.polynomial_coefficients]))
 

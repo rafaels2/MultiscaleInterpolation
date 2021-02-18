@@ -42,13 +42,15 @@ def multiscale_interpolation(manifold,
             # Can add here more grids (borders)
         ]
 
-        s_j = scaled_interpolation_method(
+        method = scaled_interpolation_method(
             manifold,
             function_to_interpolate,
             current_grid_parameters,
             rbf,
             scale,
-            is_approximating_on_tangent).approximation
+            is_approximating_on_tangent)
+
+        s_j = method.approximation
         print("interpolated!")
 
         if is_approximating_on_tangent or is_adaptive:
