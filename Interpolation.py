@@ -167,6 +167,7 @@ def run_all_experiments(config, diffs, *args):
         plot_lines(mesh_norms, mses, "mses.svg", "Error in different runs", "log(h_x)", "log(Error)")
 
     print("MSEs are: {}".format(mses))
+    print("mesh_norms are: {}".format(mesh_norms))
     print("times are: {}".format(calculation_time))
     return mses
 
