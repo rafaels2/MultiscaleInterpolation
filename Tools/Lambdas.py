@@ -11,7 +11,10 @@ class Lambdas(object):
         self.polynomial_coefficients = [
             np.array([[1, 0], [0, 0]]),
             np.array([[0, 0], [1, 0]]),
-            np.array([[0, 1], [0, 0]])
+            np.array([[0, 1], [0, 0]]),
+            np.array([[0, 0], [0, 1]]),
+            np.array([[0, 0, 1], [0, 0, 0]]),
+            np.array([[0, 0, 0], [0, 0, 0], [1, 0, 0]])
         ]
         self._filename = filename
 
@@ -38,9 +41,20 @@ class Lambdas(object):
             c_j in self.polynomial_coefficients
         ])
 
-        return 2 * np.matmul(la.inv(
-            np.matmul(np.matmul(np.transpose(polynomials_in_radius), kernel), polynomials_in_radius)),
-            polynomials_at_point)
+        try:
+            global tries_g
+            tries_g += 1
+            to_inv = np.matmul(np.matmul(np.transpose(polynomials_in_radius), kernel), polynomials_in_radius)
+            cond = la.cond(to_inv)
+            print(f"Condition {cond}")
+            return 2 * np.matmul(la.inv(to_inv),
+                                 polynomials_at_point)
+        except la.LinAlgError as e:
+            # import ipdb; ipdb.set_trace()
+            global fails_g
+            fails_g += 1
+            print(f"Singular {tries_g}, {fails_g}")
+            return np.matmul(to_inv, polynomials_at_point)
 
     def calculate(self, x, y):
         value = self._lambdas.get((x, y), None)
