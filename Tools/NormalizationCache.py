@@ -34,6 +34,7 @@ class NormalizationCache(object):
 
     def __getitem__(self, item):
         if repr(item) not in self._cache:
+            # raise KeyError(f'Please calibrate first {item}')
             print(f"{item} is set to 1, will update...")
             return 1
 
