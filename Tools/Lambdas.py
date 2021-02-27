@@ -42,8 +42,8 @@ class Lambdas(object):
         ])
 
         try:
-            global tries_g
-            tries_g += 1
+            # global tries_g
+            # tries_g += 1
             to_inv = np.matmul(np.matmul(np.transpose(polynomials_in_radius), kernel), polynomials_in_radius)
             cond = la.cond(to_inv)
             print(f"Condition {cond}")
