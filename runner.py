@@ -5,6 +5,7 @@ import Interpolation
 from ApproximationMethods.AdaptiveQuasi import AdaptiveQuasi
 from ApproximationMethods.MovingLeastSquares import MovingLeastSquares
 from ApproximationMethods.Naive import Naive
+from ApproximationMethods.NoNormalization import NoNormalization
 from ApproximationMethods.Quasi import Quasi
 from Config import CONFIG, _SCALING_FACTOR
 from Tools.Utils import set_output_directory, wendland_3_0, wendland_3_1, wendland_3_2, wendland_1_0
@@ -84,15 +85,16 @@ def run_different_rbfs(config, diffs):
     diffs = list()
 
     wendlands = {
-       "1_0": wendland_1_0,
-       "3_0": wendland_3_0,
+       # "1_0": wendland_1_0,
+       # "3_0": wendland_3_0,
        "3_1": wendland_3_1,
-       "3_2": wendland_3_2,
+       # "3_2": wendland_3_2,
     }
 
     methods = {
-        "moving": MovingLeastSquares,
-        "quasi": Quasi
+        # "moving": MovingLeastSquares,
+        # "quasi": Quasi,
+        "no_normalization": NoNormalization
     }
 
     for name, wendland in wendlands.items():
