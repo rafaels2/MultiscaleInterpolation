@@ -8,7 +8,9 @@ import os
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
+from ApproximationMethods.NoNormalization import normalization_cache
 from Config import CONFIG, DIFFS
+from Manifolds.RealNumbers import Calibration
 from Tools.GridUtils import calculate_max_derivative
 from Tools.Utils import *
 from Tools.SamplingPoints import GridParameters, Grid, symmetric_grid_params
@@ -132,7 +134,7 @@ def run_single_experiment(config, original_function):
                 }
                 pkl.dump(results, f)
 
-        yield mse, mesh_norm
+        yield mse, mesh_norm, error
 
 
 def run_all_experiments(config, diffs, *args):
@@ -151,7 +153,7 @@ def run_all_experiments(config, diffs, *args):
 
             t_0 = datetime.now()
 
-            for mse, mesh_norm in run_single_experiment(current_config, *args):
+            for mse, mesh_norm, _ in run_single_experiment(current_config, *args):
                 t_f = datetime.now()
                 calculation_time.append(t_f - t_0)
                 mse = np.log(mse)
@@ -170,6 +172,41 @@ def run_all_experiments(config, diffs, *args):
     print("mesh_norms are: {}".format(mesh_norms))
     print("times are: {}".format(calculation_time))
     return mses
+
+
+def calibrate(config, diffs, *args):
+    mses = dict()
+    mesh_norms = dict()
+    execution_name = config["EXECUTION_NAME"]
+    path = "{}_{}".format(execution_name, time.strftime("%Y%m%d__%H%M%S"))
+    with set_output_directory(path):
+        for diff in diffs:
+            current_config = config.copy()
+
+            for k, v in diff.items():
+                current_config[k] = v
+
+            current_config["MANIFOLD"] = Calibration()
+
+            for _, mesh_norm, error in run_single_experiment(current_config, *args):
+                mse = np.average(error)
+                mse_label = current_config["MSE_LABEL"]
+                current_mses = mses.get(mse_label, list())
+                current_mesh_norms = mesh_norms.get(mse_label, list())
+                current_mses.append(mse)
+                current_mesh_norms.append(mesh_norm)
+                mses[mse_label] = current_mses
+                mesh_norms[mse_label] = current_mesh_norms
+                normalization_cache[
+                    (current_config["RBF"].__name__, mesh_norm, mesh_norm * current_config["BASE_RESOLUTION"])
+                ] = mse
+
+        plot_lines(mesh_norms, mses, "mses.svg", "Error in different runs", "log(h_x)", "log(Error)")
+
+    print("MSEs are: {}".format(mses))
+    print("mesh_norms are: {}".format(mesh_norms))
+    return mses
+
 
 def main():
     rbf = wendland_3_0

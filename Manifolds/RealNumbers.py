@@ -30,6 +30,15 @@ class NoNormalizationNumbers(RealNumbers):
         return sum([w_i * v_i for w_i, v_i in zip(weights, values_to_average)])
 
 
+@register_manifold("no_norm_calibration")
+class Calibration(NoNormalizationNumbers):
+    def calculate_error(self, x, y):
+        error = np.zeros_like(x, dtype=np.float32)
+        for index in np.ndindex(x.shape):
+            error[index] = x[index] / y[index]
+        return error
+
+
 class PositiveNumbers(RealNumbers):
     def exp(self, x, y):
         return x ** y

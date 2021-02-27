@@ -50,9 +50,6 @@ class Lambdas(object):
             return 2 * np.matmul(la.inv(to_inv),
                                  polynomials_at_point)
         except la.LinAlgError as e:
-            # import ipdb; ipdb.set_trace()
-            global fails_g
-            fails_g += 1
             print(f"Singular {tries_g}, {fails_g}")
             return np.matmul(to_inv, polynomials_at_point)
 

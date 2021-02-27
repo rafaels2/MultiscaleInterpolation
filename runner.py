@@ -32,6 +32,7 @@ def parse_arguments():
     parser.add_argument('-mt', '--method', choices=METHODS.keys(), default='quasi', help='approximation method')
     parser.add_argument('-ci', '--compare-to-interpolation', action='store_true')
     parser.add_argument('-dm', '--dont-multi', action='store_true')
+    parser.add_argument('-cal', '--calibrate', action='store_true', help='config through nonorm cache')
     args = parser.parse_args()
 
     config = CONFIG.copy()
@@ -46,6 +47,7 @@ def parse_arguments():
     config['EXECUTION_NAME'] = execution_name
     config['IS_ADAPTIVE'] = args.adaptive
     config['SCALED_INTERPOLATION_METHOD'] = METHODS[args.method]
+    config['CALIBRATE'] = args.calibrate
 
     if args.dont_multi:
         diffs = []
@@ -118,7 +120,10 @@ def main():
     config, diffs = run_different_rbfs(config, diffs)
 
     with set_output_directory(output_dir):
-        results = Interpolation.run_all_experiments(config, diffs, original_function)
+        if not config['CALIBRATE']:
+            results = Interpolation.run_all_experiments(config, diffs, original_function)
+        else:
+            results = Interpolation.calibrate(config, diffs, original_function)
 
 
 if __name__ == "__main__":
