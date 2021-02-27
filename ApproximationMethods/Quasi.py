@@ -22,14 +22,14 @@ class Quasi(ApproximationMethod):
             self._is_adaptive = False
         super().__init__(manifold, original_function, grid_parameters, rbf)
         self._is_approximating_on_tangent = is_approximating_on_tangent
-        rbf_radius = scale
+        self._rbf_radius = scale
 
-        self._grid = SamplingPointsCollection(rbf_radius,
+        self._grid = SamplingPointsCollection(self._rbf_radius,
                                               original_function,
                                               grid_parameters,
                                               phi_generator=self._calculate_phi)
 
-        self._kernel = generate_kernel(self._rbf, rbf_radius)
+        self._kernel = generate_kernel(self._rbf, self._rbf_radius)
 
     @staticmethod
     def _get_weights_for_point(point, x, y):
