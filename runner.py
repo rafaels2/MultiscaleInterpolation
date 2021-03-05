@@ -33,10 +33,12 @@ def parse_arguments():
     parser.add_argument('-ci', '--compare-to-interpolation', action='store_true')
     parser.add_argument('-dm', '--dont-multi', action='store_true')
     parser.add_argument('-cal', '--calibrate', action='store_true', help='config through nonorm cache')
+    parser.add_argument('-er', '--error', action='store_true')
     args = parser.parse_args()
 
     config = CONFIG.copy()
     config['ORIGINAL_FUNCTION'] = importlib.import_module(args.function).original_function
+    config['ERROR_CALC'] = args.error
     config['MANIFOLD'] = MANIFOLDS[args.manifold]()
     config['IS_APPROXIMATING_ON_TANGENT'] = args.tangent_approximation
     config['NORM_VISUALIZATION'] = args.norm_visualization

@@ -123,7 +123,10 @@ def run_single_experiment(config, original_function):
             error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
             plot_and_save(error, "difference map", "difference.png")
 
-            mse = la.norm(error)
+            if config["ERROR_CALC"]:
+                mse = np.average(error)
+            else:
+                mse = la.norm(error)
             with open("results.pkl", "wb") as f:
                 results = {
                     "original_values": true_values_on_grid,
@@ -156,7 +159,8 @@ def run_all_experiments(config, diffs, *args):
             for mse, mesh_norm, _ in run_single_experiment(current_config, *args):
                 t_f = datetime.now()
                 calculation_time.append(t_f - t_0)
-                mse = np.log(mse)
+                if not current_config["ERROR_CALC"]:
+                    mse = np.log(mse)
                 mse_label = current_config["MSE_LABEL"]
                 current_mses = mses.get(mse_label, list())
                 current_mesh_norms = mesh_norms.get(mse_label, list())

@@ -13,7 +13,9 @@ class KarcherMean(object):
         self._manifold = manifold
         self._values_to_average = values_to_average
         self._weights = weights
-        assert all(w_i >= 0 for w_i in weights), f"All weights should be non-negative, {weights}"
+        # Removed this line because it doesn't work with lambdas. Mathematically it should be fine,
+        # but should be validated.
+        # assert all(w_i >= 0 for w_i in weights), f"All weights should be non-negative, {weights}"
         assert all(manifold.is_in_manifold(a_i)
                    for a_i in values_to_average), "Not all values_to_average in _manifold"
 

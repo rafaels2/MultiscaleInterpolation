@@ -29,6 +29,12 @@ class NoNormalizationNumbers(RealNumbers):
     def average(self, values_to_average, weights):
         return sum([w_i * v_i for w_i, v_i in zip(weights, values_to_average)])
 
+    def calculate_error(self, x, y):
+        error = np.zeros_like(x, dtype=np.float32)
+        for index in np.ndindex(x.shape):
+            error[index] = self.distance(x[index], y[index]) / np.abs(y[index])
+        return error
+
 
 @register_manifold("no_norm_calibration")
 class Calibration(NoNormalizationNumbers):
