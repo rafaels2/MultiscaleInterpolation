@@ -1,3 +1,4 @@
+import numpy as np
 from cachetools import cached
 from Tools.Utils import generate_kernel, generate_cache
 
@@ -15,6 +16,7 @@ def combine(a, b):
 class Quasi(ApproximationMethod):
     def __init__(self, manifold, original_function, grid_parameters, rbf,
                  scale, is_approximating_on_tangent):
+        self._values_to_average_counter = []
         if isinstance(original_function, tuple):
             original_function = combine(*original_function)
             self._is_adaptive = True
@@ -30,6 +32,9 @@ class Quasi(ApproximationMethod):
                                               phi_generator=self._calculate_phi)
 
         self._kernel = generate_kernel(self._rbf, self._rbf_radius)
+
+    def average_support_size(self):
+        return np.average(np.array(self._values_to_average_counter))
 
     @staticmethod
     def _get_weights_for_point(point, x, y):
@@ -63,4 +68,5 @@ class Quasi(ApproximationMethod):
         if self._is_approximating_on_tangent:
             return sum(w_i * x_i for w_i, x_i in zip(weights, values_to_average))
 
+        self._values_to_average_counter.append(len(weights))
         return self._manifold.average(values_to_average, weights)

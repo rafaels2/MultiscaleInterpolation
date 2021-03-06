@@ -53,6 +53,8 @@ def multiscale_interpolation(manifold,
             is_approximating_on_tangent)
 
         s_j = method.approximation
+        average_support_size = method.average_support_size
+
         print("interpolated!")
 
         if is_approximating_on_tangent or is_adaptive:
@@ -62,7 +64,7 @@ def multiscale_interpolation(manifold,
 
         f_j = act_on_functions(manifold.exp, f_j, function_added_to_f_j)
         e_j = act_on_functions(manifold.log, f_j, original_function)
-        yield scale / resolution, f_j
+        yield scale / resolution, f_j, average_support_size
 
 
 def run_single_experiment(config, original_function):
@@ -95,7 +97,7 @@ def run_single_experiment(config, original_function):
                   "max derivatives",
                   "deriveatives.png")
 
-    for i, (mesh_norm, interpolant) in enumerate(multiscale_interpolation(
+    for i, (mesh_norm, interpolant, support_size) in enumerate(multiscale_interpolation(
             manifold,
             number_of_scales=number_of_scales,
             original_function=original_function,
@@ -137,7 +139,7 @@ def run_single_experiment(config, original_function):
                 }
                 pkl.dump(results, f)
 
-        yield mse, mesh_norm, error
+        yield mse, mesh_norm, error, support_size
 
 
 def run_all_experiments(config, diffs, *args):
@@ -146,6 +148,7 @@ def run_all_experiments(config, diffs, *args):
     calculation_time = list()
     interpolants = list()
     execution_name = config["EXECUTION_NAME"]
+    support_sizes = list()
     path = "{}_{}".format(execution_name, time.strftime("%Y%m%d__%H%M%S"))
     with set_output_directory(path):
         for diff in diffs:
@@ -156,7 +159,8 @@ def run_all_experiments(config, diffs, *args):
 
             t_0 = datetime.now()
 
-            for mse, mesh_norm, _ in run_single_experiment(current_config, *args):
+            for mse, mesh_norm, _, support_size in run_single_experiment(current_config, *args):
+                support_sizes.append(support_size)
                 t_f = datetime.now()
                 calculation_time.append(t_f - t_0)
                 if not current_config["ERROR_CALC"]:
@@ -179,6 +183,7 @@ def run_all_experiments(config, diffs, *args):
 
 
 def calibrate(config, diffs, *args):
+    support_sizes = []
     mses = dict()
     mesh_norms = dict()
     execution_name = config["EXECUTION_NAME"]
@@ -192,7 +197,8 @@ def calibrate(config, diffs, *args):
 
             current_config["MANIFOLD"] = Calibration()
 
-            for _, mesh_norm, error in run_single_experiment(current_config, *args):
+            for _, mesh_norm, error, support_size in run_single_experiment(current_config, *args):
+                support_sizes.append(support_size())
                 mse = np.average(error)
                 mse_label = current_config["MSE_LABEL"]
                 current_mses = mses.get(mse_label, list())
@@ -207,6 +213,7 @@ def calibrate(config, diffs, *args):
 
         plot_lines(mesh_norms, mses, "mses.svg", "Error in different runs", "log(h_x)", "log(Error)")
 
+    print(f"Support Sizes{support_sizes}")
     print("MSEs are: {}".format(mses))
     print("mesh_norms are: {}".format(mesh_norms))
     return mses
