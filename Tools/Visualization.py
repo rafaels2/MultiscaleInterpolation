@@ -19,9 +19,12 @@ if __name__ == "__main__":
     from Manifolds.RigidRotations import RigidRotations
 
 
+VISUALIZATION_CONST = 10
+
+
 class Visualizer(object):
     def __init__(self, matrices, centers):
-        self.fig = plt.figure(figsize=(8,8))
+        self.fig = plt.figure(figsize=(12, 12))
         self.ax = self.fig.add_subplot(projection='3d')
         self.ax.view_init(azim=0, elev=90)
         self._matrices = matrices
@@ -45,8 +48,11 @@ class Visualizer(object):
         plt.close(self.fig)
 
     def show(self):
+        i = 1
         for index in np.ndindex(self._matrices.shape):
-            self._process_matrix(index)
+            i += 1
+            if i % VISUALIZATION_CONST == 0:
+                self._process_matrix(index)
         # Hide axes ticks
         self.ax.set_xticks([])
         self.ax.set_yticks([])
@@ -71,7 +77,7 @@ class ElipsoidVisualizer(Visualizer):
 
         print("Max Radius is ", max_radius)
 
-        self._normalizer = max_radius * 2
+        self._normalizer = max_radius
 
     def _svd_matrices(self):
         singular_values = np.zeros_like(self._matrices, dtype=object)
@@ -83,6 +89,8 @@ class ElipsoidVisualizer(Visualizer):
         self._rotations = rotations
 
     def _process_matrix(self, index):
+        if not ((index[0] % 2 == 0) and (index[1] % 2 == 0)):
+            return
         center = self._centers[index]
         radii = self._singular_values[index]
         rotation = self._rotations[index]
@@ -120,12 +128,13 @@ class RotationVisualizer(Visualizer):
                 for index in np.ndindex(centers.shape):
                     centers[index] = self._centers[index[:-1]][index[-1]]
 
-        return centers.min() - 1, centers.max() + 1
+        return 2 * centers.min() - 1, 2 * centers.max() + 1
 
     def _process_matrix(self, index):
-        center = self._centers[index]
-        matrix = self._matrices[index]
-        plot_basis(ax=self.ax, R=matrix, p=center, s=0.4)
+        if (index[0] % 2 == 0) and (index[1] % 2 == 0):
+            center = 2 * self._centers[index]
+            matrix = self._matrices[index]
+            plot_basis(ax=self.ax, R=matrix, p=center, s=1.2)
 
 
 def ellipsoids_main():

@@ -24,7 +24,8 @@ class AbstractManifold(object):
     def calculate_error(self, x, y):
         error = np.zeros_like(x, dtype=np.float32)
         for index in np.ndindex(x.shape):
-            error[index] = self.distance(x[index], y[index])
+            # Relative Error
+            error[index] = self.distance(x[index], y[index]) / self._to_numbers(y[index])
         return error
 
     @abstractmethod
@@ -36,7 +37,9 @@ class AbstractManifold(object):
         for index in np.ndindex(visualization.shape):
             x = data[index]
             visualization[index] = self._to_numbers(x)
-        plt.imshow(visualization)
+        fig = plt.imshow(visualization)
+        fig.axes.get_xaxis().set_visible(False)
+        fig.axes.get_yaxis().set_visible(False)
         cb = plt.colorbar()
         return cb
 

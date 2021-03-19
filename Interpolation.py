@@ -123,10 +123,11 @@ def run_single_experiment(config, original_function):
             )
 
             error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
-            plot_and_save(error, "difference map", "difference.png")
+            plot_and_save(error, "Difference Map", "difference.png")
 
             if config["ERROR_CALC"]:
-                mse = np.average(error)
+                mse = la.norm(error.ravel(), np.inf)
+                # mse = np.average(error.ravel())
             else:
                 mse = la.norm(error)
             with open("results.pkl", "wb") as f:
@@ -160,11 +161,10 @@ def run_all_experiments(config, diffs, *args):
             t_0 = datetime.now()
 
             for mse, mesh_norm, _, support_size in run_single_experiment(current_config, *args):
-                support_sizes.append(support_size)
+                support_sizes.append(support_size())
                 t_f = datetime.now()
                 calculation_time.append(t_f - t_0)
-                if not current_config["ERROR_CALC"]:
-                    mse = np.log(mse)
+
                 mse_label = current_config["MSE_LABEL"]
                 current_mses = mses.get(mse_label, list())
                 current_mesh_norms = mesh_norms.get(mse_label, list())
@@ -173,9 +173,11 @@ def run_all_experiments(config, diffs, *args):
                 mses[mse_label] = current_mses
                 mesh_norms[mse_label] = current_mesh_norms
                 t_0 = datetime.now()
-    
-        plot_lines(mesh_norms, mses, "mses.svg", "Error in different runs", "log(h_x)", "log(Error)")
 
+        plot_lines(mesh_norms, mses, "mses_log_h_X.svg", "Error in different runs", "log(h_X)", "Relative Error")
+        plot_lines(None, mses, "mses.svg", "Error in different runs", "Iteration", "Relative Error")
+
+    print(f"Support Sizes{support_sizes}")
     print("MSEs are: {}".format(mses))
     print("mesh_norms are: {}".format(mesh_norms))
     print("times are: {}".format(calculation_time))
@@ -199,7 +201,7 @@ def calibrate(config, diffs, *args):
 
             for _, mesh_norm, error, support_size in run_single_experiment(current_config, *args):
                 support_sizes.append(support_size())
-                mse = np.average(error)
+                mse = la.norm(error.ravel(), np.inf)
                 mse_label = current_config["MSE_LABEL"]
                 current_mses = mses.get(mse_label, list())
                 current_mesh_norms = mesh_norms.get(mse_label, list())

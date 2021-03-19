@@ -29,7 +29,9 @@ def act_on_functions(action, a, b):
 def plot_and_save(data, title, filename):
     plt.figure()
     plt.title(title)
-    plt.imshow(data)
+    fig = plt.imshow(data)
+    fig.axes.get_xaxis().set_visible(False)
+    fig.axes.get_yaxis().set_visible(False)
     cb = plt.colorbar()
     plt.savefig(filename)
     cb.remove()
@@ -40,9 +42,14 @@ def plot_lines(x_values, y_values, filename, title, x_label, y_label):
     plt.title(title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    for line_name in x_values.keys():
-        plt.plot(x_values[line_name], y_values[line_name], label=line_name)
-    plt.legend(x_values.keys())
+    for line_name in y_values.keys():
+        if x_values is not None:
+            plt.plot(x_values[line_name], y_values[line_name], label=line_name)
+        else:
+            _x_values = [x + 1 for x in range(len(y_values[line_name]))]
+            plt.plot(_x_values, y_values[line_name], label=line_name)
+            plt.xticks(_x_values)
+    plt.legend(y_values.keys())
     plt.savefig(filename)
     plt.close(fig)
 
