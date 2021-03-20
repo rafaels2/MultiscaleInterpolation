@@ -64,7 +64,7 @@ def multiscale_interpolation(manifold,
 
         f_j = act_on_functions(manifold.exp, f_j, function_added_to_f_j)
         e_j = act_on_functions(manifold.log, f_j, original_function)
-        yield scale / resolution, f_j, average_support_size
+        yield scale / resolution, f_j, average_support_size, ker_val
 
 
 def run_single_experiment(config, original_function):
@@ -97,7 +97,7 @@ def run_single_experiment(config, original_function):
                   "max derivatives",
                   "deriveatives.png")
 
-    for i, (mesh_norm, interpolant, support_size) in enumerate(multiscale_interpolation(
+    for i, (mesh_norm, interpolant, support_size, ker_val) in enumerate(multiscale_interpolation(
             manifold,
             number_of_scales=number_of_scales,
             original_function=original_function,
@@ -136,7 +136,8 @@ def run_single_experiment(config, original_function):
                     "approximation": approximated_values_on_grid,
                     "errors": error,
                     "mse": mse,
-                    "mesh_norm": mesh_norm
+                    "mesh_norm": mesh_norm,
+                    "ker_val": ker_val
                 }
                 pkl.dump(results, f)
 
@@ -161,7 +162,8 @@ def run_all_experiments(config, diffs, *args):
 
             t_0 = datetime.now()
 
-            for mse, mesh_norm, _, support_size in run_single_experiment(current_config, *args):
+            for mse, mesh_norm, _, support_size, _ in run_single_experiment(current_config, *args):
+                mus.append(current_config['SCALING_FACTOR'])
                 support_sizes.append(support_size())
                 t_f = datetime.now()
                 calculation_time.append(t_f - t_0)
@@ -196,6 +198,7 @@ def calibrate(config, diffs, *args):
     support_sizes = []
     mses = dict()
     mesh_norms = dict()
+    ker_vals = list()
     execution_name = config["EXECUTION_NAME"]
     path = "{}_{}".format(execution_name, time.strftime("%Y%m%d__%H%M%S"))
     with set_output_directory(path):
@@ -207,7 +210,8 @@ def calibrate(config, diffs, *args):
 
             current_config["MANIFOLD"] = Calibration()
 
-            for _, mesh_norm, error, support_size in run_single_experiment(current_config, *args):
+            for _, mesh_norm, error, support_size, ker_val in run_single_experiment(current_config, *args):
+                ker_vals.append(ker_val)
                 support_sizes.append(support_size())
                 mse = la.norm(error.ravel(), np.inf)
                 mse_label = current_config["MSE_LABEL"]
@@ -226,6 +230,7 @@ def calibrate(config, diffs, *args):
     print(f"Support Sizes{support_sizes}")
     print("MSEs are: {}".format(mses))
     print("mesh_norms are: {}".format(mesh_norms))
+    print(f'ker values: {ker_vals}')
     return mses
 
 
