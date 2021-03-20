@@ -52,6 +52,7 @@ def multiscale_interpolation(manifold,
             scale,
             is_approximating_on_tangent)
 
+        ker_val = sum(p.phi(0, 0) for p in method._grid.points_in_radius(0, 0))
         s_j = method.approximation
         average_support_size = method.average_support_size
 
@@ -141,7 +142,7 @@ def run_single_experiment(config, original_function):
                 }
                 pkl.dump(results, f)
 
-        yield mse, mesh_norm, error, support_size
+        yield mse, mesh_norm, error, support_size, ker_val
 
 
 def run_all_experiments(config, diffs, *args):
@@ -171,7 +172,7 @@ def run_all_experiments(config, diffs, *args):
                 mse_label = current_config["MSE_LABEL"]
                 current_mses = mses.get(mse_label, list())
                 current_mesh_norms = mesh_norms.get(mse_label, list())
-                current_mses.append(mse)
+                current_mses.append(np.log(mse))
                 current_mesh_norms.append(np.log(mesh_norm))
                 mses[mse_label] = current_mses
                 mesh_norms[mse_label] = current_mesh_norms
