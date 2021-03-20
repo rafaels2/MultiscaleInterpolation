@@ -150,6 +150,7 @@ def run_all_experiments(config, diffs, *args):
     interpolants = list()
     execution_name = config["EXECUTION_NAME"]
     support_sizes = list()
+    mus = list()
     path = "{}_{}".format(execution_name, time.strftime("%Y%m%d__%H%M%S"))
     with set_output_directory(path):
         for diff in diffs:
@@ -176,6 +177,13 @@ def run_all_experiments(config, diffs, *args):
 
         plot_lines(mesh_norms, mses, "mses_log_h_X.svg", "Error in different runs", "log(h_X)", "Relative Error")
         plot_lines(None, mses, "mses.svg", "Error in different runs", "Iteration", "Relative Error")
+        result = {
+            'mses': mses,
+            'mesh_norms': mesh_norms,
+            'mus': mus
+        }
+        with open('results_dict.pkl', 'wb') as f:
+            pkl.dump(result, f)
 
     print(f"Support Sizes{support_sizes}")
     print("MSEs are: {}".format(mses))
