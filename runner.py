@@ -34,6 +34,7 @@ def parse_arguments():
     parser.add_argument('-dm', '--dont-multi', action='store_true')
     parser.add_argument('-cal', '--calibrate', action='store_true', help='config through nonorm cache')
     parser.add_argument('-er', '--error', action='store_true')
+    parser.add_argument('-mu', '--mu-testing', action='store_true')
     args = parser.parse_args()
 
     config = CONFIG.copy()
@@ -51,12 +52,15 @@ def parse_arguments():
     config['SCALED_INTERPOLATION_METHOD'] = METHODS[args.method]
     config['CALIBRATE'] = args.calibrate
 
+    if args.mu_testing:
+        return config, run_different_mus(config, args)
+
     if args.dont_multi:
         diffs = []
     else:
         diffs = [
             {
-                "NAME":"multiscale",
+                "NAME": "multiscale",
                 "NUMBER_OF_SCALES": args.base_index + args.number_of_scales - 1,
                 "MSE_LABEL": "Multi Scale"
             }]
@@ -82,6 +86,21 @@ def parse_arguments():
             diffs.append(new_item)
 
     return config, diffs
+
+
+def run_different_mus(config, args):
+    mus = [0.5, 0.6, 0.7, 0.75, 0.8]
+    diffs = list()
+
+    for mu in mus:
+        diff = {
+            'NAME': f"different_mus_{mu}",
+            'MSE_LABEL': f"Multi scale with scaling factor {mu}",
+            'NUMBER_OF_SCALES': args.base_index + args.number_of_scales - 1,
+            'SCALING_FACTOR': mu
+        }
+        diffs.append(diff)
+    return diffs
 
 
 def run_different_rbfs(config, diffs):
