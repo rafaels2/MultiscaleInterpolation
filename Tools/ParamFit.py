@@ -1,42 +1,13 @@
 import numpy as np
+import os
+import pickle as pkl
 from matplotlib import pyplot as plt
 import scipy.optimize
 from collections import namedtuple
-from Config import _SCALING_FACTOR
+import argparse
 
 FunctionData = namedtuple('FunctionData', ['mesh_norm', 'error'])
-
-RESULTS = {
-    'numbers_gauss':
-        {
-            'quasi':
-                {
-                    'mses': [2.8570535, 2.3486903, 1.8128927, 1.2604101, 0.698276, 0.13016611, -0.4409449],
-                    'mesh_norms': [
-                        -0.2586945355785286, -0.5463766080303095, -0.8340586804820905, -1.1217407529338714,
-                        -1.4094228253856522, -1.6971048978374332, -1.984786970289214]
-                },
-            'multi':
-                {
-                    'mses': [2.8570535, 1.1803906, -0.5231396, -1.5175103, -2.16627, -3.117656, -4.3528185],
-                    'mesh_norms': [
-                        -0.2586945355785286, -0.5463766080303095, -0.8340586804820905, -1.1217407529338714,
-                        -1.4094228253856522, -1.6971048978374332, -1.984786970289214
-                    ]
-                }
-        },
-    # 'numbers_one':
-    #     {
-    #         'quasi':
-    #             {
-    #                 'mesh_norms'
-    #             },
-    #         'multi':
-    #             {
-    #
-    #             }
-    #     }
-}
+DIR = 'fit_results'
 
 
 def plot_comparison(func, x_orig, y_orig, params, title):
@@ -45,71 +16,13 @@ def plot_comparison(func, x_orig, y_orig, params, title):
     plt.plot(x_orig, y_orig, label='original')
     plt.plot(x_orig, y_new, label='fit')
     plt.title(title)
+    plt.savefig(os.path.join(DIR, f"{title.replace(' ', '_')}.png"))
     plt.show(block=False)
 
 
 def _multi_linear(x, *params):
     (a, b) = params
-    return a * x + b
-
-
-def run_results():
-    for func, result in RESULTS.copy().items():
-        _result = result.copy()
-        y_orig = [np.log(x) for x in _result['multi']['mses']]
-        x_orig = list(range(1, len(y_orig) + 1))
-        (A, B), _ = scipy.optimize.curve_fit(
-            _multi_linear, x_orig, y_orig, p0=[1, 1]
-        )
-        plot_comparison(_multi_linear, x_orig, y_orig, (A, B), 'Single Scale Fit')
-
-    print(A, B)
-# noinspection PyTypeChecker
-def _run_results():
-    for func, result in RESULTS.copy().items():
-        _result = result.copy()
-        x_orig = _result['quasi']['mesh_norms']
-        y_orig = _result['quasi']['mses']
-        (quasi_const, convergence), _ = scipy.optimize.curve_fit(
-            _quasi_error, x_orig, y_orig, p0=[1, 1]
-        )
-        # noinspection PyTypeChecker
-        RESULTS[func]['quasi']['params'] = {
-            "convergence": convergence,
-            "quasi_const": quasi_const,
-        }
-        plot_comparison(_quasi_error, x_orig, y_orig, (quasi_const, convergence), 'Single Scale Fit')
-
-        multi_mses = _result['multi']['mses']
-        multi_differences = []
-        for i in range(len(multi_mses) - 1):
-            multi_differences.append(2 * multi_mses[i + 1] - 2 * multi_mses[i])
-
-        RESULTS[func]['multi']['differences'] = multi_differences
-
-    nu = np.average([
-        result['quasi']['params']['convergence'] for result in RESULTS.values()
-    ])
-
-    for func, result in RESULTS.copy().items():
-        x_orig = _result['multi']['mesh_norms'][1:]
-        y_orig = _result['multi']['differences']
-        _result = result.copy()
-        # import ipdb
-        # ipdb.set_trace()
-
-        func = get_multi_error(nu)
-        (c_big, power_function), _ = scipy.optimize.curve_fit(
-            func, x_orig, y_orig, p0=(1, 1),
-        bounds=([0 , 0], [1000,1000]))
-
-        plot_comparison(func, x_orig, y_orig, (c_big, power_function), 'Multi Scale Fit')
-        # noinspection PyTypeChecker
-        RESULTS[func]['multi']['params'] = {
-            'power_function': power_function,
-            'c_big': c_big,
-            'norm_from_quasi': _result['quasi']['params']['quasi_const'] / c_big
-        }
+    return b * x + a
 
 
 def _quasi_error(x, *params):
@@ -117,39 +30,57 @@ def _quasi_error(x, *params):
     return np.log(c_big * (np.exp(x) ** nu))
 
 
-def get_multi_error(nu):
-    def _multi_error(x, *params):
-        c_big, c = params
-        return np.log((2 ** 3) * (c_big * (np.exp(x) ** nu) + (_SCALING_FACTOR ** (2 * 3)) * c))
-    return _multi_error
+def pkl_load(filename):
+    with open(filename, 'rb') as f:
+        return pkl.load(f)
+
+
+def fit_multi_scale(results):
+    for i, name in enumerate(results['mses'].keys()):
+        mses = results['mses'][name]
+        x_orig = list(range(1, len(mses) + 1))
+        (a, b), _ = scipy.optimize.curve_fit(
+            _multi_linear, x_orig, mses, p0=[1, 1]
+        )
+        mu = results['mus'][i]
+        plot_comparison(_multi_linear, x_orig, mses, (a, b),
+                        f'Multi Scale Fit mu {mu}')
+        yield a, b
+
+
+def fit_mus(mus, param_b):
+    # log_b = [np.log(b) for b in param_b]
+    (const, curve), _ = scipy.optimize.curve_fit(
+        _multi_linear, mus, param_b, p0=[1, 1]
+    )
+    plot_comparison(_multi_linear, mus, param_b, (const, curve), 'Mu Fit')
+    return const, curve
 
 
 def main():
-    error_multi = [x for x in [
-        3.9069011, 3.751316, 3.4572103, 3.0197046, 2.3680975, 1.4181411, 0.122505374, -1.4758203, -2.851662]]
-    error_single = [x for x in [
-        3.9069011, 3.7754338, 3.5624442, 3.2720752, 2.8900316, 2.4361544, 1.9334888, 1.400371, 0.848413]]
-    # error_single = [0.8626434, -0.17491123, -1.2536587, -2.3585966, -3.4808002]
-    mesh_norms = [x for x in [
-        -0.2586945355785286, -0.5463766080303095, -0.8340586804820905,
-        -1.1217407529338714, -1.4094228253856522, -1.6971048978374332,
-        -1.984786970289214, -2.2724690427409953, -2.560151115192776
-    ]]
-    # mesh_norms = [-0.2586945355785286, -0.5463766080303095, -0.8340586804820905, -1.1217407529338714, -1.4094228253856522]
-    result_single = scipy.optimize.curve_fit(_quasi_error, mesh_norms, error_single, p0=np.array([1, 1]))
-    # result_multi = scipy.optimize.curve_fit(_multi_error, mesh_norms, error_multi, p0=np.array([70, 1, -1]),bounds=(
-    #     [65, 0.5, -100], [100, 1.5, 0]
-    # ))
+    parser = argparse.ArgumentParser()
+    parser.add_argument('filename', type=str)
+    args = parser.parse_args()
 
-    ydata = [_quasi_error(x, *tuple(result_single[0])) for x in mesh_norms]
-    plt.plot(mesh_norms, ydata, label='fit')
-    plt.plot(mesh_norms, error_single, label='approx')
-    plt.legend()
-    plt.show()
-    print(result_single)
-    return result_single
+    experiment_results = pkl_load(args.filename)
+    experiment_results['mus'] = experiment_results['mus'][::5]
+
+    param_a = list()
+    param_b = list()
+
+    for a, b in fit_multi_scale(experiment_results):
+        param_a.append(a)
+        param_b.append(b)
+
+    print(f'Average of a: {np.average(param_a)}, '
+          f'stderr a: {np.std(param_a)}')
+
+    const, curve = fit_mus(experiment_results['mus'], param_b)
+
+    print(f'Const: {const}'
+          f'Curve: {curve}')
 
 
 if __name__ == '__main__':
     # single, multi = main()
-    run_results()
+    main()
