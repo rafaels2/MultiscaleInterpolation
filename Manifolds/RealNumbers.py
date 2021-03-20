@@ -33,7 +33,7 @@ class NoNormalizationNumbers(RealNumbers):
         """ Relative Error """
         error = np.zeros_like(x, dtype=np.float32)
         for index in np.ndindex(x.shape):
-            error[index] = self.distance(x[index], y[index]) / np.abs(y[index])
+            error[index] = self.distance(x[index], y[index])
         return error
 
 

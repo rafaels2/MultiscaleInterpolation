@@ -25,7 +25,7 @@ class AbstractManifold(object):
         error = np.zeros_like(x, dtype=np.float32)
         for index in np.ndindex(x.shape):
             # Relative Error
-            error[index] = self.distance(x[index], y[index]) / self._to_numbers(y[index])
+            error[index] = self.distance(x[index], y[index])
         return error
 
     @abstractmethod

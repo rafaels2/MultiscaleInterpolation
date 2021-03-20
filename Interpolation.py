@@ -178,8 +178,7 @@ def run_all_experiments(config, diffs, *args):
                 mesh_norms[mse_label] = current_mesh_norms
                 t_0 = datetime.now()
 
-        plot_lines(mesh_norms, mses, "mses_log_h_X.svg", "Error in different runs", "log(h_X)", "Relative Error")
-        plot_lines(None, mses, "mses.svg", "Error in different runs", "Iteration", "Relative Error")
+        plot_lines(mesh_norms, mses, "mses.svg", "Error in different runs", "log(h_X)", "log(Error)")
         result = {
             'mses': mses,
             'mesh_norms': mesh_norms,
