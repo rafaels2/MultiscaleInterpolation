@@ -225,7 +225,7 @@ def main():
     original_function = config["ORIGINAL_FUNCTION"]
     output_dir = CONFIG["OUTPUT_DIR"]
 
-    # config, diffs = run_different_rbfs(config, diffs)
+    config, diffs = run_different_rbfs(config, diffs)
 
     with set_output_directory(output_dir):
         if not config["CALIBRATE"]:

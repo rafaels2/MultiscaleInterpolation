@@ -6,8 +6,8 @@ from Manifolds.RigidRotations import RigidRotations, Quaternion, Rotation
 from ApproximationMethods.Quasi import Quasi
 from Tools.Utils import wendland_3_1
 
-# _SCALING_FACTOR = 0.5
-_SCALING_FACTOR = 0.75
+_SCALING_FACTOR = 0.5
+# _SCALING_FACTOR = 0.75
 
 r = RigidRotations()
 I = np.eye(3)
@@ -58,8 +58,8 @@ CONFIG = {
     "PLOT_RESOLUTION_FACTOR": 2,
     "SCALE": 1,
     "NUMBER_OF_SCALES": 5,
-    # "TEST_MESH_NORM": 2 ** -6,
-    "TEST_MESH_NORM": 0.01,
+    "TEST_MESH_NORM": 2 ** -6,
+    # "TEST_MESH_NORM": 0.01,
     "SCALING_FACTOR": _SCALING_FACTOR,
     "NAME": "temp",
     "OUTPUT_DIR": "results",

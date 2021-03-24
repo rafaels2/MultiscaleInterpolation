@@ -47,7 +47,7 @@ def multiscale_interpolation(
             )
 
         current_grid_parameters = [
-            ("Grid", symmetric_grid_params(grid_size + 1, scale / resolution)),
+            ("Grid", symmetric_grid_params(grid_size + .05, scale / resolution)),
             # Can add here more grids (borders)
         ]
 
@@ -60,7 +60,12 @@ def multiscale_interpolation(
             is_approximating_on_tangent,
         )
 
-        ker_val = sum(p.phi(0, 0) for p in method._grid.points_in_radius(0, 0))
+        points_in_radius = list(method._grid.points_in_radius(0, 0))
+        x_y_points_in_radius = [[p.x, p.y] for p in points_in_radius]
+        plt.figure()
+        plt.scatter([p.x for p in points_in_radius], [p.y for p in points_in_radius])
+        plt.savefig(f"point_scatter_scale_{scale}.png")
+        ker_val = [sum(p.phi(0, 0) for p in points_in_radius), len(x_y_points_in_radius)]
         s_j = method.approximation
         average_support_size = method.average_support_size
 
@@ -154,7 +159,7 @@ def run_single_experiment(config, original_function):
                     "errors": error,
                     "mse": mse,
                     "mesh_norm": mesh_norm,
-                    "ker_val": ker_val,
+                    # "ker_val": ker_val,
                 }
                 pkl.dump(results, f)
 
