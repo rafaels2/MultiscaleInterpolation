@@ -163,7 +163,7 @@ def run_all_experiments(config, diffs, *args):
 
             t_0 = datetime.now()
 
-            for mse, mesh_norm, _, support_size, _ in run_single_experiment(current_config, *args):
+            for mse, mesh_norm, _, support_size, _ in run_single_experiment(current_config, current_config['ORIGINAL_FUNCTION']):
                 mus.append(current_config['SCALING_FACTOR'])
                 support_sizes.append(support_size())
                 t_f = datetime.now()

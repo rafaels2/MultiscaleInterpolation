@@ -10,6 +10,7 @@ from ApproximationMethods.Quasi import Quasi
 from Config import CONFIG, _SCALING_FACTOR
 from Tools.Utils import set_output_directory, wendland_3_0, wendland_3_1, wendland_3_2, wendland_1_0
 from Manifolds import MANIFOLDS
+import ExampleFunctions
 
 METHODS = {'naive': Naive, 'quasi': Quasi, 'adaptive': AdaptiveQuasi, 'moving': MovingLeastSquares}
 
@@ -35,6 +36,7 @@ def parse_arguments():
     parser.add_argument('-cal', '--calibrate', action='store_true', help='config through nonorm cache')
     parser.add_argument('-er', '--error', action='store_true')
     parser.add_argument('-mu', '--mu-testing', action='store_true')
+    parser.add_argument('-df', '--different-functions', action='store_true')
     args = parser.parse_args()
 
     config = CONFIG.copy()
@@ -51,6 +53,9 @@ def parse_arguments():
     config['IS_ADAPTIVE'] = args.adaptive
     config['SCALED_INTERPOLATION_METHOD'] = METHODS[args.method]
     config['CALIBRATE'] = args.calibrate
+
+    if args.different_functions:
+        return config, run_different_functions(args)
 
     if args.mu_testing:
         return config, run_different_mus(config, args)
@@ -103,6 +108,38 @@ def run_different_mus(config, args):
     return diffs
 
 
+def run_different_functions(args):
+    functions = [
+        'numbers_gauss',
+        'numbers_high_freq',
+        'numbers_low_freq',
+        'numbers_sin',
+        'numbers_gauss_freqs'
+    ]
+    diffs = []
+
+    for function_name in functions:
+        diff = {
+            'ORIGINAL_FUNCTION': importlib.import_module(f'ExampleFunctions.{function_name}').original_function,
+            'NAME': f'multiscale_{function_name}',
+            'MSE_LABEL': f'multiscale_{function_name}',
+            'NUMBER_OF_SCALES': args.number_of_scales,
+        }
+        diffs.append(diff)
+
+        diffs = diffs + [
+            {
+                "NAME": "single_scale_{}_{}".format(function_name, index),
+                'ORIGINAL_FUNCTION': importlib.import_module(f'ExampleFunctions.{function_name}').original_function,
+                "MSE_LABEL": f"Single_Scale_{function_name}",
+                "NUMBER_OF_SCALES": 1,
+                "SCALING_FACTOR": args.scaling_factor ** index
+            } for index in range(args.base_index, args.base_index + args.number_of_scales)
+        ]
+
+    return diffs
+
+
 def run_different_rbfs(config, diffs):
     old_diffs = diffs.copy()
     diffs = list()
@@ -138,7 +175,7 @@ def main():
     original_function = config['ORIGINAL_FUNCTION']
     output_dir = CONFIG["OUTPUT_DIR"]
 
-    config, diffs = run_different_rbfs(config, diffs)
+    # config, diffs = run_different_rbfs(config, diffs)
 
     with set_output_directory(output_dir):
         if not config['CALIBRATE']:

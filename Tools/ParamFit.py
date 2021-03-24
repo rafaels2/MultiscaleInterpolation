@@ -10,6 +10,14 @@ FunctionData = namedtuple('FunctionData', ['mesh_norm', 'error'])
 DIR = 'fit_results'
 
 
+def sort_points(x_orig, y_orig):
+    zipped = [(x, y) for x, y in zip(x_orig, y_orig)]
+    zipped.sort(key=lambda x: x[0])
+    x_list = [p[0] for p in zipped]
+    y_list = [p[1] for p in zipped]
+    return x_list, y_list
+
+
 def plot_comparison(func, x_orig, y_orig, params, title):
     y_new = [func(x, *params) for x in x_orig]
     plt.figure()
@@ -38,22 +46,26 @@ def pkl_load(filename):
 def fit_multi_scale(results):
     for i, name in enumerate(results['mses'].keys()):
         mses = results['mses'][name]
-        x_orig = list(range(1, len(mses) + 1))
+        if 'multiscale' in name:
+            x_orig = list(range(1, len(mses) + 1))
+        else:
+            x_orig = results['mesh_norms'][name]
         (a, b), _ = scipy.optimize.curve_fit(
             _multi_linear, x_orig, mses, p0=[1, 1]
         )
-        mu = results['mus'][i]
+        # mu = results['mus'][i]
         plot_comparison(_multi_linear, x_orig, mses, (a, b),
-                        f'Multi Scale Fit mu {mu}')
-        yield a, b
+                        f'Multi Scale Fit {name}')
+        yield a, b, ('multiscale' in name)
 
 
-def fit_mus(mus, param_b):
+def fit_mus(mus, param_b, debug=False):
     # log_b = [np.log(b) for b in param_b]
     (const, curve), _ = scipy.optimize.curve_fit(
         _multi_linear, mus, param_b, p0=[1, 1]
     )
-    plot_comparison(_multi_linear, mus, param_b, (const, curve), 'Mu Fit')
+    if not debug:
+        plot_comparison(_multi_linear, mus, param_b, (const, curve), 'A param fit')
     return const, curve
 
 
@@ -67,18 +79,28 @@ def main():
 
     param_a = list()
     param_b = list()
+    multiscale_param_a = list()
+    multiscale_param_b = list()
 
-    for a, b in fit_multi_scale(experiment_results):
-        param_a.append(a)
-        param_b.append(b)
+    for a, b, is_multiscale in fit_multi_scale(experiment_results):
+        if is_multiscale:
+            multiscale_param_a.append(a)
+            multiscale_param_b.append(b)
+        else:
+            param_a.append(a)
+            param_b.append(b)
 
     print(f'Average of a: {np.average(param_a)}, '
           f'stderr a: {np.std(param_a)}')
 
-    const, curve = fit_mus(experiment_results['mus'], param_b)
+    # const, curve = fit_mus(experiment_results['mus'], param_b)
+    x_orig, y_orig = sort_points(param_a, multiscale_param_a)
+    const, curve = fit_mus(x_orig, y_orig)
 
     print(f'Const: {const}'
           f'Curve: {curve}')
+
+    return param_a, multiscale_param_a, const, curve
 
 
 if __name__ == '__main__':
