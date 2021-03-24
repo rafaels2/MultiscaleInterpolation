@@ -23,6 +23,7 @@ def act_on_functions(action, a, b):
     @cached(cache=generate_cache(maxsize=100))
     def new_func(*args):
         return action(a(*args), b(*args))
+
     return new_func
 
 
@@ -56,7 +57,7 @@ def plot_lines(x_values, y_values, filename, title, x_label, y_label):
 
 def generate_kernel(rbf, scale=1):
     def kernel(x, y):
-        ans = (1 / scale ** 2) * rbf(la.norm(x-y) / scale)
+        ans = (1 / scale ** 2) * rbf(la.norm(x - y) / scale)
         # ans = (1/scale) * rbf(la.norm(x-y) * 1.25 / scale)
         # ans = rbf(1.25 * la.norm(x-y) / scale)
         return ans
@@ -102,8 +103,8 @@ def wendland_1_0(x):
 
 @contextmanager
 def set_output_directory(path):
-    """ 
-    This is the easy implementation. 
+    """
+    This is the easy implementation.
     The correct one should not change the working directory,
     but keep it as a variable.
     """

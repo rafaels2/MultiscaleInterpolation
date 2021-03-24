@@ -14,8 +14,15 @@ def combine(a, b):
 
 
 class Quasi(ApproximationMethod):
-    def __init__(self, manifold, original_function, grid_parameters, rbf,
-                 scale, is_approximating_on_tangent):
+    def __init__(
+        self,
+        manifold,
+        original_function,
+        grid_parameters,
+        rbf,
+        scale,
+        is_approximating_on_tangent,
+    ):
         self._values_to_average_counter = []
         if isinstance(original_function, tuple):
             original_function = combine(*original_function)
@@ -26,10 +33,12 @@ class Quasi(ApproximationMethod):
         self._is_approximating_on_tangent = is_approximating_on_tangent
         self._rbf_radius = scale
 
-        self._grid = SamplingPointsCollection(self._rbf_radius,
-                                              original_function,
-                                              grid_parameters,
-                                              phi_generator=self._calculate_phi)
+        self._grid = SamplingPointsCollection(
+            self._rbf_radius,
+            original_function,
+            grid_parameters,
+            phi_generator=self._calculate_phi,
+        )
 
         self._kernel = generate_kernel(self._rbf, self._rbf_radius)
 

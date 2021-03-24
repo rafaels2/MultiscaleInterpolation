@@ -20,10 +20,12 @@ class SymmetricPositiveDefinite(AbstractManifold):
         self.dim = dim
 
     def is_in_manifold(self, x):
-        return all([
-            (la.norm(x - np.transpose(x)) < SYMMETRIC_ERROR),
-            (all(x > 0 for x in la.eig(x)[0]))
-        ])
+        return all(
+            [
+                (la.norm(x - np.transpose(x)) < SYMMETRIC_ERROR),
+                (all(x > 0 for x in la.eig(x)[0])),
+            ]
+        )
 
     def exp(self, x, y):
         sqrt_x = sqrtm(x)
@@ -32,9 +34,9 @@ class SymmetricPositiveDefinite(AbstractManifold):
 
     def _calculate_log_param(self, x, y):
         sqrt_x = sqrtm(x)
-        inv_sqrt_x = la.inv(sqrt_x) 
+        inv_sqrt_x = la.inv(sqrt_x)
         return np.matmul(np.matmul(inv_sqrt_x, y), inv_sqrt_x)
-        
+
     def log(self, x, y):
         sqrt_x = sqrtm(x)
         log_param = self._calculate_log_param(x, y)
@@ -83,7 +85,7 @@ def main():
     a = m.gen_point()
     b = m.gen_point()
     e = m.gen_point()
-    f = m.gen_point ()
+    f = m.gen_point()
     # s = m.average([a, b], [1, 1])
     # print("s: ", np.arctan2(s[1], s[0]))
     c = m.log(a, b)

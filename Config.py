@@ -12,13 +12,15 @@ _SCALING_FACTOR = 0.75
 r = RigidRotations()
 I = np.eye(3)
 
+
 def _original_function(x, y):
-    q = 0.5 * Quaternion(x, y, x * y, x**2 + y ** 2)
+    q = 0.5 * Quaternion(x, y, x * y, x ** 2 + y ** 2)
     return r.exp(I, q)
 
 
 def _original_function(x, y):
-    return Rotation.from_euler('xyz', [x/2, y/2, x*y/4]).as_matrix()
+    return Rotation.from_euler("xyz", [x / 2, y / 2, x * y / 4]).as_matrix()
+
 
 """
 def _original_function(x, y):
@@ -67,7 +69,7 @@ CONFIG = {
     "SCALED_INTERPOLATION_METHOD": Quasi,
     "NORM_VISUALIZATION": False,
     "IS_APPROXIMATING_ON_TANGENT": False,
-    "MSE_LABEL":"Default Run",
+    "MSE_LABEL": "Default Run",
     "IS_ADAPTIVE": False,
 }
 
@@ -79,11 +81,14 @@ DIFFS = [
 
 """
 DIFFS = [
-        {"MSE_LABEL": "Multiscale", "NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x} for x in range(1, 5)
-    ] + [
-        {"NAME": "single_scale_{}".format(i), 
-         "MSE_LABEL": "Single Scale",
-         "NUMBER_OF_SCALES": 1,
-         "SCALING_FACTOR": _SCALING_FACTOR ** i} for i in range(1, 5)
-    ]
-
+    {"MSE_LABEL": "Multiscale", "NAME": "{}_scale".format(x), "NUMBER_OF_SCALES": x}
+    for x in range(1, 5)
+] + [
+    {
+        "NAME": "single_scale_{}".format(i),
+        "MSE_LABEL": "Single Scale",
+        "NUMBER_OF_SCALES": 1,
+        "SCALING_FACTOR": _SCALING_FACTOR ** i,
+    }
+    for i in range(1, 5)
+]

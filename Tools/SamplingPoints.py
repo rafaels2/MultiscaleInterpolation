@@ -9,8 +9,10 @@ from cachetools import cached
 from Tools.Lambdas import Lambdas
 from Tools.Utils import generate_cache, wendland_3_1, generate_kernel
 
-GridParameters = namedtuple('GridParameters', ['x_min', 'x_max', 'y_min', 'y_max', 'mesh_norm'])
-Point = namedtuple('Point', ['evaluation', 'phi', 'x', 'y', 'lambdas'])
+GridParameters = namedtuple(
+    "GridParameters", ["x_min", "x_max", "y_min", "y_max", "mesh_norm"]
+)
+Point = namedtuple("Point", ["evaluation", "phi", "x", "y", "lambdas"])
 
 SAMPLING_POINTS_CLASSES = dict()
 
@@ -23,7 +25,7 @@ def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
     if should_ravel:
         return x_matrix.ravel(), y_matrix.ravel()
     else:
-         return x_matrix, y_matrix
+        return x_matrix, y_matrix
 
 
 def symmetric_grid_params(grid_size, mesh_norm):
@@ -34,11 +36,13 @@ def add_sampling_class(name):
     def _register_decorator(cls):
         SAMPLING_POINTS_CLASSES[name] = cls
         return cls
+
     return _register_decorator
 
 
 class SamplingPoints(object):
     """docstring for SamplingPoints"""
+
     def __init__(self, rbf_radius, function_to_evaluate, *args, **kwargs):
         self._rbf_radius = rbf_radius
         self._function_to_evaluate = function_to_evaluate
@@ -48,15 +52,17 @@ class SamplingPoints(object):
         pass
 
 
-@add_sampling_class('Grid')
+@add_sampling_class("Grid")
 class Grid(SamplingPoints):
-    def __init__(self, rbf_radius, function_to_evaluate, grid_parameters, phi_generator=None):
+    def __init__(
+        self, rbf_radius, function_to_evaluate, grid_parameters, phi_generator=None
+    ):
         self._x_min = grid_parameters.x_min
         self._x_max = grid_parameters.x_max
         self._y_min = grid_parameters.y_min
         self._y_max = grid_parameters.y_max
-        self._x_len = (self._x_max - self._x_min)
-        self._y_len = (self._y_max - self._y_min)
+        self._x_len = self._x_max - self._x_min
+        self._y_len = self._y_max - self._y_min
         self._mesh_norm = grid_parameters.mesh_norm
         print("Mesh norm: ", self._mesh_norm)
         self._x, self._y = self._generate_grid()
@@ -65,10 +71,10 @@ class Grid(SamplingPoints):
 
         if phi_generator is not None:
             self._phi = self._evaluate_on_grid(phi_generator)
-        
+
         self._radius_in_index = int(np.ceil(rbf_radius / self._mesh_norm))
 
-        self._lambdas_generator = Lambdas(self, 'grid_cache.pkl')
+        self._lambdas_generator = Lambdas(self, "grid_cache.pkl")
         self._lambdas = self._evaluate_on_grid(self._lambdas_generator.weight_for_grid)
 
     def _generate_grid(self):
@@ -78,7 +84,7 @@ class Grid(SamplingPoints):
 
     def _evaluate_on_grid(self, func):
         evaluation = np.zeros_like(self._x, dtype=object)
-        
+
         for index in np.ndindex(self._x.shape):
             if index[1] == 0:
                 print(index[0] / self._x.shape[0])
@@ -93,17 +99,27 @@ class Grid(SamplingPoints):
         index_0 = np.array([y_0, x_0])
         radius_array = np.array([self._radius_in_index + 1, self._radius_in_index + 1])
 
-        for index in np.ndindex((2 * self._radius_in_index + 2, 2 * self._radius_in_index + 2)):
+        for index in np.ndindex(
+            (2 * self._radius_in_index + 2, 2 * self._radius_in_index + 2)
+        ):
             current_index = tuple(index_0 - radius_array + np.array(index))
-            if all([current_index[0] >= 0, current_index[1] >= 0, 
-                    current_index[0] < self._x.shape[0], current_index[1] < self._y.shape[1]]):
+            if all(
+                [
+                    current_index[0] >= 0,
+                    current_index[1] >= 0,
+                    current_index[0] < self._x.shape[0],
+                    current_index[1] < self._y.shape[1],
+                ]
+            ):
                 # This is important to avoid singular matrices.
                 if self._phi[current_index](x, y) != 0:
-                    yield Point(self._evaluation[current_index],
-                                self._phi[current_index],
-                                self._x[current_index],
-                                self._y[current_index],
-                                self._lambdas[current_index])
+                    yield Point(
+                        self._evaluation[current_index],
+                        self._phi[current_index],
+                        self._x[current_index],
+                        self._y[current_index],
+                        self._lambdas[current_index],
+                    )
 
     @property
     def evaluation(self):
@@ -123,9 +139,12 @@ class Grid(SamplingPoints):
 
 class SamplingPointsCollection(object):
     def __init__(self, rbf_radius, function_to_evaluate, grids_parameters, **kwargs):
-        self._grids = [SAMPLING_POINTS_CLASSES[name](rbf_radius, 
-                                                     function_to_evaluate, parameters, **kwargs) 
-                       for name, parameters in grids_parameters]
+        self._grids = [
+            SAMPLING_POINTS_CLASSES[name](
+                rbf_radius, function_to_evaluate, parameters, **kwargs
+            )
+            for name, parameters in grids_parameters
+        ]
 
     def points_in_radius(self, x, y):
         for grid in self._grids:
@@ -154,9 +173,11 @@ def main():
         return x
 
     grid_parameters = GridParameters(-1, 1, -1, 1, 0.2)
-    collection_params = [('Grid', grid_parameters)]
-    grid = SamplingPointsCollection(0.5, func, collection_params, phi_generator=_calculate_phi)
-    lambdas = Lambdas(grid, 'test.pkl')
+    collection_params = [("Grid", grid_parameters)]
+    grid = SamplingPointsCollection(
+        0.5, func, collection_params, phi_generator=_calculate_phi
+    )
+    lambdas = Lambdas(grid, "test.pkl")
 
     lambdas_0 = lambdas.calculate(0, 0)
     lambdas_0_5 = lambdas.calculate(0, 0.5)
@@ -165,5 +186,5 @@ def main():
     return grid, lambdas_0, lambdas_0_5, lambdas
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     smpl = main()

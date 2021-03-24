@@ -16,16 +16,18 @@ from Tools.Utils import *
 from Tools.SamplingPoints import GridParameters, Grid, symmetric_grid_params
 
 
-def multiscale_interpolation(manifold, 
-                             original_function,
-                             grid_size,
-                             resolution,
-                             scaling_factor,
-                             rbf,
-                             number_of_scales,
-                             scaled_interpolation_method,
-                             is_approximating_on_tangent,
-                             is_adaptive):
+def multiscale_interpolation(
+    manifold,
+    original_function,
+    grid_size,
+    resolution,
+    scaling_factor,
+    rbf,
+    number_of_scales,
+    scaled_interpolation_method,
+    is_approximating_on_tangent,
+    is_adaptive,
+):
     f_j = manifold.zero_func
     e_j = act_on_functions(manifold.log, f_j, original_function)
     for scale_index in range(1, number_of_scales + 1):
@@ -35,12 +37,17 @@ def multiscale_interpolation(manifold,
         if is_approximating_on_tangent:
             function_to_interpolate = e_j
         elif is_adaptive:
-            function_to_interpolate = (e_j, act_on_functions(manifold.exp, manifold.zero_func, e_j))
+            function_to_interpolate = (
+                e_j,
+                act_on_functions(manifold.exp, manifold.zero_func, e_j),
+            )
         else:
-            function_to_interpolate = act_on_functions(manifold.exp, manifold.zero_func, e_j)
+            function_to_interpolate = act_on_functions(
+                manifold.exp, manifold.zero_func, e_j
+            )
 
         current_grid_parameters = [
-            ('Grid', symmetric_grid_params(grid_size + 1, scale / resolution)),
+            ("Grid", symmetric_grid_params(grid_size + 1, scale / resolution)),
             # Can add here more grids (borders)
         ]
 
@@ -50,7 +57,8 @@ def multiscale_interpolation(manifold,
             current_grid_parameters,
             rbf,
             scale,
-            is_approximating_on_tangent)
+            is_approximating_on_tangent,
+        )
 
         ker_val = sum(p.phi(0, 0) for p in method._grid.points_in_radius(0, 0))
         s_j = method.approximation
@@ -61,7 +69,9 @@ def multiscale_interpolation(manifold,
         if is_approximating_on_tangent or is_adaptive:
             function_added_to_f_j = s_j
         else:
-            function_added_to_f_j = act_on_functions(manifold.log, manifold.zero_func, s_j)
+            function_added_to_f_j = act_on_functions(
+                manifold.log, manifold.zero_func, s_j
+            )
 
         f_j = act_on_functions(manifold.exp, f_j, function_added_to_f_j)
         e_j = act_on_functions(manifold.log, f_j, original_function)
@@ -79,7 +89,7 @@ def run_single_experiment(config, original_function):
     scaling_factor = config["SCALING_FACTOR"]
     experiment_name = config["NAME"] or "temp"
     manifold = config["MANIFOLD"]
-    scaled_interpolation_method=config["SCALED_INTERPOLATION_METHOD"]
+    scaled_interpolation_method = config["SCALED_INTERPOLATION_METHOD"]
     norm_visualization = config["NORM_VISUALIZATION"]
     is_approximating_on_tangent = config["IS_APPROXIMATING_ON_TANGENT"]
     is_adaptive = config["IS_ADAPTIVE"]
@@ -91,26 +101,30 @@ def run_single_experiment(config, original_function):
         true_values_on_grid,
         "original",
         "original.png",
-        norm_visualization=norm_visualization
+        norm_visualization=norm_visualization,
     )
 
-    plot_and_save(calculate_max_derivative(original_function, grid_params, manifold),
-                  "max derivatives",
-                  "deriveatives.png")
+    plot_and_save(
+        calculate_max_derivative(original_function, grid_params, manifold),
+        "max derivatives",
+        "deriveatives.png",
+    )
 
-    for i, (mesh_norm, interpolant, support_size, ker_val) in enumerate(multiscale_interpolation(
+    for i, (mesh_norm, interpolant, support_size, ker_val) in enumerate(
+        multiscale_interpolation(
             manifold,
             number_of_scales=number_of_scales,
             original_function=original_function,
-            grid_size = grid_size,
+            grid_size=grid_size,
             resolution=base_resolution,
             scaling_factor=scaling_factor,
             rbf=rbf,
             scaled_interpolation_method=scaled_interpolation_method,
             is_approximating_on_tangent=is_approximating_on_tangent,
-            is_adaptive=is_adaptive
-            )):    
-        with set_output_directory("{}_{}".format(experiment_name, i+1)):
+            is_adaptive=is_adaptive,
+        )
+    ):
+        with set_output_directory("{}_{}".format(experiment_name, i + 1)):
             with open("config.pkl", "wb") as f:
                 pkl.dump(config, f)
 
@@ -120,10 +134,12 @@ def run_single_experiment(config, original_function):
                 approximated_values_on_grid,
                 "approximation",
                 "approximation.png",
-                norm_visualization=norm_visualization
+                norm_visualization=norm_visualization,
             )
 
-            error = manifold.calculate_error(approximated_values_on_grid, true_values_on_grid)
+            error = manifold.calculate_error(
+                approximated_values_on_grid, true_values_on_grid
+            )
             plot_and_save(error, "Difference Map", "difference.png")
 
             if config["ERROR_CALC"]:
@@ -138,7 +154,7 @@ def run_single_experiment(config, original_function):
                     "errors": error,
                     "mse": mse,
                     "mesh_norm": mesh_norm,
-                    "ker_val": ker_val
+                    "ker_val": ker_val,
                 }
                 pkl.dump(results, f)
 
@@ -163,8 +179,10 @@ def run_all_experiments(config, diffs, *args):
 
             t_0 = datetime.now()
 
-            for mse, mesh_norm, _, support_size, _ in run_single_experiment(current_config, current_config['ORIGINAL_FUNCTION']):
-                mus.append(current_config['SCALING_FACTOR'])
+            for mse, mesh_norm, _, support_size, _ in run_single_experiment(
+                current_config, current_config["ORIGINAL_FUNCTION"]
+            ):
+                mus.append(current_config["SCALING_FACTOR"])
                 support_sizes.append(support_size())
                 t_f = datetime.now()
                 calculation_time.append(t_f - t_0)
@@ -178,13 +196,16 @@ def run_all_experiments(config, diffs, *args):
                 mesh_norms[mse_label] = current_mesh_norms
                 t_0 = datetime.now()
 
-        plot_lines(mesh_norms, mses, "mses.svg", "Error in different runs", "log(h_X)", "log(Error)")
-        result = {
-            'mses': mses,
-            'mesh_norms': mesh_norms,
-            'mus': mus
-        }
-        with open('results_dict.pkl', 'wb') as f:
+        plot_lines(
+            mesh_norms,
+            mses,
+            "mses.svg",
+            "Error in different runs",
+            "log(h_X)",
+            "log(Error)",
+        )
+        result = {"mses": mses, "mesh_norms": mesh_norms, "mus": mus}
+        with open("results_dict.pkl", "wb") as f:
             pkl.dump(result, f)
 
     print(f"Support Sizes{support_sizes}")
@@ -210,7 +231,9 @@ def calibrate(config, diffs, *args):
 
             current_config["MANIFOLD"] = Calibration()
 
-            for _, mesh_norm, error, support_size, ker_val in run_single_experiment(current_config, *args):
+            for _, mesh_norm, error, support_size, ker_val in run_single_experiment(
+                current_config, *args
+            ):
                 ker_vals.append(ker_val)
                 support_sizes.append(support_size())
                 mse = la.norm(error.ravel(), np.inf)
@@ -222,15 +245,26 @@ def calibrate(config, diffs, *args):
                 mses[mse_label] = current_mses
                 mesh_norms[mse_label] = current_mesh_norms
                 normalization_cache[
-                    (current_config["RBF"].__name__, mesh_norm, mesh_norm * current_config["BASE_RESOLUTION"])
+                    (
+                        current_config["RBF"].__name__,
+                        mesh_norm,
+                        mesh_norm * current_config["BASE_RESOLUTION"],
+                    )
                 ] = mse
 
-        plot_lines(mesh_norms, mses, "mses.svg", "Error in different runs", "log(h_x)", "log(Error)")
+        plot_lines(
+            mesh_norms,
+            mses,
+            "mses.svg",
+            "Error in different runs",
+            "log(h_x)",
+            "log(Error)",
+        )
 
     print(f"Support Sizes{support_sizes}")
     print("MSEs are: {}".format(mses))
     print("mesh_norms are: {}".format(mesh_norms))
-    print(f'ker values: {ker_vals}')
+    print(f"ker values: {ker_vals}")
     return mses
 
 

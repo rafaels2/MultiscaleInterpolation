@@ -6,7 +6,7 @@ import argparse
 
 
 def print_configuration(filename):
-    with open(filename, 'rb') as f:
+    with open(filename, "rb") as f:
         data = pkl.load(f)
 
     print(data)
@@ -14,10 +14,10 @@ def print_configuration(filename):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('filename', type=str)
+    parser.add_argument("filename", type=str)
     args = parser.parse_args()
     print_configuration(args.filename)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

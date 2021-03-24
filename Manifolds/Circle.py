@@ -10,6 +10,7 @@ class Circle(AbstractManifold):
     """
     S2 retraction pairs
     """
+
     def exp(self, x, y):
         z = x + y
         return z / la.norm(z, ord=2)
@@ -18,16 +19,15 @@ class Circle(AbstractManifold):
         inner_product = np.inner(x, y)
         if inner_product == 0:
             inner_product = 0.00001
-        return ((y / np.abs(inner_product)) - x)
+        return (y / np.abs(inner_product)) - x
 
     def _to_numbers(self, x):
         """
-        WARNING! this usage of arctan can be missleading - it can choose the 
+        WARNING! this usage of arctan can be missleading - it can choose the
         incorrect brach.
         I guess that plotting the log can be better.
         """
         return np.arctan2(x[1], x[0])
-        
 
     def gen_point(self, phi):
         return np.array([np.cos(phi), np.sin(phi)])

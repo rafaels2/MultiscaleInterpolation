@@ -7,7 +7,6 @@ NORMALIZER_FILE = "C:\\temp\\normalizers.json5"
 
 
 class NormalizationCache(object):
-
     def __init__(self, filename):
         self._filename = filename
         self._items_on_trial = set()

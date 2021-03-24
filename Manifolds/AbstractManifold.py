@@ -69,16 +69,13 @@ class AbstractManifold(object):
 
     def _geodesic_average(self, values_to_average, weights):
         """
-        This calculation is recursive because we always know to 
+        This calculation is recursive because we always know to
         calculate the geodetic average only for a couple of points.
         """
         average = self._geodesic_average_two_points(
-            values_to_average[0],
-            values_to_average[-1],
-            weights[0],
-            weights[-1]
+            values_to_average[0], values_to_average[-1], weights[0], weights[-1]
         )
-        
+
         values_to_average = values_to_average[:-1]
         new_weight = weights[0] + weights[-1]
         values_to_average[0] = average

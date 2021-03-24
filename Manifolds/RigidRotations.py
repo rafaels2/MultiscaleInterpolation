@@ -61,18 +61,27 @@ class RigidRotations(AbstractManifold):
         :param matrix: Examined matrix.
         :return: bool
         """
-        is_orthogonal = (la.norm(np.matmul(matrix, np.transpose(matrix)) - np.eye(self.dim)) < ORTHOGONAL_TOLERANCE)
+        is_orthogonal = (
+            la.norm(np.matmul(matrix, np.transpose(matrix)) - np.eye(self.dim))
+            < ORTHOGONAL_TOLERANCE
+        )
         is_special = np.abs(la.det(matrix) - 1) < SPECIAL_TOLERANCE
         answer = is_special and is_orthogonal
         if not answer:
             print(matrix, is_special, is_orthogonal)
         return answer
 
-    def geodesic_l2_mean_step(self, current_estimator, noisy_samples, weights, tolerance=0.00000001):
-        projected_diff_samples = [w_i * scipy.linalg.logm(np.matmul(np.linalg.inv(current_estimator), noisy_sample)) 
-                                  for w_i, noisy_sample in
-                                  zip(weights, noisy_samples)]
-        matrices_sum = np.zeros(projected_diff_samples[0].shape, dtype='complex128')
+    def geodesic_l2_mean_step(
+        self, current_estimator, noisy_samples, weights, tolerance=0.00000001
+    ):
+        projected_diff_samples = [
+            w_i
+            * scipy.linalg.logm(
+                np.matmul(np.linalg.inv(current_estimator), noisy_sample)
+            )
+            for w_i, noisy_sample in zip(weights, noisy_samples)
+        ]
+        matrices_sum = np.zeros(projected_diff_samples[0].shape, dtype="complex128")
         for projected_diff_matrix in projected_diff_samples:
             matrices_sum += projected_diff_matrix
         r = matrices_sum / sum(weights)
@@ -85,7 +94,9 @@ class RigidRotations(AbstractManifold):
             state_of_convergence = False
             return new_estimator, state_of_convergence
 
-    def geodesic_l2_mean(self, noisy_samples, weights, tolerance=0.00000001, maximum_iteration=10):
+    def geodesic_l2_mean(
+        self, noisy_samples, weights, tolerance=0.00000001, maximum_iteration=10
+    ):
         """ L2 mean From my weiszfeld project, adapted to weighted averaging """
         mean_estimator = noisy_samples[0]
         mean_estimator_list = [mean_estimator]
@@ -93,7 +104,8 @@ class RigidRotations(AbstractManifold):
         run_index = 0
         while not state_of_convergence and run_index < maximum_iteration:
             mean_estimator, state_of_convergence = self.geodesic_l2_mean_step(
-                mean_estimator, noisy_samples, weights, tolerance)
+                mean_estimator, noisy_samples, weights, tolerance
+            )
             mean_estimator_list.append(mean_estimator)
             run_index += 1
         return mean_estimator_list
@@ -121,14 +133,14 @@ def main():
     b = m.gen_point()
     c = m.gen_point()
 
-    d = m.average([a,b,c], [1,1,1])
+    d = m.average([a, b, c], [1, 1, 1])
     e = m.log(a, b)
     f = m.exp(a, e)
     print("dist", m.distance(f, b))
     print("dist", m.distance(a, b))
     print("a, a", m.log(a, a))
-    return a,b,c,d,m
+    return a, b, c, d, m
 
 
-if __name__ == '__main__':
-    a,b,c,d,m = main()
+if __name__ == "__main__":
+    a, b, c, d, m = main()

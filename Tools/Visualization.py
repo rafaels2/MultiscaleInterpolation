@@ -25,7 +25,7 @@ VISUALIZATION_CONST = 10
 class Visualizer(object):
     def __init__(self, matrices, centers):
         self.fig = plt.figure(figsize=(12, 12))
-        self.ax = self.fig.add_subplot(projection='3d')
+        self.ax = self.fig.add_subplot(projection="3d")
         self.ax.view_init(azim=0, elev=90)
         self._matrices = matrices
         self._centers = centers
@@ -64,7 +64,7 @@ class Visualizer(object):
 class ElipsoidVisualizer(Visualizer):
     def __init__(self, matrices, centers):
         super().__init__(matrices, centers)
-        
+
         self._svd_matrices()
         self._calculate_normalizer()
 
@@ -104,21 +104,38 @@ class ElipsoidVisualizer(Visualizer):
 
         for i in range(len(x)):
             for j in range(len(x)):
-                [x[i,j],y[i,j],z[i,j]] = np.dot([x[i,j],y[i,j],z[i,j]], rotation) + center
-        
-        self.ax.plot_surface(x, y, z,  rstride=3, cstride=3, linewidth=0.1, alpha=1, shade=True,
-            cmap=cm.coolwarm)
+                [x[i, j], y[i, j], z[i, j]] = (
+                    np.dot([x[i, j], y[i, j], z[i, j]], rotation) + center
+                )
+
+        self.ax.plot_surface(
+            x,
+            y,
+            z,
+            rstride=3,
+            cstride=3,
+            linewidth=0.1,
+            alpha=1,
+            shade=True,
+            cmap=cm.coolwarm,
+        )
 
 
 class RotationVisualizer(Visualizer):
     """docstring for RotationVisualizer"""
+
     def __init__(self, matrices, centers):
         super().__init__(matrices, centers)
         min_lim, max_lim = self._get_lims()
-        plt.setp(self.ax, xlim=(min_lim, max_lim), ylim=(min_lim, max_lim), zlim=(min_lim, max_lim))
+        plt.setp(
+            self.ax,
+            xlim=(min_lim, max_lim),
+            ylim=(min_lim, max_lim),
+            zlim=(min_lim, max_lim),
+        )
 
     def _get_lims(self):
-        if self._centers.dtype.kind == 'f':
+        if self._centers.dtype.kind == "f":
             centers = self._centers
         else:
             shape = list(self._centers.shape)

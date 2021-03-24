@@ -21,6 +21,7 @@ class RealNumbers(AbstractManifold):
     def _get_geodetic_line(self, x, y):
         def line(t):
             return x + (y - x) * (1 - t)
+
         return line
 
 
