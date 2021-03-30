@@ -1,5 +1,6 @@
 import argparse
 import importlib
+import numpy as np
 
 import Interpolation
 from ApproximationMethods.AdaptiveQuasi import AdaptiveQuasi
@@ -17,6 +18,7 @@ from Tools.Utils import (
 )
 from Manifolds import MANIFOLDS
 import ExampleFunctions
+from Tools.Lambdas import condition_g
 
 METHODS = {
     "naive": Naive,
@@ -234,6 +236,9 @@ def main():
             )
         else:
             results = Interpolation.calibrate(config, diffs, original_function)
+
+    if len(condition_g):
+        print(f"Average condition {np.average(condition_g)}")
 
 
 if __name__ == "__main__":

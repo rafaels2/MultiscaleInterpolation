@@ -4,6 +4,8 @@ import pickle as pkl
 import numpy as np
 from numpy import linalg as la
 
+condition_g = list()
+
 
 class Lambdas(object):
     def __init__(self, grid, filename="cache.pkl"):
@@ -59,9 +61,10 @@ class Lambdas(object):
             )
             cond = la.cond(to_inv)
             print(f"Condition {cond}")
+            condition_g.append(cond)
             return 2 * np.matmul(la.inv(to_inv), polynomials_at_point)
         except la.LinAlgError as e:
-            print(f"Singular {tries_g}, {fails_g}")
+            print(f"Singular")
             return np.matmul(to_inv, polynomials_at_point)
 
     def calculate(self, x, y):
