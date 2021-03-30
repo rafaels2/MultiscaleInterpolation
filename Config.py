@@ -60,6 +60,7 @@ CONFIG = {
     "NUMBER_OF_SCALES": 5,
     # "TEST_MESH_NORM": 2 ** -6,
     "TEST_MESH_NORM": 0.05,
+    "SCALING_FACTOR_POWER": 1,
     "SCALING_FACTOR": _SCALING_FACTOR,
     "NAME": "temp",
     "OUTPUT_DIR": "results",

@@ -1,5 +1,7 @@
 import argparse
 import importlib
+from itertools import product
+
 import numpy as np
 
 import Interpolation
@@ -121,6 +123,7 @@ def parse_arguments():
                 "MSE_LABEL": "Single scale",
                 "NUMBER_OF_SCALES": 1,
                 "SCALING_FACTOR": args.scaling_factor ** index,
+                "SCALING_FACTOR_POWER": index,
             }
             for index in range(args.base_index, args.base_index + args.number_of_scales)
         ]
@@ -183,6 +186,7 @@ def run_different_functions(args):
                 "MSE_LABEL": f"Single_Scale_{function_name}",
                 "NUMBER_OF_SCALES": 1,
                 "SCALING_FACTOR": args.scaling_factor ** index,
+                "SCALING_FACTOR_POWER": index,
             }
             for index in range(args.base_index, args.base_index + args.number_of_scales)
         ]
@@ -207,17 +211,46 @@ def run_different_rbfs(config, diffs):
         "no_normalization": NoNormalization
     }
 
-    for name, wendland in wendlands.items():
-        for method_name, method in methods.items():
-            for diff in old_diffs:
-                current_diff = diff.copy()
-                current_diff["NAME"] = f"{method_name}_{name}_{current_diff['NAME']}"
-                current_diff[
-                    "MSE_LABEL"
-                ] = f"{method_name}_{name}_{current_diff['MSE_LABEL']}"
-                current_diff["RBF"] = wendland
-                current_diff["SCALED_INTERPOLATION_METHOD"] = method
-                diffs.append(current_diff)
+    mus = [
+        # 0.5,
+        # 0.6,
+        # 0.65,
+        # 0.7,
+        # 0.75,
+        0.8]
+
+    functions = [
+        # "numbers_gauss",
+        # "numbers_high_freq",
+        # "numbers_low_freq",
+        # "numbers_sin",
+        "numbers_gauss_freqs",
+    ]
+
+    for wendland_name, method_name, mu, function in product(
+        wendlands, methods, mus, functions
+    ):
+        wendland = wendlands[wendland_name]
+        method = methods[method_name]
+        for diff in old_diffs:
+            current_diff = diff.copy()
+            current_diff[
+                "NAME"
+            ] = f"{method_name}_{wendland_name}_mu_{mu}_{function}_{current_diff['NAME']}"
+            current_diff[
+                "MSE_LABEL"
+            ] = f"{method_name}_{wendland_name}_mu_{mu}_{function}_{current_diff['MSE_LABEL']}"
+            current_diff["RBF"] = wendland
+            current_diff["SCALED_INTERPOLATION_METHOD"] = method
+            current_diff["SCALING_FACTOR"] = mu ** current_diff.get(
+                "SCALING_FACTOR_POWER", config["SCALING_FACTOR_POWER"]
+            )
+            current_diff["ORIGINAL_FUNCTION"] = (
+                importlib.import_module(
+                    f"ExampleFunctions.{function}"
+                ).original_function,
+            )
+            diffs.append(current_diff)
 
     return config, diffs
 

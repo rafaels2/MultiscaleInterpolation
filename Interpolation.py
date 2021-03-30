@@ -56,7 +56,12 @@ def multiscale_interpolation(
                 manifold.exp, manifold.zero_func, e_j
             )
 
-        current_grid_parameters = grids[scale]
+        current_grid_parameters = [
+            (
+                "Grid",
+                symmetric_grid_params(grid_size + 0.5, scale / resolution),
+            )
+        ]
 
         method = scaled_interpolation_method(
             manifold,
