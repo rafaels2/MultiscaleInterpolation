@@ -1,12 +1,7 @@
 from datetime import datetime
-import numpy.linalg as la
 import pickle as pkl
 import numpy as np
 import time
-import os
-
-from mpl_toolkits import mplot3d
-import matplotlib.pyplot as plt
 
 from ApproximationMethods.NoNormalization import normalization_cache
 from Config import CONFIG, DIFFS
@@ -14,6 +9,20 @@ from Manifolds.RealNumbers import Calibration
 from Tools.GridUtils import calculate_max_derivative
 from Tools.Utils import *
 from Tools.SamplingPoints import GridParameters, Grid, symmetric_grid_params
+
+
+def generate_grids(number_of_scales, grid_size, resolution, scaling_factor):
+    grids = dict()
+    accumulated_grid = list()
+    for i in range(1, number_of_scales + 1):
+        scale = scaling_factor ** i
+        current_grid = (
+            "Grid",
+            symmetric_grid_params(grid_size + 0.5, scale / resolution),
+        )
+        accumulated_grid.append(current_grid)
+        grids[scale] = accumulated_grid.copy()
+    return grids
 
 
 def multiscale_interpolation(
@@ -27,6 +36,7 @@ def multiscale_interpolation(
     scaled_interpolation_method,
     is_approximating_on_tangent,
     is_adaptive,
+    grids,
 ):
     f_j = manifold.zero_func
     e_j = act_on_functions(manifold.log, f_j, original_function)
@@ -46,10 +56,7 @@ def multiscale_interpolation(
                 manifold.exp, manifold.zero_func, e_j
             )
 
-        current_grid_parameters = [
-            ("Grid", symmetric_grid_params(grid_size + .05, scale / resolution)),
-            # Can add here more grids (borders)
-        ]
+        current_grid_parameters = grids[scale]
 
         method = scaled_interpolation_method(
             manifold,
@@ -65,7 +72,10 @@ def multiscale_interpolation(
         plt.figure()
         plt.scatter([p.x for p in points_in_radius], [p.y for p in points_in_radius])
         plt.savefig(f"point_scatter_scale_{scale}.png")
-        ker_val = [sum(p.phi(0, 0) for p in points_in_radius), len(x_y_points_in_radius)]
+        ker_val = [
+            sum(p.phi(0, 0) for p in points_in_radius),
+            len(x_y_points_in_radius),
+        ]
         s_j = method.approximation
         average_support_size = method.average_support_size
 
@@ -84,6 +94,7 @@ def multiscale_interpolation(
 
 
 def run_single_experiment(config, original_function):
+
     rbf = config["RBF"]
     grid_size = config["GRID_SIZE"]
     base_resolution = config["BASE_RESOLUTION"]
@@ -127,6 +138,12 @@ def run_single_experiment(config, original_function):
             scaled_interpolation_method=scaled_interpolation_method,
             is_approximating_on_tangent=is_approximating_on_tangent,
             is_adaptive=is_adaptive,
+            grids=generate_grids(
+                number_of_scales=8,
+                grid_size=grid_size,
+                resolution=base_resolution,
+                scaling_factor=0.75,
+            ),
         )
     ):
         with set_output_directory("{}_{}".format(experiment_name, i + 1)):

@@ -18,7 +18,9 @@ def sort_points(x_orig, y_orig):
     return x_list, y_list
 
 
-def plot_comparison(func, x_orig, y_orig, params, title, xlabel="log(h_X)", ylabel="log(Error)"):
+def plot_comparison(
+    func, x_orig, y_orig, params, title, xlabel="log(h_X)", ylabel="log(Error)"
+):
     y_new = [func(x, *params) for x in x_orig]
     plt.figure()
     plt.plot(x_orig, y_orig, label="original")
@@ -57,7 +59,14 @@ def fit_multi_scale(results, keyword="multiscale"):
         #     x_orig = results["mesh_norms"][name]
         (a, b), _ = scipy.optimize.curve_fit(_multi_linear, x_orig, mses, p0=[1, 1])
         # mu = results['mus'][i]
-        plot_comparison(_multi_linear, x_orig, mses, (a, b), f"Multi Scale Quasi Interpolation Fit {name}", "iteration")
+        plot_comparison(
+            _multi_linear,
+            x_orig,
+            mses,
+            (a, b),
+            f"Multi Scale Quasi Interpolation Fit {name}",
+            "iteration",
+        )
         yield a, b, (keyword in name)
 
 
@@ -65,7 +74,15 @@ def fit_mus(mus, param_b, debug=False):
     # log_b = [np.log(b) for b in param_b]
     (const, curve), _ = scipy.optimize.curve_fit(_multi_linear, mus, param_b, p0=[1, 1])
     if not debug:
-        plot_comparison(_multi_linear, mus, param_b, (const, curve), "mu param fit", "log(mu)", "multiscale fit slope")
+        plot_comparison(
+            _multi_linear,
+            mus,
+            param_b,
+            (const, curve),
+            "mu param fit",
+            "log(mu)",
+            "multiscale fit slope",
+        )
     return const, curve
 
 
@@ -85,7 +102,7 @@ def fit_multi_and_single(experiment_results, keyword="multiscale"):
 
     print(f"Average of a: {np.average(param_a)}, " f"stderr a: {np.std(param_a)}")
 
-    const, curve = fit_mus([np.log(m) for m in experiment_results['mus']], param_b)
+    const, curve = fit_mus([np.log(m) for m in experiment_results["mus"]], param_b)
     # x_orig, y_orig = sort_points(param_a, multiscale_param_a)
     # const, curve = fit_mus(x_orig, y_orig)
 
@@ -103,8 +120,7 @@ def fit_moving_and_quasi(experiment_results):
             quasi_a = a
             quasi_b = b
 
-    print(f'moving slope is {moving_b}\n'
-          f'quasi slope is {quasi_b}')
+    print(f"moving slope is {moving_b}\n" f"quasi slope is {quasi_b}")
 
 
 def main():
