@@ -78,8 +78,8 @@ class Grid(SamplingPoints):
         self._lambdas = self._evaluate_on_grid(self._lambdas_generator.weight_for_grid)
 
     def _generate_grid(self):
-        x = np.linspace(self._x_min, self._y_max, int(self._x_len / self._mesh_norm + 1))
-        y = np.linspace(self._y_min, self._y_max, int(self._y_len / self._mesh_norm + 1))
+        x = np.linspace(self._x_min, self._y_max, int(np.round(self._x_len / self._mesh_norm + 1)))
+        y = np.linspace(self._y_min, self._y_max, int(np.round(self._y_len / self._mesh_norm + 1)))
         return np.meshgrid(x, y)
 
     def _evaluate_on_grid(self, func):
