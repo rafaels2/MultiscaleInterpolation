@@ -199,31 +199,32 @@ def run_different_rbfs(config, diffs):
     diffs = list()
 
     wendlands = {
-        # "1_0": wendland_1_0,
-        # "3_0": wendland_3_0,
+        "1_0": wendland_1_0,
+        "3_0": wendland_3_0,
         "3_1": wendland_3_1,
-        # "3_2": wendland_3_2,
+        "3_2": wendland_3_2,
     }
 
     methods = {
-        # "moving": MovingLeastSquares,
-        # "quasi": Quasi,
-        "no_normalization": NoNormalization
+        "moving": MovingLeastSquares,
+        "quasi": Quasi,
+        # "no_normalization": NoNormalization
     }
 
     mus = [
-        # 0.5,
-        # 0.6,
-        # 0.65,
-        # 0.7,
-        # 0.75,
-        0.8]
+        0.5,
+        0.6,
+        0.65,
+        0.7,
+        0.75,
+        0.8,
+        ]
 
     functions = [
-        # "numbers_gauss",
-        # "numbers_high_freq",
-        # "numbers_low_freq",
-        # "numbers_sin",
+        "numbers_gauss",
+        "numbers_high_freq",
+        "numbers_low_freq",
+        "numbers_sin",
         "numbers_gauss_freqs",
     ]
 
@@ -236,20 +237,18 @@ def run_different_rbfs(config, diffs):
             current_diff = diff.copy()
             current_diff[
                 "NAME"
-            ] = f"{method_name}_{wendland_name}_mu_{mu}_{function}_{current_diff['NAME']}"
+            ] = f"{method_name}__{wendland_name}__mu_{mu}__{function}__{current_diff['NAME']}"
             current_diff[
                 "MSE_LABEL"
-            ] = f"{method_name}_{wendland_name}_mu_{mu}_{function}_{current_diff['MSE_LABEL']}"
+            ] = f"{method_name}__{wendland_name}__mu_{mu}__{function}__{current_diff['MSE_LABEL']}"
             current_diff["RBF"] = wendland
             current_diff["SCALED_INTERPOLATION_METHOD"] = method
             current_diff["SCALING_FACTOR"] = mu ** current_diff.get(
                 "SCALING_FACTOR_POWER", config["SCALING_FACTOR_POWER"]
             )
-            current_diff["ORIGINAL_FUNCTION"] = (
-                importlib.import_module(
-                    f"ExampleFunctions.{function}"
-                ).original_function,
-            )
+            current_diff["ORIGINAL_FUNCTION"] = importlib.import_module(
+                f"ExampleFunctions.{function}"
+            ).original_function
             diffs.append(current_diff)
 
     return config, diffs
