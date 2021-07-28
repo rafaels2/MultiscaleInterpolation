@@ -4,7 +4,7 @@ from itertools import product
 
 import numpy as np
 
-import Interpolation
+import Experiment
 from ApproximationMethods.AdaptiveQuasi import AdaptiveQuasi
 from ApproximationMethods.MovingLeastSquares import MovingLeastSquares
 from ApproximationMethods.Naive import Naive
@@ -112,7 +112,7 @@ def parse_arguments():
             {
                 "NAME": "multiscale",
                 "NUMBER_OF_SCALES": args.base_index + args.number_of_scales - 1,
-                "MSE_LABEL": "Multi Scale",
+                "MSE_LABEL": "Multiscale",
             }
         ]
 
@@ -142,13 +142,13 @@ def parse_arguments():
 
 
 def run_different_mus(config, args):
-    mus = [0.5, 0.6, 0.7, 0.75, 0.8]
+    mus = [0.5, 0.6, 0.65, 0.7, 0.75]
     diffs = list()
 
     for mu in mus:
         diff = {
             "NAME": f"different_mus_{mu}",
-            "MSE_LABEL": f"Multi scale with scaling factor {mu}",
+            "MSE_LABEL": f"Multiscale with scaling factor {mu}",
             "NUMBER_OF_SCALES": args.base_index + args.number_of_scales - 1,
             "SCALING_FACTOR": mu,
         }
@@ -199,10 +199,10 @@ def run_different_rbfs(config, diffs):
     diffs = list()
 
     wendlands = {
-        "1_0": wendland_1_0,
-        "3_0": wendland_3_0,
+        # "1_0": wendland_1_0,
+        # "3_0": wendland_3_0,
         "3_1": wendland_3_1,
-        "3_2": wendland_3_2,
+        # "3_2": wendland_3_2,
     }
 
     methods = {
@@ -212,20 +212,20 @@ def run_different_rbfs(config, diffs):
     }
 
     mus = [
-        0.5,
-        0.6,
-        0.65,
-        0.7,
+        # 0.5,
+        # 0.6,
+        # 0.65,
+        # 0.7,
         0.75,
-        0.8,
-        ]
+        # 0.8,
+    ]
 
     functions = [
-        "numbers_gauss",
-        "numbers_high_freq",
-        "numbers_low_freq",
+        # "numbers_gauss",
+        # "numbers_high_freq",
+        # "numbers_low_freq",
         "numbers_sin",
-        "numbers_gauss_freqs",
+        # "numbers_gauss_freqs",
     ]
 
     for wendland_name, method_name, mu, function in product(
@@ -254,20 +254,85 @@ def run_different_rbfs(config, diffs):
     return config, diffs
 
 
+def run_quasi_comparison(config, diffs):
+    old_diffs = diffs.copy()
+    diffs = list()
+
+    wendland = wendland_3_1
+    methods = {
+        "Quadratic Reproduction": MovingLeastSquares,
+        "Constant Reproduction": Quasi,
+    }
+    mu = 0.75
+
+    function = "numbers_sin"
+
+    for method_name in methods:
+        method = methods[method_name]
+        for diff in old_diffs:
+            current_diff = diff.copy()
+            current_diff[
+                "NAME"
+            ] = f"{method_name}__{wendland.__name__}__mu_{mu}__{function}__{current_diff['NAME']}"
+            current_diff["MSE_LABEL"] = f"{method_name}"
+            current_diff["RBF"] = wendland
+            current_diff["SCALED_INTERPOLATION_METHOD"] = method
+            current_diff["SCALING_FACTOR"] = mu ** current_diff.get(
+                "SCALING_FACTOR_POWER", config["SCALING_FACTOR_POWER"]
+            )
+            current_diff["ORIGINAL_FUNCTION"] = importlib.import_module(
+                f"ExampleFunctions.{function}"
+            ).original_function
+            diffs.append(current_diff)
+
+    return config, diffs
+
+
+def run_functions_comparison(config, diffs):
+    old_diffs = diffs.copy()
+
+    wendland = wendland_3_1
+    method = Quasi
+    mu = 0.75
+    execution_name = config["EXECUTION_NAME"]
+
+    functions = ["numbers", "numbers_gauss"]
+    for function in functions:
+        diffs = list()
+        config["EXECUTION_NAME"] = f"{execution_name}_{function}"
+        for diff in old_diffs:
+            current_diff = diff.copy()
+            current_diff["NAME"] = f"{function}__{current_diff['NAME']}"
+            current_diff["RBF"] = wendland
+            current_diff["SCALED_INTERPOLATION_METHOD"] = method
+            current_diff["SCALING_FACTOR"] = mu ** current_diff.get(
+                "SCALING_FACTOR_POWER", config["SCALING_FACTOR_POWER"]
+            )
+            current_diff["ORIGINAL_FUNCTION"] = importlib.import_module(
+                f"ExampleFunctions.{function}"
+            ).original_function
+            diffs.append(current_diff)
+
+        Experiment.run_all_experiments(config, diffs, current_diff["ORIGINAL_FUNCTION"])
+
+    return config, diffs
+
+
 def main():
     config, diffs = parse_arguments()
     original_function = config["ORIGINAL_FUNCTION"]
     output_dir = CONFIG["OUTPUT_DIR"]
 
-    config, diffs = run_different_rbfs(config, diffs)
+    # config, diffs = run_different_rbfs(config, diffs)
+    config, diffs = run_quasi_comparison(config, diffs)
 
     with set_output_directory(output_dir):
+        # return run_functions_comparison(config, diffs)
+
         if not config["CALIBRATE"]:
-            results = Interpolation.run_all_experiments(
-                config, diffs, original_function
-            )
+            results = Experiment.run_all_experiments(config, diffs, original_function)
         else:
-            results = Interpolation.calibrate(config, diffs, original_function)
+            results = Experiment.calibrate(config, diffs, original_function)
 
     if len(condition_g):
         print(f"Average condition {np.average(condition_g)}")

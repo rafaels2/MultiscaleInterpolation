@@ -43,7 +43,7 @@ class Visualizer(object):
         self.ax.set_zticks([])
         # Add a color bar which maps values to colors.
         # plt.colorbar()
-        plt.title(title)
+        # plt.title(title)
         plt.savefig(filename)
         plt.close(self.fig)
 

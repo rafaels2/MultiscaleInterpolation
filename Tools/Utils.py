@@ -29,7 +29,7 @@ def act_on_functions(action, a, b):
 
 def plot_and_save(data, title, filename):
     plt.figure()
-    plt.title(title)
+    # plt.title(title)
     fig = plt.imshow(data)
     fig.axes.get_xaxis().set_visible(False)
     fig.axes.get_yaxis().set_visible(False)
@@ -40,9 +40,10 @@ def plot_and_save(data, title, filename):
 
 def plot_lines(x_values, y_values, filename, title, x_label, y_label):
     fig = plt.figure()
-    plt.title(title)
+    # plt.title(title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
+    plt.grid()
     for line_name in y_values.keys():
         if x_values is not None:
             plt.plot(x_values[line_name], y_values[line_name], label=line_name)
@@ -51,7 +52,9 @@ def plot_lines(x_values, y_values, filename, title, x_label, y_label):
             plt.plot(_x_values, y_values[line_name], label=line_name)
             plt.xticks(_x_values)
     plt.legend(y_values.keys())
-    plt.savefig(filename)
+    plt.savefig(filename, bbox_inches='tight')
+    if ".svg" in filename:
+        plt.savefig(f"{filename[:-4]}.png", bbox_inches='tight')
     plt.close(fig)
 
 

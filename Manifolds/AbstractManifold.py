@@ -45,7 +45,7 @@ class AbstractManifold(object):
 
     def plot(self, data, title, filename, **kwargs):
         self.fig = plt.figure()
-        plt.title(title)
+        # plt.title(title)
         cb = self._visualize(plt, data)
         plt.savefig(filename)
         cb.remove()

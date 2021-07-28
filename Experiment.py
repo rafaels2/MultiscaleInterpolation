@@ -11,6 +11,16 @@ from Tools.Utils import *
 from Tools.SamplingPoints import GridParameters, Grid, symmetric_grid_params
 
 
+plt.rc("font", size=20)  # controls default text size
+plt.rc("axes", titlesize=20)  # fontsize of the title
+plt.rc("axes", labelsize=20)  # fontsize of the x and y labels
+plt.rc("xtick", labelsize=20)  # fontsize of the x tick labels
+plt.rc("ytick", labelsize=20)  # fontsize of the y tick labels
+plt.rc("legend", fontsize=20)  # fontsize of the legend
+plt.rc("axes", labelsize=20)
+plt.tight_layout()
+
+
 def generate_grids(number_of_scales, grid_size, resolution, scaling_factor):
     grids = dict()
     accumulated_grid = list()
@@ -120,14 +130,14 @@ def run_single_experiment(config, original_function):
 
     manifold.plot(
         true_values_on_grid,
-        "original",
+        "Original",
         "original.png",
         norm_visualization=norm_visualization,
     )
 
     plot_and_save(
         calculate_max_derivative(original_function, grid_params, manifold),
-        "max derivatives",
+        "Max Derivatives",
         "deriveatives.png",
     )
 
@@ -159,7 +169,7 @@ def run_single_experiment(config, original_function):
 
             manifold.plot(
                 approximated_values_on_grid,
-                "approximation",
+                "Approximation",
                 "approximation.png",
                 norm_visualization=norm_visualization,
             )
@@ -227,8 +237,8 @@ def run_all_experiments(config, diffs, *args):
             mesh_norms,
             mses,
             "mses.svg",
-            "Error in different runs",
-            "log(h_X)",
+            "Errors Comparison",
+            "log$(h_X)$",
             "log(Error)",
         )
         result = {"mses": mses, "mesh_norms": mesh_norms, "mus": mus}
