@@ -52,9 +52,9 @@ def plot_lines(x_values, y_values, filename, title, x_label, y_label):
             plt.plot(_x_values, y_values[line_name], label=line_name)
             plt.xticks(_x_values)
     plt.legend(y_values.keys())
-    plt.savefig(filename, bbox_inches='tight')
+    plt.savefig(filename, bbox_inches="tight")
     if ".svg" in filename:
-        plt.savefig(f"{filename[:-4]}.png", bbox_inches='tight')
+        plt.savefig(f"{filename[:-4]}.png", bbox_inches="tight")
     plt.close(fig)
 
 

@@ -68,7 +68,8 @@ def multiscale_interpolation(
 
         current_grid_parameters = [
             (
-                "Grid",
+                "kd-tree",
+                # "grid",
                 symmetric_grid_params(grid_size + 0.5, scale / resolution),
             )
         ]

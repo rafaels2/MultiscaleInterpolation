@@ -70,7 +70,7 @@ def plot_comparison(
     xlabel="log(h_X)",
     y_err=None,
     ylabel="log(Error)",
-    is_fit=False
+    is_fit=False,
 ):
     y_new = [func(x, *params) for x in x_orig]
     plt.figure()
@@ -78,9 +78,9 @@ def plot_comparison(
     plt.grid()
     if y_err is not None:
         plt.scatter(x_orig, y_orig)
-        plt.errorbar(x_orig, y_orig, yerr=y_err, fmt='o')
+        plt.errorbar(x_orig, y_orig, yerr=y_err, fmt="o")
     elif is_fit:
-        plt.scatter(x_orig, y_orig, marker='*')
+        plt.scatter(x_orig, y_orig, marker="*")
     else:
         plt.plot(x_orig, y_orig, label="original")
         plt.legend()
@@ -89,7 +89,9 @@ def plot_comparison(
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     # plt.title(title)
-    plt.savefig(os.path.join(DIR, f"{title.replace(' ', '_')}.png"), bbox_inches='tight')
+    plt.savefig(
+        os.path.join(DIR, f"{title.replace(' ', '_')}.png"), bbox_inches="tight"
+    )
     plt.show(block=False)
 
 
@@ -144,7 +146,7 @@ def fit_mus(mus, param_b, b_err, debug=False):
             "log($\mu$)",
             ylabel="multiscale fit slope",
             y_err=b_err,
-            is_fit=True
+            is_fit=True,
         )
     return const, curve
 
@@ -189,7 +191,7 @@ def fit_single_scale(results, keyword):
         x_orig = results["mesh_norms"][name]
         title = f"Quasi-interpolation fit for {name.lower()}"
         xlabel = "log$(h_X)$"
-        is_keyword = (keyword in name)
+        is_keyword = keyword in name
         (a, b), _ = scipy.optimize.curve_fit(_multi_linear, x_orig, mses, p0=[1, 1])
         plot_comparison(_multi_linear, x_orig, mses, (a, b), title, xlabel)
         yield a, b, is_keyword

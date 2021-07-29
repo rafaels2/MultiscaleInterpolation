@@ -5,7 +5,9 @@ from functools import partial
 import numpy as np
 from numpy import linalg as la
 from cachetools import cached
+from pykdtree.kdtree import KDTree
 
+from Tools.Halton import get_scaled_halton, measure_fill_and_separation
 from Tools.Lambdas import Lambdas
 from Tools.Utils import generate_cache, wendland_3_1, generate_kernel
 
@@ -52,7 +54,64 @@ class SamplingPoints(object):
         pass
 
 
-@add_sampling_class("Grid")
+@add_sampling_class("kd-tree")
+class KDTreeSampler(SamplingPoints):
+    def __init__(
+        self, rbf_radius, function_to_evaluate, grid_parameters, phi_generator=None
+    ):
+        self._rbf_radius = rbf_radius
+
+        # Generate halton sequence, then scale and duplicate.
+        self._seq = get_scaled_halton(*grid_parameters)
+        self._tree = KDTree(self._seq)
+        print("sep, fill", measure_fill_and_separation(self._tree, self._seq))
+
+        self._evaluation = self._evaluate_on_grid(function_to_evaluate)
+        self._phi = None
+
+        self._lambdas_generator = Lambdas(self, "grid_cache.pkl")
+        self._lambdas = self._evaluate_on_grid(self._lambdas_generator.weight_for_grid)
+
+        if phi_generator is not None:
+            self._phi = self._evaluate_on_grid(phi_generator)
+
+    def points_in_radius(self, x, y):
+        p = np.array([[x, y]])
+        _, ids = self._tree.query(p, k=30, distance_upper_bound=self._rbf_radius)
+        indices = ids[0]
+        last_index = 0
+
+        if indices[-1] < self._seq.shape[0]:
+            print("reached K")
+
+        for index in indices:
+            if index == self._seq.shape[0]:
+                break
+
+            yield Point(
+                self._evaluation[index],
+                self._phi[index],
+                self._seq[index, 0],
+                self._seq[index, 1],
+                self._lambdas[index],
+            )
+            last_index += 1
+        print(last_index)
+
+    def _evaluate_on_grid(self, function_to_evaluate):
+        evaluation = np.zeros(self._seq.shape[0], dtype=object)
+
+        for index in range(evaluation.shape[0]):
+            # import ipdb
+            # ipdb.set_trace()
+            evaluation[index] = function_to_evaluate(
+                self._seq[index, 0], self._seq[index, 1]
+            )
+
+        return evaluation
+
+
+@add_sampling_class("grid")
 class Grid(SamplingPoints):
     def __init__(
         self, rbf_radius, function_to_evaluate, grid_parameters, phi_generator=None
