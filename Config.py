@@ -53,13 +53,13 @@ def _original_function(x, y):
 
 CONFIG = {
     "RBF": wendland_3_1,
-    "GRID_SIZE": 0.45,
+    "GRID_SIZE": 0.85,
     "BASE_RESOLUTION": 2,
     "PLOT_RESOLUTION_FACTOR": 2,
     "SCALE": 1,
     "NUMBER_OF_SCALES": 3,
     # "TEST_MESH_NORM": 2 ** -6,
-    "TEST_MESH_NORM": 0.02,
+    "TEST_MESH_NORM": 0.001,
     "SCALING_FACTOR_POWER": 1,
     "SCALING_FACTOR": _SCALING_FACTOR,
     "NAME": "temp",

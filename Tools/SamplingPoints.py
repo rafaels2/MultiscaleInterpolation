@@ -62,7 +62,14 @@ class KDTreeSampler(SamplingPoints):
         self._rbf_radius = rbf_radius
 
         # Generate halton sequence, then scale and duplicate.
-        self._seq = get_scaled_halton(*grid_parameters)
+        self._seq = []
+        for row in get_scaled_halton(*grid_parameters):
+            if (
+                grid_parameters.x_min < row[0] < grid_parameters.x_max
+                and grid_parameters.y_min < row[1] < grid_parameters.y_max
+            ):
+                self._seq.append(row)
+        self._seq = np.array(self._seq)
         self._tree = KDTree(self._seq)
         print("sep, fill", measure_fill_and_separation(self._tree, self._seq))
 
@@ -109,6 +116,14 @@ class KDTreeSampler(SamplingPoints):
             )
 
         return evaluation
+
+    @property
+    def evaluation(self):
+        return self._evaluation
+
+    @property
+    def seq(self):
+        return self._seq
 
 
 @add_sampling_class("grid")

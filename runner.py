@@ -296,7 +296,8 @@ def run_functions_comparison(config, diffs):
     mu = 0.75
     execution_name = config["EXECUTION_NAME"]
 
-    functions = ["numbers", "numbers_gauss"]
+    # functions = ["numbers", "numbers_gauss"]
+    functions = ["picture"]
     for function in functions:
         diffs = list()
         config["EXECUTION_NAME"] = f"{execution_name}_{function}"
@@ -324,10 +325,10 @@ def main():
     output_dir = CONFIG["OUTPUT_DIR"]
 
     # config, diffs = run_different_rbfs(config, diffs)
-    config, diffs = run_quasi_comparison(config, diffs)
+    # config, diffs = run_quasi_comparison(config, diffs)
 
     with set_output_directory(output_dir):
-        # return run_functions_comparison(config, diffs)
+        return run_functions_comparison(config, diffs)
 
         if not config["CALIBRATE"]:
             results = Experiment.run_all_experiments(config, diffs, original_function)

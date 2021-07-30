@@ -70,7 +70,7 @@ def multiscale_interpolation(
             (
                 "kd-tree",
                 # "grid",
-                symmetric_grid_params(grid_size + 0.5, scale / resolution),
+                symmetric_grid_params(grid_size + 0.1, scale / resolution),
             )
         ]
 
