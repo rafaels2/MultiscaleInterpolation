@@ -103,7 +103,7 @@ class KDTreeSampler(SamplingPoints):
                 self._lambdas[index],
             )
             last_index += 1
-        print(last_index)
+        # print(last_index)
 
     def _evaluate_on_grid(self, function_to_evaluate):
         evaluation = np.zeros(self._seq.shape[0], dtype=object)

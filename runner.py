@@ -293,7 +293,7 @@ def run_functions_comparison(config, diffs):
 
     wendland = wendland_3_1
     method = Quasi
-    mu = 0.75
+    mu = 0.68
     execution_name = config["EXECUTION_NAME"]
 
     # functions = ["numbers", "numbers_gauss"]

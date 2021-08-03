@@ -7,6 +7,7 @@ from cachetools import cached, LFUCache
 from matplotlib import cm
 from matplotlib import pyplot as plt
 
+import numpy as np
 from numpy import linalg as la
 
 num_of_caches_g = 0
@@ -30,7 +31,7 @@ def act_on_functions(action, a, b):
 def plot_and_save(data, title, filename):
     plt.figure()
     # plt.title(title)
-    fig = plt.imshow(data)
+    fig = plt.imshow(data, cmap='gray')
     fig.axes.get_xaxis().set_visible(False)
     fig.axes.get_yaxis().set_visible(False)
     cb = plt.colorbar()

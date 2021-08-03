@@ -37,7 +37,7 @@ class AbstractManifold(object):
         for index in np.ndindex(visualization.shape):
             x = data[index]
             visualization[index] = self._to_numbers(x)
-        fig = plt.imshow(visualization)
+        fig = plt.imshow(visualization, cmap='gray')
         fig.axes.get_xaxis().set_visible(False)
         fig.axes.get_yaxis().set_visible(False)
         cb = plt.colorbar()

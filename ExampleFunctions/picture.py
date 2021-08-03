@@ -1,9 +1,9 @@
-from PIL import Image
+from PIL import Image, ImageOps
 import numpy as np
 
-FILENAME = "HeadScan.jpg"
-_IMAGE = Image.open(FILENAME)
-IMAGE = np.array(_IMAGE)
+FILENAME = "pexels-h-r-5802771.jpg"
+_IMAGE = ImageOps.grayscale(Image.open(FILENAME).rotate(90))
+IMAGE = np.array(_IMAGE) / 255
 
 
 def original_function(x, y):

@@ -51,7 +51,7 @@ def multiscale_interpolation(
     f_j = manifold.zero_func
     e_j = act_on_functions(manifold.log, f_j, original_function)
     for scale_index in range(1, number_of_scales + 1):
-        scale = scaling_factor ** scale_index
+        scale = 0.1 * scaling_factor ** scale_index
         print("NEW SCALE: {}".format(scale))
 
         if is_approximating_on_tangent:
