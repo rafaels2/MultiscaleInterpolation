@@ -6,9 +6,9 @@ import scipy.optimize
 from collections import namedtuple
 import argparse
 
-from Tools.Utils import config_plt
+import Tools.Utils
 
-config_plt(plt)
+Tools.Utils.config_plt(plt)
 
 RunData = namedtuple(
     "RunData",
@@ -214,5 +214,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # single, multi = main()
     main()
+    input()

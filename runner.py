@@ -280,11 +280,15 @@ def run_functions_comparison(diffs):
     mu = 0.75
     execution_name = config.EXECUTION_NAME
 
-    functions = ["numbers", "numbers_gauss"]
+    functions = [
+        "numbers",
+        "numbers_gauss"
+    ]
     for function in functions:
         diffs = list()
         config.EXECUTION_NAME = f"{execution_name}_{function}"
         for diff in old_diffs:
+            config.renew()
             current_diff = diff.copy()
             current_diff["NAME"] = f"{function}__{current_diff['NAME']}"
             current_diff["RBF"] = wendland
@@ -306,7 +310,7 @@ def main():
     output_dir = config.OUTPUT_DIR
 
     # diffs = run_different_rbfs(diffs)
-    diffs = run_quasi_comparison(diffs)
+    # diffs = run_quasi_comparison(diffs)
 
     with set_output_directory(output_dir):
         # return run_functions_comparison(diffs)

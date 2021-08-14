@@ -21,5 +21,14 @@ class Config(object):
     def set_base_config(self, base_config):
         self._base_config = base_config
 
+    def __repr__(self):
+        representation = dict()
+        for d in dir(self):
+            if d.isupper():
+                representation[d] = self.__getattribute__(d)
+
+        return str(representation)
+
+
 
 config = Config()

@@ -17,6 +17,8 @@ class Grid(DataSitesStorage):
         phi_generator=None,
     ):
         self._x, self._y = sites
+        self._x_min = np.min(self._x)
+        self._y_min = np.min(self._y)
         self._evaluation = self._evaluate_on_grid(function_to_evaluate)
         self._phi = None
         self._fill_distance = fill_distance
