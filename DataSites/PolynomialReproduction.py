@@ -7,7 +7,7 @@ from numpy import linalg as la
 condition_g = list()
 
 
-class Lambdas(object):
+class PolynomialReproduction(object):
     def __init__(self, grid, filename="cache.pkl"):
         self.grid = grid
         self.polynomial_coefficients = [

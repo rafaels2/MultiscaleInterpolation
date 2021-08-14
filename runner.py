@@ -4,38 +4,29 @@ from itertools import product
 
 import numpy as np
 
+from Config.Options import options
+from Config.Config import config
 import Experiment
-from ApproximationMethods.AdaptiveQuasi import AdaptiveQuasi
-from ApproximationMethods.MovingLeastSquares import MovingLeastSquares
-from ApproximationMethods.Naive import Naive
-from ApproximationMethods.NoNormalization import NoNormalization
-from ApproximationMethods.Quasi import Quasi
-from Config import CONFIG, _SCALING_FACTOR
-from Tools.Utils import (
-    set_output_directory,
-    wendland_3_0,
-    wendland_3_1,
-    wendland_3_2,
-    wendland_1_0,
-)
-from Manifolds import MANIFOLDS
-import ExampleFunctions
-from Tools.Lambdas import condition_g
-
-METHODS = {
-    "naive": Naive,
-    "quasi": Quasi,
-    "adaptive": AdaptiveQuasi,
-    "moving": MovingLeastSquares,
-}
+from Tools.Utils import set_output_directory
+from DataSites.PolynomialReproduction import condition_g
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser("RBF Approximation Scrtipt")
+    parser = argparse.ArgumentParser("RBF Approximation Script")
     parser.add_argument(
-        "-f", "--function", type=str, help="Original function file", required=True
+        "-f",
+        "--function",
+        type=str,
+        help="Original function for approximation, see OriginalFunction.py",
+        choices=options.get_options("original_function"),
+        default="numbers",
     )
-    parser.add_argument("-m", "--manifold", choices=MANIFOLDS.keys(), required=True)
+    parser.add_argument(
+        "-m",
+        "--manifold",
+        choices=options.get_options("manifold").keys(),
+        default="numbers",
+    )
     parser.add_argument(
         "-t",
         "--tangent-approximation",
@@ -58,13 +49,15 @@ def parse_arguments():
     parser.add_argument(
         "-b", "--base-index", type=int, help="The first number of scales", default=1
     )
-    parser.add_argument("-sf", "--scaling-factor", type=float, default=_SCALING_FACTOR)
+    parser.add_argument(
+        "-sf", "--scaling-factor", type=float, default=config.SCALING_FACTOR
+    )
     parser.add_argument("-e", "--execution-name", type=str, default="NoName")
     parser.add_argument("-a", "--adaptive", action="store_true", help="is adaptive m0")
     parser.add_argument(
         "-mt",
         "--method",
-        choices=METHODS.keys(),
+        choices=options.get_options("approximation_method").keys(),
         default="quasi",
         help="approximation method",
     )
@@ -78,32 +71,35 @@ def parse_arguments():
     parser.add_argument("-df", "--different-functions", action="store_true")
     args = parser.parse_args()
 
-    config = CONFIG.copy()
-    config["ORIGINAL_FUNCTION"] = importlib.import_module(
-        args.function
-    ).original_function
-    config["ERROR_CALC"] = args.error
-    config["MANIFOLD"] = MANIFOLDS[args.manifold]()
-    config["IS_APPROXIMATING_ON_TANGENT"] = args.tangent_approximation
-    config["NORM_VISUALIZATION"] = args.norm_visualization
-    config["SCALING_FACTOR"] = args.scaling_factor
+    base_config = dict()
+    base_config["ORIGINAL_FUNCTION"] = options.get_option(
+        "original_function", args.function
+    )
+    base_config["ERROR_CALC"] = args.error
+    base_config["MANIFOLD"] = options.get_option("manifold", args.manifold)()
+    base_config["IS_APPROXIMATING_ON_TANGENT"] = args.tangent_approximation
+    base_config["NORM_VISUALIZATION"] = args.norm_visualization
+    base_config["SCALING_FACTOR"] = args.scaling_factor
     is_tangent = "Tangent" if args.tangent_approximation else "Intrinsic"
-    config["EXECUTION_NAME"] = "{}_{}".format(args.manifold, is_tangent)
+    base_config["EXECUTION_NAME"] = "{}_{}".format(args.manifold, is_tangent)
     execution_name = (
         args.execution_name
         if (args.execution_name != "NoName")
         else "{}_{}".format(args.manifold, is_tangent)
     )
-    config["EXECUTION_NAME"] = execution_name
-    config["IS_ADAPTIVE"] = args.adaptive
-    config["SCALED_INTERPOLATION_METHOD"] = METHODS[args.method]
-    config["CALIBRATE"] = args.calibrate
+    base_config["EXECUTION_NAME"] = execution_name
+    base_config["IS_ADAPTIVE"] = args.adaptive
+    base_config["SCALED_INTERPOLATION_METHOD"] = args.method
+    base_config["CALIBRATE"] = args.calibrate
+
+    config.set_base_config(base_config)
+    config.renew()
 
     if args.different_functions:
-        return config, run_different_functions(args)
+        return run_different_functions(args)
 
     if args.mu_testing:
-        return config, run_different_mus(config, args)
+        return run_different_mus(args)
 
     if args.dont_multi:
         diffs = []
@@ -135,13 +131,13 @@ def parse_arguments():
             new_item = item.copy()
             new_item["NAME"] = "_".join([item["NAME"], "interpolation"])
             new_item["MSE_LABEL"] = " ".join(["Interpolated", item["MSE_LABEL"]])
-            new_item["SCALED_INTERPOLATION_METHOD"] = Naive
+            new_item["SCALED_INTERPOLATION_METHOD"] = "naive"
             diffs.append(new_item)
 
-    return config, diffs
+    return diffs
 
 
-def run_different_mus(config, args):
+def run_different_mus(args):
     mus = [0.5, 0.6, 0.65, 0.7, 0.75]
     diffs = list()
 
@@ -168,9 +164,7 @@ def run_different_functions(args):
 
     for function_name in functions:
         diff = {
-            "ORIGINAL_FUNCTION": importlib.import_module(
-                f"ExampleFunctions.{function_name}"
-            ).original_function,
+            "ORIGINAL_FUNCTION": options.get_option("original_function", function_name),
             "NAME": f"multiscale_{function_name}",
             "MSE_LABEL": f"multiscale_{function_name}",
             "NUMBER_OF_SCALES": args.number_of_scales,
@@ -180,9 +174,7 @@ def run_different_functions(args):
         diffs = diffs + [
             {
                 "NAME": "single_scale_{}_{}".format(function_name, index),
-                "ORIGINAL_FUNCTION": importlib.import_module(
-                    f"ExampleFunctions.{function_name}"
-                ).original_function,
+                "ORIGINAL_FUNCTION": options.get_option("original_fucntion", function_name),
                 "MSE_LABEL": f"Single_Scale_{function_name}",
                 "NUMBER_OF_SCALES": 1,
                 "SCALING_FACTOR": args.scaling_factor ** index,
@@ -194,22 +186,18 @@ def run_different_functions(args):
     return diffs
 
 
-def run_different_rbfs(config, diffs):
+def run_different_rbfs(diffs):
     old_diffs = diffs.copy()
     diffs = list()
 
-    wendlands = {
-        # "1_0": wendland_1_0,
-        # "3_0": wendland_3_0,
-        "3_1": wendland_3_1,
-        # "3_2": wendland_3_2,
-    }
+    wendlands = [
+        "wendland_3_1"
+    ]
 
-    methods = {
-        "moving": MovingLeastSquares,
-        "quasi": Quasi,
-        # "no_normalization": NoNormalization
-    }
+    methods = [
+        "moving",
+        "quasi",
+    ]
 
     mus = [
         # 0.5,
@@ -244,24 +232,22 @@ def run_different_rbfs(config, diffs):
             current_diff["RBF"] = wendland
             current_diff["SCALED_INTERPOLATION_METHOD"] = method
             current_diff["SCALING_FACTOR"] = mu ** current_diff.get(
-                "SCALING_FACTOR_POWER", config["SCALING_FACTOR_POWER"]
+                "SCALING_FACTOR_POWER", config.SCALING_FACTOR_POWER
             )
-            current_diff["ORIGINAL_FUNCTION"] = importlib.import_module(
-                f"ExampleFunctions.{function}"
-            ).original_function
+            current_diff["ORIGINAL_FUNCTION"] = options.get_option("original_function", function)
             diffs.append(current_diff)
 
-    return config, diffs
+    return diffs
 
 
-def run_quasi_comparison(config, diffs):
+def run_quasi_comparison(diffs):
     old_diffs = diffs.copy()
     diffs = list()
 
-    wendland = wendland_3_1
+    wendland = "wendland_3_1"
     methods = {
-        "Quadratic Reproduction": MovingLeastSquares,
-        "Constant Reproduction": Quasi,
+        "Quadratic Reproduction": "moving",
+        "Constant Reproduction": "quasi",
     }
     mu = 0.75
 
@@ -273,66 +259,62 @@ def run_quasi_comparison(config, diffs):
             current_diff = diff.copy()
             current_diff[
                 "NAME"
-            ] = f"{method_name}__{wendland.__name__}__mu_{mu}__{function}__{current_diff['NAME']}"
+            ] = f"{method_name}__{wendland}__mu_{mu}__{function}__{current_diff['NAME']}"
             current_diff["MSE_LABEL"] = f"{method_name}"
             current_diff["RBF"] = wendland
             current_diff["SCALED_INTERPOLATION_METHOD"] = method
             current_diff["SCALING_FACTOR"] = mu ** current_diff.get(
-                "SCALING_FACTOR_POWER", config["SCALING_FACTOR_POWER"]
+                "SCALING_FACTOR_POWER", config.SCALING_FACTOR_POWER
             )
-            current_diff["ORIGINAL_FUNCTION"] = importlib.import_module(
-                f"ExampleFunctions.{function}"
-            ).original_function
+            current_diff["ORIGINAL_FUNCTION"] = options.get_option("original_function", function)
             diffs.append(current_diff)
 
-    return config, diffs
+    return diffs
 
 
-def run_functions_comparison(config, diffs):
+def run_functions_comparison(diffs):
     old_diffs = diffs.copy()
 
-    wendland = wendland_3_1
-    method = Quasi
+    wendland = "wendland_3_1"
+    method = "quasi"
     mu = 0.75
-    execution_name = config["EXECUTION_NAME"]
+    execution_name = config.EXECUTION_NAME
 
     functions = ["numbers", "numbers_gauss"]
     for function in functions:
         diffs = list()
-        config["EXECUTION_NAME"] = f"{execution_name}_{function}"
+        config.EXECUTION_NAME = f"{execution_name}_{function}"
         for diff in old_diffs:
             current_diff = diff.copy()
             current_diff["NAME"] = f"{function}__{current_diff['NAME']}"
             current_diff["RBF"] = wendland
             current_diff["SCALED_INTERPOLATION_METHOD"] = method
             current_diff["SCALING_FACTOR"] = mu ** current_diff.get(
-                "SCALING_FACTOR_POWER", config["SCALING_FACTOR_POWER"]
+                "SCALING_FACTOR_POWER", config.SCALING_FACTOR_POWER
             )
-            current_diff["ORIGINAL_FUNCTION"] = importlib.import_module(
-                f"ExampleFunctions.{function}"
-            ).original_function
+            current_diff["ORIGINAL_FUNCTION"] = options.get_option("original_function", function)
             diffs.append(current_diff)
 
-        Experiment.run_all_experiments(config, diffs, current_diff["ORIGINAL_FUNCTION"])
+        Experiment.run_all_experiments(diffs)
 
     return config, diffs
 
 
 def main():
-    config, diffs = parse_arguments()
-    original_function = config["ORIGINAL_FUNCTION"]
-    output_dir = CONFIG["OUTPUT_DIR"]
+    diffs = parse_arguments()
+    original_function = config.ORIGINAL_FUNCTION
+    output_dir = config.OUTPUT_DIR
 
-    # config, diffs = run_different_rbfs(config, diffs)
-    config, diffs = run_quasi_comparison(config, diffs)
+    # diffs = run_different_rbfs(diffs)
+    diffs = run_quasi_comparison(diffs)
 
     with set_output_directory(output_dir):
-        # return run_functions_comparison(config, diffs)
+        # return run_functions_comparison(diffs)
 
-        if not config["CALIBRATE"]:
-            results = Experiment.run_all_experiments(config, diffs, original_function)
+        if not config.CALIBRATE:
+            results = Experiment.run_all_experiments(diffs)
         else:
-            results = Experiment.calibrate(config, diffs, original_function)
+            results = Experiment.calibrate(diffs)
 
     if len(condition_g):
         print(f"Average condition {np.average(condition_g)}")

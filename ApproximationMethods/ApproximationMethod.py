@@ -6,6 +6,7 @@ from Tools.Utils import generate_cache
 
 
 class ApproximationMethod(object):
+    # TODO: get manifold, function, kernel, scale, grid.
     def __init__(self, manifold, original_function, grid_parameters, rbf):
         self._original_function = original_function
         self._grid_parameters = grid_parameters

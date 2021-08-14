@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pykdtree.kdtree import KDTree
 
+from . import register_generation
+
 HALTON_SIZE = 400
 HALTON_DIM = 2
 
@@ -43,7 +45,9 @@ def halton_sequence(size, dim):
     return seq
 
 
+@register_generation("halton")
 def get_scaled_halton(x_min, x_max, y_min, y_max, fill_distance):
+    # TODO: generalize to n-dim
     seq = halton_sequence(HALTON_SIZE, HALTON_DIM)
     data_points = np.transpose(np.array(seq))
     orig_tree = KDTree(data_points)
@@ -77,28 +81,27 @@ def measure_fill_and_separation(tree, seq):
     return min(lst), max(lst)
 
 
-def test():
-    mins = list()
-    maxs = list()
-    sizes = list()
-    for size in range(100, 20000, 200):
-        print("size :", size)
-        seq = halton_sequence(size, 2)
-        data = np.array(seq).transpose()
-        tree = KDTree(data)
-        mn, mx = measure_fill_and_separation(tree, data)
-        mins.append(mn)
-        maxs.append(mx)
-        sizes.append(np.log(size))
-        print(mn, mx)
-
-    plt.figure()
-    plt.plot(sizes, mins)
-    plt.plot(sizes, maxs)
-    plt.show()
-
-
 def main():
+    def test():
+        mins = list()
+        maxs = list()
+        sizes = list()
+        for size in range(100, 20000, 200):
+            print("size :", size)
+            seq = halton_sequence(size, 2)
+            data = np.array(seq).transpose()
+            tree = KDTree(data)
+            mn, mx = measure_fill_and_separation(tree, data)
+            mins.append(mn)
+            maxs.append(mx)
+            sizes.append(np.log(size))
+            print(mn, mx)
+
+        plt.figure()
+        plt.plot(sizes, mins)
+        plt.plot(sizes, maxs)
+        plt.show()
+
     # test()
     size = 100
     seq = halton_sequence(size, 2)

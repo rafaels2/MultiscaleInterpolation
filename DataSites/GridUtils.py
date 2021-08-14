@@ -1,11 +1,13 @@
+from collections import namedtuple
+
 import numpy as np
 
-from Tools.SamplingPoints import Grid, generate_grid
+from Config.Options import options
 
 
 def calculate_max_derivative(original_function, grid_params, manifold):
     def derivative(x, y):
-        delta = grid_params.mesh_norm / 2
+        delta = grid_params.fill_distance / 2
         evaluations_around = [
             original_function(x + (delta / np.sqrt(2)), y + (delta / np.sqrt(2))),
             original_function(x, y + delta),
@@ -25,7 +27,8 @@ def calculate_max_derivative(original_function, grid_params, manifold):
             ]
         )
 
-    evaluation = Grid(1, derivative, grid_params).evaluation
+    sites = options.get_option("generation_method", "grid")(*grid_params)
+    evaluation = options.get_option("data_storage", "grid")(sites, 1, derivative, grid_params.fill_distance).evaluation
 
     result = np.zeros_like(evaluation, dtype=np.float32)
     for index in np.ndindex(result.shape):
@@ -34,11 +37,18 @@ def calculate_max_derivative(original_function, grid_params, manifold):
     return result
 
 
-def evaluate_on_grid(func, *args, points=None, should_log=False):
+def evaluate_on_grid(func, grid_size, resolution, scale, points=None, should_log=False):
     if points is not None:
         x, y = points
     else:
-        x, y = generate_grid(*args, should_ravel=False)
+        x, y = options.get_option("generation_method", "grid")(
+            -grid_size,
+            grid_size,
+            -grid_size,
+            grid_size,
+            scale / resolution,
+            should_ravel=False,
+        )
 
     z = np.zeros(x.shape, dtype=object)
     print("Z shape", z.shape)
@@ -49,3 +59,12 @@ def evaluate_on_grid(func, *args, points=None, should_log=False):
         z[index] = func(x[index], y[index])
 
     return z
+
+
+GridParameters = namedtuple(
+    "GridParameters", ["x_min", "x_max", "y_min", "y_max", "fill_distance"]
+)
+
+
+def symmetric_grid_params(grid_size, fill_distance):
+    return GridParameters(-grid_size, grid_size, -grid_size, grid_size, fill_distance)
