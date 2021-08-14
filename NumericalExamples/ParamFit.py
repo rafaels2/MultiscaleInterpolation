@@ -6,15 +6,9 @@ import scipy.optimize
 from collections import namedtuple
 import argparse
 
+from Tools.Utils import config_plt
 
-plt.rc("font", size=20)  # controls default text size
-plt.rc("axes", titlesize=20)  # fontsize of the title
-plt.rc("axes", labelsize=20)  # fontsize of the x and y labels
-plt.rc("xtick", labelsize=20)  # fontsize of the x tick labels
-plt.rc("ytick", labelsize=20)  # fontsize of the y tick labels
-plt.rc("legend", fontsize=20)  # fontsize of the legend
-plt.rc("axes", labelsize=20)
-plt.tight_layout()
+config_plt(plt)
 
 RunData = namedtuple(
     "RunData",

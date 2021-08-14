@@ -1,6 +1,8 @@
 from ApproximationMethods.Quasi import Quasi
+from . import register_approximation_method
 
 
+@register_approximation_method("moving")
 class MovingLeastSquares(Quasi):
     @staticmethod
     def _get_weights_for_point(point, x, y):

@@ -1,10 +1,8 @@
 import os
-from collections import namedtuple
 from contextlib import contextmanager
 
 from cachetools import cached, LFUCache
 
-from matplotlib import cm
 from matplotlib import pyplot as plt
 
 from numpy import linalg as la
@@ -68,42 +66,6 @@ def generate_kernel(rbf, scale=1):
     return kernel
 
 
-def wendland_3_1(x):
-    if x < 0:
-        raise ValueError("x should be > 0, not {}".format(x))
-    if x > 1:
-        return 0
-    else:
-        return (1 + (4 * x)) * ((1 - x) ** 4)
-
-
-def wendland_3_0(x):
-    if x < 0:
-        raise ValueError("x should be > 0, not {}".format(x))
-    if x > 1:
-        return 0
-    else:
-        return (1 - x) ** 2
-
-
-def wendland_3_2(x):
-    if x < 0:
-        raise ValueError("x should be > 0, not {}".format(x))
-    if x > 1:
-        return 0
-    else:
-        return (35 * (x ** 2) + 18 * x + 3) * (1 - x) ** 6
-
-
-def wendland_1_0(x):
-    if x < 0:
-        raise ValueError("x should be > 0, not {}".format(x))
-    if x > 1:
-        return 0
-    else:
-        return 1 - x
-
-
 @contextmanager
 def set_output_directory(path):
     """
@@ -119,3 +81,14 @@ def set_output_directory(path):
 
     os.chdir(last_cwd)
     return
+
+
+def config_plt(_plt):
+    _plt.rc("font", size=20)  # controls default text size
+    _plt.rc("axes", titlesize=20)  # fontsize of the title
+    _plt.rc("axes", labelsize=20)  # fontsize of the x and y labels
+    _plt.rc("xtick", labelsize=20)  # fontsize of the x tick labels
+    _plt.rc("ytick", labelsize=20)  # fontsize of the y tick labels
+    _plt.rc("legend", fontsize=20)  # fontsize of the legend
+    _plt.rc("axes", labelsize=20)
+    _plt.tight_layout()
