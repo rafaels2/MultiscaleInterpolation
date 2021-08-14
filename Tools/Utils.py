@@ -58,9 +58,7 @@ def plot_lines(x_values, y_values, filename, title, x_label, y_label):
 
 def generate_kernel(rbf, scale=1):
     def kernel(x, y):
-        # ans = (1 / scale ** 2) * rbf(la.norm(x - y) / scale)
-        # ans = (1/scale) * rbf(la.norm(x-y) * 1.25 / scale)
-        ans = rbf(1.25 * la.norm(x - y) / scale)
+        ans = rbf(la.norm(x - y) / scale)
         return ans
 
     return kernel

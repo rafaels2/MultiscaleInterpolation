@@ -128,7 +128,7 @@ def run_all_experiments(diffs):
 
             t_0 = datetime.now()
 
-            for mse, mesh_norm, _ in run_single_experiment():
+            for mse, fill_distance, _ in run_single_experiment():
                 # log results
                 mus.append(config.SCALING_FACTOR)
                 t_f = datetime.now()
@@ -137,7 +137,7 @@ def run_all_experiments(diffs):
                 current_mses = mses.get(mse_label, list())
                 current_mesh_norms = fill_distances.get(mse_label, list())
                 current_mses.append(np.log(mse))
-                current_mesh_norms.append(np.log(mesh_norm))
+                current_mesh_norms.append(np.log(fill_distance))
                 mses[mse_label] = current_mses
                 fill_distances[mse_label] = current_mesh_norms
                 t_0 = datetime.now()
