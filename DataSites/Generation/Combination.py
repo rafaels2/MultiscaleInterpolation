@@ -2,6 +2,7 @@
 This module allows to generate data sites with different configurations and types.
 Not tested
 """
+from Config.Options import options
 
 
 class SamplingPointsCollection(object):

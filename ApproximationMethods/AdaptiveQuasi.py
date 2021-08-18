@@ -34,3 +34,10 @@ class AdaptiveQuasi(Quasi):
     def approximation(self, x, y):
         base = self._original_function(x, y)[1]
         return self._manifold.log(base, super().approximation(x, y))
+
+
+def combine(a, b):
+    def func(x, y):
+        return a(x, y), b(x, y)
+
+    return func
