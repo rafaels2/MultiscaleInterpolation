@@ -46,7 +46,7 @@ In order to update the config by a differences `dict`, use the method `update_co
     - $Q^Mf(x):=av_M(\Phi(x),f(\Xi))$
 - `Moving` is a moving least squares that promises polynomial reproduction. It is based on the `PolynomialReproduction` module.
 ### Manifolds
-- `AbstractManifold.py` is the base class for the manifolds. It implements naively some of the required APIs for a manifold.
+- `AbstractManifold.py` is the base class for the manifolds. It implements naively some required APIs for a manifold.
 - `Circle.py` is the $S^1$ single dimensional sphere manifold. 
 	- The suggested average is geodesic.
 	- Exp-Log pair is
