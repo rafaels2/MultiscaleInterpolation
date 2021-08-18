@@ -70,7 +70,6 @@ def parse_arguments():
     base_config["ORIGINAL_FUNCTION"] = options.get_option(
         "original_function", args.function
     )
-    base_config["ERROR_CALC"] = args.error
     base_config["MANIFOLD"] = options.get_option("manifold", args.manifold)()
     base_config["IS_APPROXIMATING_ON_TANGENT"] = args.tangent_approximation
     base_config["NORM_VISUALIZATION"] = args.norm_visualization
@@ -85,7 +84,6 @@ def parse_arguments():
     base_config["EXECUTION_NAME"] = execution_name
     base_config["IS_ADAPTIVE"] = args.adaptive
     base_config["SCALED_INTERPOLATION_METHOD"] = args.method
-    base_config["CALIBRATE"] = args.calibrate
 
     config.set_base_config(base_config)
     config.renew()
