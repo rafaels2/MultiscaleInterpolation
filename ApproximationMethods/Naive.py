@@ -3,6 +3,7 @@ import numpy as np
 from numpy import linalg as la
 
 from ApproximationMethods.ApproximationMethod import ApproximationMethod
+from DataSites.Storage.Grid import Grid
 from Tools.Utils import generate_kernel
 from . import register_approximation_method
 

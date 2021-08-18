@@ -11,13 +11,6 @@ from .ApproximationMethod import ApproximationMethod
 from . import register_approximation_method
 
 
-def combine(a, b):
-    def func(x, y):
-        return a(x, y), b(x, y)
-
-    return func
-
-
 @register_approximation_method("quasi")
 class Quasi(ApproximationMethod):
     def __init__(
