@@ -1,3 +1,6 @@
+"""
+Fit utils to validate theory
+"""
 import time
 
 import numpy as np
@@ -29,6 +32,7 @@ DIR = "fit_results"
 
 
 def parse_results(results):
+    """ Parse results.pkl """
     tags = results["mses"].keys()
     return [
         RunData(

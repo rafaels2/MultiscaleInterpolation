@@ -6,6 +6,7 @@ from Config.Options import options
 
 
 def calculate_max_derivative(original_function, grid_params, manifold):
+    """ Calculate max directional differences in the function on the test grid """
     def derivative(x, y):
         delta = grid_params.fill_distance / 2
         evaluations_around = [
@@ -40,6 +41,7 @@ def calculate_max_derivative(original_function, grid_params, manifold):
 
 
 def evaluate_on_grid(func, grid_size, resolution, scale, points=None, should_log=False):
+    """ Probably deprecated, use the evaluation in {Storage} module """
     if points is not None:
         x, y = points
     else:
@@ -63,6 +65,7 @@ def evaluate_on_grid(func, grid_size, resolution, scale, points=None, should_log
     return z
 
 
+# Defining the parameters for generation and storage of data.
 GridParameters = namedtuple(
     "GridParameters", ["x_min", "x_max", "y_min", "y_max", "fill_distance"]
 )

@@ -1,3 +1,6 @@
+"""
+This method promises polynomial reproduction, using the lambdas (of the reproduction).
+"""
 from ApproximationMethods.Quasi import Quasi
 from . import register_approximation_method
 

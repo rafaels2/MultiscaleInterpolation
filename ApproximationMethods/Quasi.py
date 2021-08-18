@@ -1,8 +1,11 @@
+"""
+This is the main method we discuss.
+Q(f)(x) = sum f(x_i) a(x) / sum a(x).
+"""
 from cachetools import cached
 
 from Config.Config import config
 from Config.Options import options
-from DataSites.Generation.Combination import SamplingPointsCollection
 from Tools.Utils import generate_kernel, generate_cache
 from .ApproximationMethod import ApproximationMethod
 from . import register_approximation_method
@@ -23,6 +26,12 @@ class Quasi(ApproximationMethod):
         grid_parameters,
         scale,
     ):
+        """
+        See the description of this file.
+        :param original_function: f(x,y) -> manifold element
+        :param grid_parameters: (x_min, x_max, y_min, y_max, fill_distance)
+        :param scale: The rbf support radius.
+        """
         super().__init__(
             config.MANIFOLD,
             original_function,

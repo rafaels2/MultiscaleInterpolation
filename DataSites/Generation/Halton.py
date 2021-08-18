@@ -1,3 +1,7 @@
+"""
+Halton sequence generation.
+Partially copied from https://laszukdawid.com/2017/02/04/halton-sequence-in-python/.
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 from pykdtree.kdtree import KDTree
@@ -6,9 +10,6 @@ from . import register_generation
 
 HALTON_SIZE = 400
 HALTON_DIM = 2
-
-# Calculated
-SEPARATION_DISTANCE, DEFAULT_FILL_DISTANCE = (0.017527259373766313, 0.09051018919638595)
 
 
 def next_prime():
@@ -47,6 +48,15 @@ def halton_sequence(size, dim):
 
 @register_generation("halton")
 def get_scaled_halton(x_min, x_max, y_min, y_max, fill_distance):
+    """
+    Get data sites using halton points with the following properties
+    :param x_min:
+    :param x_max:
+    :param y_min:
+    :param y_max:
+    :param fill_distance:
+    :return: two columns of data sites (x,y)
+    """
     # TODO: generalize to n-dim
     seq = halton_sequence(HALTON_SIZE, HALTON_DIM)
     data_points = np.transpose(np.array(seq))
