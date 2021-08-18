@@ -1,10 +1,21 @@
-# Multiscale Aproximation
+# Multiscale Approximation
+## Introduction
+This is an infrastructure for scattered data multiscale approximation.
+This readme describes the code and how to run it. 
+Numerical examples from our paper and how to run them can be found in `NumericalExamples`.
+
+The code is modular, and designed for customization. It is possible to choose and add new methods:
+- Manifold - The range of the approximated function.
+- Approximation method - Currently implemented quasi-interpolation, multiscale approach, naive kernel interpolation,...
+- Data structure - The algorithm of storing and querying the data sites.
+- Data sites generation - The method of choosing the sampling sites.
+
 ## How to run?
 Install Requirements
 ```bash
-pip instasll -r requirements.txt
+pip install -r requirements.txt
 ```
-And run `runner.py`:
+For flexible options, run `runner.py`:
 ```bash
 # Approximate 3 scales both multiscale and single scale
 python runner.py -m rotations -f ExampleFunctions.euler -s -n 3
@@ -12,29 +23,28 @@ python runner.py -m rotations -f ExampleFunctions.euler -s -n 3
 # For help:
 python runner.py -h
 ```
-## Multiscale Approximation
-The base of all this project is the following algorithm:
 
- 1. $f_0(x)=0$
- 2. $e_0(x)=f(x)$
- 3. for $i=0...N$ repeat steps 4-6
- 4. $s_j=Approximate(e_j,\delta^{j})$
- 5. $f_{j+1}=f_j+s_j$
- 6. $e_{j+1}=f-f_{j+1}$
+To run experiments from the paper, run:
+```bash
+python NumericalExamples/{{EXPERIMENT_NAME}}
+```
 
-## Modules 
-- `Interpolation.py` is the main module. It runs the multiscale logic on a specific method.
-	- Implements the multi scale algorithm.
--  `Config.py` configures the run.
-	- `IS_APPROXIMATING_ON_TANGENT` - should use the tnagent averaging algorithm or the intrinsic average?
-	- `NORM_VISUALIZATION` - should visualize naively with $|m|$ or use the more complex visualization?
-	- `SCALING_FACTOR` - the $\delta$ of multi scale
-### Approximation Methods
-- `Quasi.py` now includes an environment averaging using RBF coefficients.
-	- $Q^Mf(x):=av_M(\Phi(x),f(\Xi))$
-- `Naive.py` picks the RBFs' coefficients by solving interpolation constraint.
-	- $I_Xf(x)=\Sigma_{i\in I}{b_i\phi(x, x_i)}$
-	- $I_Xf(x_j)=f(x_j)\space  \forall j\in I$
+## Design
+### Main experiment
+The main multiscale logic is in `Experiment`, in the `multiscale_approximation()`. 
+One can run an experiment from the `runner`, 
+which is flexible, or run the examples from the paper in `NumericalExamples`.
+
+### Config
+The module `Config` contains the `config` object that 
+holds the configurations for the current experiment. 
+`config` is an instance of the `Config` class. It allows to `set_base_config`,
+and `renew` to the base config. It loads its default values from `defaults`. 
+In order to update the config by a differences `dict`, use the method `update_config_with_diff`.
+### Approximation methods
+- `Quasi` performs averaging using RBF coefficients.
+    - $Q^Mf(x):=av_M(\Phi(x),f(\Xi))$
+- `Moving` is a moving least squares that promises polynomial reproduction. It is based on the `PolynomialReproduction` module.
 ### Manifolds
 - `AbstractManifold.py` is the base class for the manifolds. It implements naively some of the required APIs for a manifold.
 - `Circle.py` is the $S^1$ single dimensional sphere manifold. 
@@ -56,9 +66,5 @@ The base of all this project is the following algorithm:
 	- plotting
 	- RBF functions
 	- output directory management  
-- `KarcherMean.py` - calculates weighted Karcher mean based on[^fn1] 
+- `KarcherMean.py` - calculates weighted Karcher mean.
 - `Visualization.py` - Ellipsoid visualization of SPD matrices.
-
-[^fn1]: Iannazzo B., Jeuris B., Pompili F. (2019) The Derivative of the Matrix Geometric Mean with an Application to the Nonnegative Decomposition of Tensor Grids. In: Bini D., Di Benedetto F., Tyrtyshnikov E., Van Barel M. (eds) Structured Matrices in Numerical Linear Algebra. Springer INdAM Series, vol 30. Springer, Cham
-
-> Written with [StackEdit](https://stackedit.io/).
