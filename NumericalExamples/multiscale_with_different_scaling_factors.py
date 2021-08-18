@@ -1,6 +1,7 @@
 import Experiment
 from Config.Config import config
 from Config.Options import options
+from ParamFit import fit_multi_and_single
 from Tools.Utils import set_output_directory
 
 NUMBER_OF_SCALES = 4
@@ -31,7 +32,9 @@ def main():
         diffs.append(diff)
 
     with set_output_directory("results"):
-        Experiment.run_all_experiments(diffs)
+        results = Experiment.run_all_experiments(diffs)
+        results["mus"] = results["mus"][::NUMBER_OF_SCALES]
+        fit_multi_and_single(results)
 
 
 if __name__ == "__main__":

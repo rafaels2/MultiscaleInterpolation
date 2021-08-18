@@ -1,6 +1,7 @@
 import Experiment
 from Config.Config import config
 from Config.Options import options
+from ParamFit import fit_moving_and_quasi
 from Tools.Utils import set_output_directory
 
 NUMBER_OF_SCALES = 5
@@ -37,7 +38,8 @@ def main():
             diffs.append(current_diff.copy())
 
     with set_output_directory("results"):
-        Experiment.run_all_experiments(diffs)
+        results = Experiment.run_all_experiments(diffs)
+        fit_moving_and_quasi(results)
 
 
 if __name__ == "__main__":
