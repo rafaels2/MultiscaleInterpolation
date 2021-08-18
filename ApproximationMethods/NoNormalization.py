@@ -1,3 +1,10 @@
+"""
+This method can be used to test the case where the is no polynomial reproduction.
+The normalization is done in the calibration.
+
+To do so, run the experiment on f(p) = 1, and then calculate c, average value of Q(f).
+Then change the normalizer to be c.
+"""
 from ApproximationMethods.Quasi import Quasi
 from Tools.NormalizationCache import NORMALIZER_FILE, NormalizationCache
 from . import register_approximation_method

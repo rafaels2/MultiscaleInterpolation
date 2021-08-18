@@ -1,3 +1,6 @@
+"""
+This method uses the kd-tree algorithm.
+"""
 import numpy as np
 from pykdtree.kdtree import KDTree
 
@@ -10,6 +13,7 @@ from DataSites.Storage.Storage import DataSitesStorage, Point
 class KDTreeSampler(DataSitesStorage):
     # TODO: add the other tree method from Wendland's book.
     def __init__(self, sites, rbf_radius, function_to_evaluate, *_, phi_generator=None):
+
         # Grid compatability
         if type(sites) is tuple:
             points_in_matrices = [axis.ravel() for axis in sites]

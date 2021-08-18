@@ -11,12 +11,22 @@ from DataSites.Storage.Grid import Grid
 from Tools.Utils import *
 from DataSites.GridUtils import symmetric_grid_params
 
+# Configure plot style
 config_plt(plt)
 
 
-def multiscale_interpolation():
+def multiscale_approximation():
+    """
+    Run multiscale approximation
+    """
+
+    # approximate when initial guess f_0 = 0
     f_j = config.MANIFOLD.zero_func
+
+    # Initial error e_0 = log(0, f_j)
     e_j = act_on_functions(config.MANIFOLD.log, f_j, config.ORIGINAL_FUNCTION)
+
+    # For all scales do
     for scale_index in range(1, config.NUMBER_OF_SCALES + 1):
         scale = config.SCALING_FACTOR ** scale_index
         print("NEW SCALE: {}".format(scale))
@@ -29,15 +39,18 @@ def multiscale_interpolation():
                 act_on_functions(config.MANIFOLD.exp, config.MANIFOLD.zero_func, e_j),
             )
         else:
+            # Approximate exp(0, e_j)
             function_to_interpolate = act_on_functions(
                 config.MANIFOLD.exp, config.MANIFOLD.zero_func, e_j
             )
 
+        # Initializing current scale sites properties
         fill_distance = scale / config.BASE_RESOLUTION
         current_grid_parameters = symmetric_grid_params(
             config.GRID_SIZE + 0.5, fill_distance
         )
 
+        # Call the approximation method
         approximation_method = options.get_option(
             "approximation_method", config.SCALED_INTERPOLATION_METHOD
         )(
@@ -45,6 +58,8 @@ def multiscale_interpolation():
             current_grid_parameters,
             scale,
         )
+
+        # s_j = Q(e_j)
         s_j = approximation_method.approximation
 
         if config.IS_APPROXIMATING_ON_TANGENT or config.IS_ADAPTIVE:
@@ -54,18 +69,27 @@ def multiscale_interpolation():
                 config.MANIFOLD.log, config.MANIFOLD.zero_func, s_j
             )
 
+        # f_j = exp (f_{j-1}, s_j)
         f_j = act_on_functions(config.MANIFOLD.exp, f_j, function_added_to_f_j)
+
+        # Update the error for next step
         e_j = act_on_functions(config.MANIFOLD.log, f_j, config.ORIGINAL_FUNCTION)
         yield fill_distance, f_j
 
 
 def run_single_experiment():
-    grid_params = symmetric_grid_params(config.GRID_SIZE, config.TEST_MESH_NORM)
+    """ Run an experiment with the current config """
+
+    # Initialize test grid
+    grid_params = symmetric_grid_params(config.GRID_SIZE, config.TEST_FILL_DISTANCE)
     sites = get_grid(*grid_params)
+
+    # Evaluate original function on the grid
     true_values_on_grid = Grid(
         sites, 1, config.ORIGINAL_FUNCTION, grid_params.fill_distance
     ).evaluation
 
+    # Plot the original evaluation
     config.MANIFOLD.plot(
         true_values_on_grid,
         "Original",
@@ -73,6 +97,7 @@ def run_single_experiment():
         norm_visualization=config.NORM_VISUALIZATION,
     )
 
+    # Plot max derivatives
     plot_and_save(
         calculate_max_derivative(
             config.ORIGINAL_FUNCTION, grid_params, config.MANIFOLD
@@ -81,16 +106,21 @@ def run_single_experiment():
         "derivatives.png",
     )
 
-    for i, (fill_distance, interpolant) in enumerate(multiscale_interpolation()):
+    # Run multiscale iterations
+    for i, (fill_distance, interpolant) in enumerate(multiscale_approximation()):
+        # Each scale in the multiscale, evaluate and save the error
         with set_output_directory("{}_{}".format(config.NAME, i + 1)):
+            # Save the results of current scale
             with open("config.pkl", "wb") as f:
                 pkl.dump(config, f)
 
+            # Evaluate the approximation on the test grid
             sites = get_grid(*grid_params)
             approximated_values_on_grid = Grid(
                 sites, 1, interpolant, grid_params.fill_distance
             ).evaluation
 
+            # Plot the evaluation
             config.MANIFOLD.plot(
                 approximated_values_on_grid,
                 "Approximation",
@@ -98,11 +128,13 @@ def run_single_experiment():
                 norm_visualization=config.NORM_VISUALIZATION,
             )
 
+            # Calculate and plot the current scale's approximation error.
             error = config.MANIFOLD.calculate_error(
                 approximated_values_on_grid, true_values_on_grid
             )
             plot_and_save(error, "Difference Map", "difference.png")
 
+            # Calculate the l_2 norm of the error
             if config.ERROR_CALC:
                 mse = la.norm(error.ravel(), np.inf)
             else:
@@ -121,19 +153,25 @@ def run_single_experiment():
 
 
 def run_all_experiments(diffs):
+    """ Experiments runner, gets a list of config differences for each iteration """
     mses = dict()
     fill_distances = dict()
     calculation_time = list()
     mus = list()
+
+    # Output of the run is in results/path
     path = "{}_{}".format(config.EXECUTION_NAME, time.strftime("%Y%m%d__%H%M%S"))
 
     with set_output_directory(path):
         for diff in diffs:
+            # Update configurations
             config.renew()
             config.update_config_with_diff(diff)
 
+            # Measure iteration's duration
             t_0 = datetime.now()
 
+            # Run the iteration
             for mse, fill_distance, _ in run_single_experiment():
                 # log results
                 mus.append(config.SCALING_FACTOR)
@@ -148,6 +186,7 @@ def run_all_experiments(diffs):
                 fill_distances[mse_label] = current_mesh_norms
                 t_0 = datetime.now()
 
+        # Plot error rates comparison
         plot_lines(
             fill_distances,
             mses,

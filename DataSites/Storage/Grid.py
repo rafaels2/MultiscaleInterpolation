@@ -1,3 +1,7 @@
+"""
+This structure saves the data assuming it's in a grid.
+The query just assumes that the block of size {rbf_radius} has all closest points.
+"""
 import numpy as np
 
 from DataSites.PolynomialReproduction import PolynomialReproduction

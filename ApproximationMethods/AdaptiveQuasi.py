@@ -1,3 +1,7 @@
+"""
+This method is dedicated for manifold valued functions.
+It performs the averages around the values of the functions instead of the origin.
+"""
 from cachetools import cached
 
 from ApproximationMethods.Quasi import Quasi

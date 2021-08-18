@@ -17,6 +17,14 @@ class DataSitesStorage(object):
     # TODO: do this
 
     def __init__(self, sites, rbf_radius, function_to_evaluate, *args, **kwargs):
+        """
+        Data Structure that gives the points in radius when asked.
+        :param sites: List of sites (columns x,y)
+        :param rbf_radius: For the points_in_radius query
+        :param function_to_evaluate:
+        :param args:
+        :param kwargs:
+        """
         # TODO: remove rbf_radius
         # TODO: change to "functions to evaluate" (and now no need to phi_generator).
         # TODO: maybe function_to_evaluate can be in a setter.

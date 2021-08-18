@@ -1,7 +1,9 @@
+"""
+Deprecated
+"""
 import numpy as np
 from numpy import linalg as la
 
-from DataSites.Generation.Grid import generate_grid
 from DataSites.GridUtils import evaluate_on_grid
 from Tools.Utils import generate_kernel
 
@@ -40,3 +42,14 @@ def naive_scaled_interpolation(
     x, y = generate_grid(grid_size, grid_resolution, scale)
     phi = generate_kernel(rbf, scale)
     return _interpolate(phi, original_function, (x, y))
+
+
+def generate_grid(grid_size, resolution, scale=1, should_ravel=True):
+    print("creating a grid", 2 * resolution / scale)
+    y = np.linspace(-grid_size, grid_size, int(2 * resolution / scale))
+    x = np.linspace(-grid_size, grid_size, int(2 * resolution / scale))
+    x_matrix, y_matrix = np.meshgrid(x, y)
+    if should_ravel:
+        return x_matrix.ravel(), y_matrix.ravel()
+    else:
+        return x_matrix, y_matrix

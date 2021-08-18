@@ -1,3 +1,7 @@
+"""
+Generate coefficients for the quasi-interpolation that promise polynomial reproduction.
+Based on H. Wendland's paper on local polynomial reproduction.
+"""
 import os
 import pickle as pkl
 
@@ -10,6 +14,8 @@ condition_g = list()
 class PolynomialReproduction(object):
     def __init__(self, grid, filename="cache.pkl"):
         self.grid = grid
+
+        # Coefficients for the linear problem. Currently for quadratic reproduction.
         self.polynomial_coefficients = [
             np.array([[1, 0], [0, 0]]),
             np.array([[0, 0], [1, 0]]),
@@ -53,12 +59,13 @@ class PolynomialReproduction(object):
         )
 
         try:
-            # global tries_g
-            # tries_g += 1
+            # Solve the linear problem of polynomial reproduction
             to_inv = np.matmul(
                 np.matmul(np.transpose(polynomials_in_radius), kernel),
                 polynomials_in_radius,
             )
+
+            # This is the condition number of the problem
             cond = la.cond(to_inv)
             print(f"Condition {cond}")
             condition_g.append(cond)
@@ -81,8 +88,9 @@ class PolynomialReproduction(object):
             pkl.dump(self._lambdas, f, protocol=pkl.HIGHEST_PROTOCOL)
 
     def weight_for_grid(self, x_j, y_j):
+        """ Get a(x, y) coefficient for the quasi-interpolation {sum a(p)f(p_i)} """
         def weight(x, y):
-            # TODO: Debug!!! why did i need to transpose??
+            # TODO: Debug! why did i need to transpose?
             return np.inner(
                 np.transpose(self.calculate(x, y)),
                 np.array(

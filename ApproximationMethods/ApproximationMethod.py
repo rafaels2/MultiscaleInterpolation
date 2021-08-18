@@ -1,3 +1,7 @@
+"""
+This is the basic approximation method.
+To implement it one should inherit, and implement the approximation.
+"""
 from abc import abstractmethod
 import numpy as np
 from cachetools import cached
@@ -6,7 +10,6 @@ from Tools.Utils import generate_cache
 
 
 class ApproximationMethod(object):
-    # TODO: get manifold, function, kernel, scale, grid.
     def __init__(self, manifold, original_function, grid_parameters, rbf):
         self._original_function = original_function
         self._grid_parameters = grid_parameters
