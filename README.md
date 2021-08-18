@@ -26,7 +26,7 @@ python runner.py -h
 
 To run experiments from the paper, run:
 ```bash
-python NumericalExamples/{{EXPERIMENT_NAME}}
+python -m NumericalExamples.{{EXPERIMENT_NAME}}
 ```
 
 ## Design
