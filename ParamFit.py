@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 import os
 import pickle as pkl
@@ -7,6 +9,7 @@ from collections import namedtuple
 import argparse
 
 import Tools.Utils
+from Tools.Utils import set_output_directory
 
 Tools.Utils.config_plt(plt)
 
@@ -82,11 +85,13 @@ def plot_comparison(
         plt.xticks(x_orig)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    # plt.title(title)
-    plt.savefig(
-        os.path.join(DIR, f"{title.replace(' ', '_')}.png"), bbox_inches="tight"
-    )
-    plt.show(block=False)
+
+    path = "{}_{}".format(DIR, time.strftime("%Y%m%d__%H%M%S"))
+
+    with set_output_directory(path):
+        plt.savefig(
+            f"{title.replace(' ', '_')}.png", bbox_inches="tight"
+        )
 
 
 def _multi_linear(x, *params):

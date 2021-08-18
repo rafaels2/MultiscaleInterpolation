@@ -163,4 +163,4 @@ def run_all_experiments(diffs):
     print("MSEs are: {}".format(mses))
     print("mesh_norms are: {}".format(fill_distances))
     print("times are: {}".format(calculation_time))
-    return mses
+    return result
