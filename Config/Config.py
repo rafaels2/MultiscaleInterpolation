@@ -30,5 +30,4 @@ class Config(object):
         return str(representation)
 
 
-
 config = Config()

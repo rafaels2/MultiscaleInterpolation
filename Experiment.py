@@ -38,7 +38,9 @@ def multiscale_interpolation():
             config.GRID_SIZE + 0.5, fill_distance
         )
 
-        approximation_method = options.get_option("approximation_method", config.SCALED_INTERPOLATION_METHOD)(
+        approximation_method = options.get_option(
+            "approximation_method", config.SCALED_INTERPOLATION_METHOD
+        )(
             function_to_interpolate,
             current_grid_parameters,
             scale,
@@ -60,7 +62,9 @@ def multiscale_interpolation():
 def run_single_experiment():
     grid_params = symmetric_grid_params(config.GRID_SIZE, config.TEST_MESH_NORM)
     sites = get_grid(*grid_params)
-    true_values_on_grid = Grid(sites, 1, config.ORIGINAL_FUNCTION, grid_params.fill_distance).evaluation
+    true_values_on_grid = Grid(
+        sites, 1, config.ORIGINAL_FUNCTION, grid_params.fill_distance
+    ).evaluation
 
     config.MANIFOLD.plot(
         true_values_on_grid,
@@ -83,7 +87,9 @@ def run_single_experiment():
                 pkl.dump(config, f)
 
             sites = get_grid(*grid_params)
-            approximated_values_on_grid = Grid(sites, 1, interpolant, grid_params.fill_distance).evaluation
+            approximated_values_on_grid = Grid(
+                sites, 1, interpolant, grid_params.fill_distance
+            ).evaluation
 
             config.MANIFOLD.plot(
                 approximated_values_on_grid,
