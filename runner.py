@@ -174,7 +174,9 @@ def run_different_functions(args):
         diffs = diffs + [
             {
                 "NAME": "single_scale_{}_{}".format(function_name, index),
-                "ORIGINAL_FUNCTION": options.get_option("original_fucntion", function_name),
+                "ORIGINAL_FUNCTION": options.get_option(
+                    "original_fucntion", function_name
+                ),
                 "MSE_LABEL": f"Single_Scale_{function_name}",
                 "NUMBER_OF_SCALES": 1,
                 "SCALING_FACTOR": args.scaling_factor ** index,
@@ -190,9 +192,7 @@ def run_different_rbfs(diffs):
     old_diffs = diffs.copy()
     diffs = list()
 
-    wendlands = [
-        "wendland_3_1"
-    ]
+    wendlands = ["wendland_3_1"]
 
     methods = [
         "moving",
@@ -234,7 +234,9 @@ def run_different_rbfs(diffs):
             current_diff["SCALING_FACTOR"] = mu ** current_diff.get(
                 "SCALING_FACTOR_POWER", config.SCALING_FACTOR_POWER
             )
-            current_diff["ORIGINAL_FUNCTION"] = options.get_option("original_function", function)
+            current_diff["ORIGINAL_FUNCTION"] = options.get_option(
+                "original_function", function
+            )
             diffs.append(current_diff)
 
     return diffs
@@ -266,7 +268,9 @@ def run_quasi_comparison(diffs):
             current_diff["SCALING_FACTOR"] = mu ** current_diff.get(
                 "SCALING_FACTOR_POWER", config.SCALING_FACTOR_POWER
             )
-            current_diff["ORIGINAL_FUNCTION"] = options.get_option("original_function", function)
+            current_diff["ORIGINAL_FUNCTION"] = options.get_option(
+                "original_function", function
+            )
             diffs.append(current_diff)
 
     return diffs
@@ -280,10 +284,7 @@ def run_functions_comparison(diffs):
     mu = 0.75
     execution_name = config.EXECUTION_NAME
 
-    functions = [
-        "numbers",
-        "numbers_gauss"
-    ]
+    functions = ["numbers", "numbers_gauss"]
     for function in functions:
         diffs = list()
         config.EXECUTION_NAME = f"{execution_name}_{function}"
@@ -296,7 +297,9 @@ def run_functions_comparison(diffs):
             current_diff["SCALING_FACTOR"] = mu ** current_diff.get(
                 "SCALING_FACTOR_POWER", config.SCALING_FACTOR_POWER
             )
-            current_diff["ORIGINAL_FUNCTION"] = options.get_option("original_function", function)
+            current_diff["ORIGINAL_FUNCTION"] = options.get_option(
+                "original_function", function
+            )
             diffs.append(current_diff)
 
         Experiment.run_all_experiments(diffs)

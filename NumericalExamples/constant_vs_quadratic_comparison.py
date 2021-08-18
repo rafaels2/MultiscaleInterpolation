@@ -12,7 +12,7 @@ def main():
         "ORIGINAL_FUNCTION": options.get_option("original_function", "numbers_sin"),
         "NUMBER_OF_SCALES": 1,
         "SCALING_FACTOR": 0.75,
-        "EXECUTION_NAME": "comparison_of_polynomial_reproduction_degree"
+        "EXECUTION_NAME": "comparison_of_polynomial_reproduction_degree",
     }
 
     config.set_base_config(base_config)

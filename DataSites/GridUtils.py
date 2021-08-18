@@ -28,7 +28,9 @@ def calculate_max_derivative(original_function, grid_params, manifold):
         )
 
     sites = options.get_option("generation_method", "grid")(*grid_params)
-    evaluation = options.get_option("data_storage", "grid")(sites, 1, derivative, grid_params.fill_distance).evaluation
+    evaluation = options.get_option("data_storage", "grid")(
+        sites, 1, derivative, grid_params.fill_distance
+    ).evaluation
 
     result = np.zeros_like(evaluation, dtype=np.float32)
     for index in np.ndindex(result.shape):

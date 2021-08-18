@@ -13,7 +13,7 @@ def main():
         "NUMBER_OF_SCALES": NUMBER_OF_SCALES,
         "SCALING_FACTOR": 0.75,
         "EXECUTION_NAME": "multiscale_with_different_scaling_factors",
-        "SCALED_INTERPOLATION_METHOD": "quasi"
+        "SCALED_INTERPOLATION_METHOD": "quasi",
     }
 
     config.set_base_config(base_config)

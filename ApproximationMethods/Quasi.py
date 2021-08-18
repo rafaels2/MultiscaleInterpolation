@@ -24,7 +24,10 @@ class Quasi(ApproximationMethod):
         scale,
     ):
         super().__init__(
-            config.MANIFOLD, original_function, grid_parameters, options.get_option("rbf", config.RBF)
+            config.MANIFOLD,
+            original_function,
+            grid_parameters,
+            options.get_option("rbf", config.RBF),
         )
         self._is_approximating_on_tangent = config.IS_APPROXIMATING_ON_TANGENT
         self._rbf_radius = scale
