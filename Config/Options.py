@@ -28,6 +28,7 @@ class Options:
 
         def register(option_name):
             """ The gets a decorator by name """
+
             def decorator(obj):
                 """
                 Decorate with this decorator to list the

@@ -93,9 +93,7 @@ def plot_comparison(
     path = "{}_{}".format(DIR, time.strftime("%Y%m%d__%H%M%S"))
 
     with set_output_directory(path):
-        plt.savefig(
-            f"{title.replace(' ', '_')}.png", bbox_inches="tight"
-        )
+        plt.savefig(f"{title.replace(' ', '_')}.png", bbox_inches="tight")
 
 
 def _multi_linear(x, *params):
