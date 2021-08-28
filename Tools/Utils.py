@@ -44,7 +44,10 @@ def plot_lines(x_values, y_values, filename, title, x_label, y_label):
     plt.grid()
     for line_name in y_values.keys():
         if x_values is not None:
-            plt.plot(x_values[line_name], y_values[line_name], label=line_name)
+            if isinstance(x_values, dict):
+                plt.plot(x_values[line_name], y_values[line_name], label=line_name)
+            else:
+                plt.plot(x_values, y_values[line_name], label=line_name)
         else:
             _x_values = [x + 1 for x in range(len(y_values[line_name]))]
             plt.plot(_x_values, y_values[line_name], label=line_name)
