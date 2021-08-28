@@ -7,6 +7,7 @@ from Config.Options import options
 
 def calculate_max_derivative(original_function, grid_params, manifold):
     """ Calculate max directional differences in the function on the test grid """
+
     def derivative(x, y):
         delta = grid_params.fill_distance / 2
         evaluations_around = [

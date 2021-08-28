@@ -2,8 +2,9 @@ from . import defaults
 
 
 class Config(object):
-    """ Configurations based on defaults module.
-        Every object there is an attribute of the config file"""
+    """Configurations based on defaults module.
+    Every object there is an attribute of the config file"""
+
     def __init__(self, base_config=None):
         self._base_config = base_config
         for setting in dir(defaults):

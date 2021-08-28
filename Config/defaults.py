@@ -28,7 +28,7 @@ MSE_LABEL = "Default Run"
 DATA_SITES_GENERATION = "grid"
 
 # Option from DataSites.Storage
-DATA_SITES_STORAGE = "grid"
+DATA_SITES_STORAGE = "kd-tree"
 
 # Option from RBF
 RBF = "wendland_3_1"
@@ -41,6 +41,8 @@ SCALED_INTERPOLATION_METHOD = "quasi"
 
 # Option from OriginalFunction
 ORIGINAL_FUNCTION = "numbers"
+
+BASE_SCALE = 1
 
 """ Not important for now """
 OUTPUT_DIR = "results"
