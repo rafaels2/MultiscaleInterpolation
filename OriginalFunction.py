@@ -28,3 +28,15 @@ def one(*_):
 @register_function("numbers_sin")
 def numbers_sin(x, y):
     return np.sin(2 * (x + 0.5)) * np.cos((3 * (y + 0.5)))
+
+
+@register_function("anomaly_synthetic")
+def anomaly_synthetic(x, y):
+    ans = np.sin(x) + np.cos(y)
+    if 0.2 < x < 0.25 and 0.3 < y < 0.35:
+        ans = ans * 1.01
+
+    return ans
+
+
+
