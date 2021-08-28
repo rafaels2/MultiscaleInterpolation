@@ -8,6 +8,7 @@ from Config.Options import options
 from DataSites.Generation.Grid import get_grid
 from DataSites.GridUtils import calculate_max_derivative
 from DataSites.Storage.Grid import Grid
+from Tools.Results import ResultsStorage
 from Tools.Utils import *
 from DataSites.GridUtils import symmetric_grid_params
 
@@ -28,7 +29,7 @@ def multiscale_approximation():
 
     # For all scales do
     for scale_index in range(1, config.NUMBER_OF_SCALES + 1):
-        scale = config.SCALING_FACTOR ** scale_index
+        scale = config.BASE_SCALE * config.SCALING_FACTOR ** scale_index
         print("NEW SCALE: {}".format(scale))
 
         if config.IS_APPROXIMATING_ON_TANGENT:
@@ -77,6 +78,20 @@ def multiscale_approximation():
         yield fill_distance, f_j
 
 
+def calculate_execution_time(func):
+    def new_func():
+        t_0 = datetime.now()
+        for ans in func():
+            ans = list(ans)
+            t_f = datetime.now()
+            ans.insert(0, (t_f - t_0).total_seconds())
+            yield tuple(ans)
+            t_0 = datetime.now()
+
+    return new_func
+
+
+@calculate_execution_time
 def run_single_experiment():
     """ Run an experiment with the current config """
 
@@ -154,9 +169,9 @@ def run_single_experiment():
 
 def run_all_experiments(diffs):
     """ Experiments runner, gets a list of config differences for each iteration """
-    mses = dict()
-    fill_distances = dict()
-    calculation_time = list()
+    mses = ResultsStorage()
+    fill_distances = ResultsStorage()
+    calculation_times = ResultsStorage()
     mus = list()
 
     # Output of the run is in results/path
@@ -168,38 +183,36 @@ def run_all_experiments(diffs):
             config.renew()
             config.update_config_with_diff(diff)
 
-            # Measure iteration's duration
-            t_0 = datetime.now()
-
             # Run the iteration
-            for mse, fill_distance, _ in run_single_experiment():
+            for calculation_time, mse, fill_distance, _ in run_single_experiment():
                 # log results
-                mus.append(config.SCALING_FACTOR)
-                t_f = datetime.now()
-                calculation_time.append(t_f - t_0)
                 mse_label = config.MSE_LABEL
-                current_mses = mses.get(mse_label, list())
-                current_mesh_norms = fill_distances.get(mse_label, list())
-                current_mses.append(np.log(mse))
-                current_mesh_norms.append(np.log(fill_distance))
-                mses[mse_label] = current_mses
-                fill_distances[mse_label] = current_mesh_norms
-                t_0 = datetime.now()
+                calculation_times.append(calculation_time, mse_label)
+                mses.append(np.log(mse), mse_label)
+                fill_distances.append(np.log(fill_distance), mse_label)
+                mus.append(config.SCALING_FACTOR)
 
         # Plot error rates comparison
         plot_lines(
-            fill_distances,
-            mses,
+            fill_distances.results,
+            mses.results,
             "mses.svg",
             "Errors Comparison",
             "log$(h_X)$",
             "log(Error)",
         )
-        result = {"mses": mses, "mesh_norms": fill_distances, "mus": mus}
+
+        result = {
+            "mses": mses.results,
+            "mesh_norms": fill_distances.results,
+            "mus": mus,
+            "times": calculation_times.results,
+            "path": path,
+        }
         with open("results_dict.pkl", "wb") as f:
             pkl.dump(result, f)
 
     print("MSEs are: {}".format(mses))
     print("mesh_norms are: {}".format(fill_distances))
-    print("times are: {}".format(calculation_time))
+    print("times are: {}".format(calculation_times))
     return result
