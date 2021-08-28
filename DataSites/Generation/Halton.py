@@ -79,7 +79,17 @@ def get_scaled_halton(x_min, x_max, y_min, y_max, fill_distance):
                 scaling_ratio * (data_points + translation) + origin
             )
 
-    return output
+    # filter points
+    old_output = output
+    output = list()
+    for row in old_output:
+        if (
+            x_min < row[0] < x_max
+            and y_min < row[1] < y_max
+        ):
+            output.append(row)
+
+    return np.array(output)
 
 
 def measure_fill_and_separation(tree, seq):

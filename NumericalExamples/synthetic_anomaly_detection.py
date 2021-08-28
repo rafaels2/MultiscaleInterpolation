@@ -1,5 +1,3 @@
-import numpy as np
-
 import Experiment
 from Config.Config import config
 from Config.Options import options

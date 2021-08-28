@@ -4,6 +4,7 @@ List of functions to examine
 # TODO: add option to get an image.
 # TODO: add an option to get any data.
 import numpy as np
+from PIL import ImageOps, Image
 
 from Config.Options import options
 
@@ -39,4 +40,25 @@ def anomaly_synthetic(x, y):
     return ans
 
 
+FILENAME = r"C:\Users\lelu9\PycharmProjects\MultiscalteInterpolation\input_data\1150.PNG"
+FILENAME = r"C:\Users\lelu9\PycharmProjects\MultiscalteInterpolation\input_data\img.png"
+FILENAME = r"C:\Users\lelu9\PycharmProjects\MultiscalteInterpolation\input_data\011.png"
+_IMAGE = ImageOps.grayscale(Image.open(FILENAME).rotate(90))
+IMAGE = np.array(_IMAGE) / 255
 
+
+@register_function("image")
+def image(x, y):
+    if x > 1 or x < -1:
+        import ipdb
+
+        ipdb.set_trace()
+    try:
+        x = int(((x + 0.95) / 2) * IMAGE.shape[0])
+        y = int(((y + 0.95) / 2) * IMAGE.shape[1])
+
+        return IMAGE[x, y]
+    except:
+        import ipdb
+
+        ipdb.set_trace()

@@ -48,7 +48,7 @@ def multiscale_approximation():
         # Initializing current scale sites properties
         fill_distance = scale / config.BASE_RESOLUTION
         current_grid_parameters = symmetric_grid_params(
-            config.GRID_SIZE + 0.5, fill_distance
+            config.GRID_SIZE + config.GRID_BORDER, fill_distance
         )
 
         # Call the approximation method

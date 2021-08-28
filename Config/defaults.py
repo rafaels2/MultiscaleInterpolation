@@ -44,6 +44,8 @@ ORIGINAL_FUNCTION = "numbers"
 
 BASE_SCALE = 1
 
+GRID_BORDER = 0.5
+
 """ Not important for now """
 OUTPUT_DIR = "results"
 NAME = "temp"
