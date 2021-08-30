@@ -34,9 +34,9 @@ def plot_and_save(data, title, filename):
     fig = plt.imshow(data, cmap='gray')
     fig.axes.get_xaxis().set_visible(False)
     fig.axes.get_yaxis().set_visible(False)
-    cb = plt.colorbar()
+    # cb = plt.colorbar()
     plt.savefig(filename)
-    cb.remove()
+    # cb.remove()
 
 
 def plot_lines(x_values, y_values, filename, title, x_label, y_label):

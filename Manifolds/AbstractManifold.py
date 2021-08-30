@@ -40,15 +40,15 @@ class AbstractManifold(object):
         fig = plt.imshow(visualization, cmap='gray')
         fig.axes.get_xaxis().set_visible(False)
         fig.axes.get_yaxis().set_visible(False)
-        cb = plt.colorbar()
-        return cb
+        # cb = plt.colorbar()
+        # return cb
 
     def plot(self, data, title, filename, **kwargs):
         self.fig = plt.figure()
         # plt.title(title)
-        cb = self._visualize(plt, data)
+        self._visualize(plt, data)
         plt.savefig(filename)
-        cb.remove()
+        # cb.remove()
         plt.close(self.fig)
 
     def zero_func(self, x_0, x_1):

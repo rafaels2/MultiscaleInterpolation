@@ -59,7 +59,7 @@ CONFIG = {
     "SCALE": 1,
     "NUMBER_OF_SCALES": 3,
     # "TEST_MESH_NORM": 2 ** -6,
-    "TEST_MESH_NORM": 0.003,
+    "TEST_MESH_NORM": 0.0008,
     "SCALING_FACTOR_POWER": 1,
     "SCALING_FACTOR": _SCALING_FACTOR,
     "NAME": "temp",
