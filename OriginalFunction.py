@@ -34,7 +34,7 @@ def numbers_sin(x, y):
 @register_function("anomaly_synthetic")
 def anomaly_synthetic(x, y):
     ans = np.sin(x) + np.cos(y)
-    if 0.2 < x < 0.25 and 0.3 < y < 0.35:
+    if 0.1 < x < 0.25 and 0.2 < y < 0.4:
         ans = ans * 1.01
 
     return ans

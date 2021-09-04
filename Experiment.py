@@ -30,7 +30,6 @@ def multiscale_approximation():
     # For all scales do
     for scale_index in range(1, config.NUMBER_OF_SCALES + 1):
         scale = config.BASE_SCALE * config.SCALING_FACTOR ** scale_index
-        print("NEW SCALE: {}".format(scale))
 
         if config.IS_APPROXIMATING_ON_TANGENT:
             function_to_interpolate = e_j

@@ -31,6 +31,7 @@ class KDTreeSampler(DataSitesStorage):
 
         if phi_generator is not None:
             self._phi = self._evaluate_on_grid(phi_generator)
+            self._phi_generator = phi_generator
 
     def points_in_radius(self, x, y):
         p = np.array([[x, y]])
@@ -53,7 +54,6 @@ class KDTreeSampler(DataSitesStorage):
                 self._lambdas[index],
             )
             last_index += 1
-        print(last_index)
 
     def _evaluate_on_grid(self, function_to_evaluate):
         evaluation = np.zeros(self._seq.shape[0], dtype=object)
