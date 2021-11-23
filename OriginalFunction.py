@@ -5,6 +5,7 @@ List of functions to examine
 # TODO: add an option to get any data.
 import numpy as np
 from PIL import ImageOps, Image
+from scipy.spatial.transform import Rotation
 
 from Config.Options import options
 
@@ -62,3 +63,29 @@ def image(x, y):
         import ipdb
 
         ipdb.set_trace()
+
+
+@register_function("rotations_euler_gauss")
+def rotations_euler_gauss(x, y):
+    return Rotation.from_euler(
+        "xyz",
+        [
+            0.5 * (1 - np.exp(-(x ** 2))),
+            0.5 * (1 - np.exp(-(y ** 2))),
+            0.2 * np.cos(2 * x * y),
+            ],
+    ).as_matrix()
+
+
+@register_function("rotations_euler")
+def rotations_euler(x, y):
+    return Rotation.from_euler("xyz", [1.2 * np.sin(5 * x - 0.1), y**2 / 2 - np.sin(3 * x), 1.5 * np.cos(2 * x)]).as_matrix()
+
+
+@register_function("spd")
+def spd(x, y):
+    # TODO: add check if function returns a valid manifold point.
+    z = (0.3 * np.abs(np.cos(2 * y)) + 0.6) * np.exp(-(x ** 2) - y ** 2) * (
+            5 * np.eye(3) + np.array([[np.sin(5 * y), y, x * y], [0, 0, y ** 2], [0, 0, 0]])
+    ) + 0.3 * np.eye(3)
+    return z + np.transpose(z)

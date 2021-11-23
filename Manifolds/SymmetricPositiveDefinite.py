@@ -5,7 +5,7 @@ from scipy.linalg import expm, logm, sqrtm
 from sklearn.datasets import make_spd_matrix
 
 from Tools.KarcherMean import KarcherMean
-from Tools.Visualization import ElipsoidVisualizer
+from Tools.Visualization import EllipsoidVisualizer
 
 from .AbstractManifold import AbstractManifold
 from . import register_manifold
@@ -77,7 +77,7 @@ class SymmetricPositiveDefinite(AbstractManifold):
         for index in np.ndindex(data.shape):
             centers[index] = np.array([index[0], index[1], 0])
         print("start to visualize")
-        ElipsoidVisualizer(data, centers).save(filename, title)
+        EllipsoidVisualizer(data, centers).save(filename, title)
 
 
 def main():

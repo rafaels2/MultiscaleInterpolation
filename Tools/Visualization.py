@@ -20,17 +20,30 @@ if __name__ == "__main__":
 
 
 VISUALIZATION_CONST = 10
+MAX_AXIS_LEN = 15
 
 
 class Visualizer(object):
-    def __init__(self, matrices, centers):
+    def __init__(self, matrices, centers, dims=3):
         self.fig = plt.figure(figsize=(12, 12))
-        self.ax = self.fig.add_subplot(projection="3d")
-        self.ax.view_init(azim=0, elev=90)
-        self._matrices = matrices
-        self._centers = centers
+        if dims == 3:
+            self.ax = self.fig.add_subplot(projection="3d")
+            self.ax.view_init(azim=0, elev=90)
+        else:
+            self.ax = self.fig.add_subplot()
+        indices = self._get_indices(matrices.shape)
+        self._matrices = matrices[indices]
+        self._centers = centers[indices]
 
-    @abstractmethod
+    @staticmethod
+    def _get_indices(shape):
+        new_shape = tuple(min(axis_len, MAX_AXIS_LEN) for axis_len in shape)
+        indices = tuple(np.meshgrid(*(
+            [int(old_len / new_len) * index for index in range(new_len)] for new_len, old_len in zip(new_shape, shape)
+        )))
+
+        return indices
+
     def _process_matrix(self, index):
         pass
 
@@ -61,7 +74,7 @@ class Visualizer(object):
         plt.show()
 
 
-class ElipsoidVisualizer(Visualizer):
+class EllipsoidVisualizer(Visualizer):
     def __init__(self, matrices, centers):
         super().__init__(matrices, centers)
 
@@ -92,7 +105,7 @@ class ElipsoidVisualizer(Visualizer):
         if not ((index[0] % 2 == 0) and (index[1] % 2 == 0)):
             return
         center = self._centers[index]
-        radii = self._singular_values[index]
+        radii = 2.4 * self._singular_values[index]
         rotation = self._rotations[index]
 
         # calculate cartesian coordinates for the ellipsoid surface
@@ -125,33 +138,27 @@ class RotationVisualizer(Visualizer):
     """docstring for RotationVisualizer"""
 
     def __init__(self, matrices, centers):
-        super().__init__(matrices, centers)
-        min_lim, max_lim = self._get_lims()
-        plt.setp(
-            self.ax,
-            xlim=(min_lim, max_lim),
-            ylim=(min_lim, max_lim),
-            zlim=(min_lim, max_lim),
-        )
+        super().__init__(matrices, centers, dims=2)
 
-    def _get_lims(self):
-        if self._centers.dtype.kind == "f":
-            centers = self._centers
-        else:
-            shape = list(self._centers.shape)
-            shape.append(3)
-            centers = np.zeros(shape)
-            if self._centers.dtype != np.float:
-                for index in np.ndindex(centers.shape):
-                    centers[index] = self._centers[index[:-1]][index[-1]]
-
-        return 2 * centers.min() - 1, 2 * centers.max() + 1
-
-    def _process_matrix(self, index):
-        if (index[0] % 2 == 0) and (index[1] % 2 == 0):
-            center = 2 * self._centers[index]
-            matrix = self._matrices[index]
-            plot_basis(ax=self.ax, R=matrix, p=center, s=1.2)
+    def save(self, filename, title):
+        d_0 = np.array([1, 0, 0])
+        shape = list(self._matrices.shape)
+        quiver_shape = 5
+        shape.append(quiver_shape)
+        parameters = np.zeros(shape)
+        for index in np.ndindex(self._matrices.shape):
+            parameters[index][:2] = self._centers[index][:2]
+            parameters[index][2:] = np.matmul(self._matrices[index], d_0)
+        # TODO: this line assumes shape of parameters (can't work with halton)
+        self.ax.quiver(*(parameters[:, :, i] for i in range(quiver_shape)))
+        # Hide axes ticks
+        self.ax.set_xticks([])
+        self.ax.set_yticks([])
+        # Add a color bar which maps values to colors.
+        plt.colorbar()
+        # plt.title(title)
+        plt.savefig(filename)
+        plt.close(self.fig)
 
 
 def ellipsoids_main():
@@ -163,7 +170,7 @@ def ellipsoids_main():
         matrices[index] = spd.gen_point()
         centers[index] = np.array([index[0], index[1], 0])
     print("start to visualize")
-    ElipsoidVisualizer(matrices, centers).save("vis.png", "ellipsoids")
+    EllipsoidVisualizer(matrices, centers).save("vis.png", "ellipsoids")
 
 
 def rotations_main():
