@@ -155,7 +155,7 @@ class RotationVisualizer(Visualizer):
         self.ax.set_xticks([])
         self.ax.set_yticks([])
         # Add a color bar which maps values to colors.
-        plt.colorbar()
+        # plt.colorbar()
         # plt.title(title)
         plt.savefig(filename)
         plt.close(self.fig)
