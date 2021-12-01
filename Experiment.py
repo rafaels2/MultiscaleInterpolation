@@ -211,6 +211,8 @@ def run_all_experiments(diffs):
         with open("results_dict.pkl", "wb") as f:
             pkl.dump(result, f)
 
+        plot_lines(fill_distances.results, calculation_times.results, "time_comparison.png", "Time Comparison", "$log(h_X)$", "time")
+
     print("MSEs are: {}".format(mses))
     print("mesh_norms are: {}".format(fill_distances))
     print("times are: {}".format(calculation_times))
