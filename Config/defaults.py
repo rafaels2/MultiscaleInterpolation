@@ -42,8 +42,11 @@ SCALED_INTERPOLATION_METHOD = "quasi"
 # Option from OriginalFunction
 ORIGINAL_FUNCTION = "numbers"
 
+ERROR_CALC = True
+
 BASE_SCALE = 1
 
+# The sampling addition to the test grid: [-GRID_SIZE - GRID_BORDER, GRID_SIZE + GRID_BORDER]
 GRID_BORDER = 0.5
 
 """ Not important for now """
