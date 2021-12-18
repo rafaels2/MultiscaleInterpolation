@@ -73,12 +73,13 @@ class Quasi(ApproximationMethod):
 
         return [w_i / normalizer for w_i in weights]
 
-    @cached(cache=generate_cache(maxsize=1000))
+    @cached(cache=generate_cache(maxsize=10000))
     def approximation(self, x, y):
         # TODO: point should be an array - not x, y. so we can generalize dimensions
         """ Average sampled points around (x, y), using phis as weights """
         values_to_average, weights = self._get_values_to_average(x, y)
         weights = self._normalize_weights(weights)
+        # print(len(weights))
 
         if self._is_approximating_on_tangent:
             return sum(w_i * x_i for w_i, x_i in zip(weights, values_to_average))

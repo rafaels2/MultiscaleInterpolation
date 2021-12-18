@@ -10,6 +10,7 @@ from scipy.spatial.transform import Rotation
 from Config.Options import options
 
 register_function = options.get_type_register("original_function")
+FUNCTIONS = dict()
 
 
 @register_function("numbers")
@@ -39,35 +40,6 @@ def anomaly_synthetic(x, y):
         ans = ans * 1.01
 
     return ans
-
-
-FILENAME = (
-    r"C:\Users\lelu9\PycharmProjects\MultiscalteInterpolation\input_data\1150.PNG"
-)
-FILENAME = r"C:\Users\lelu9\PycharmProjects\MultiscalteInterpolation\input_data\img.png"
-FILENAME = r"C:\Users\lelu9\PycharmProjects\MultiscalteInterpolation\input_data\011.png"
-_IMAGE = ImageOps.grayscale(Image.open(FILENAME).rotate(90))
-IMAGE = np.array(_IMAGE) / 255
-
-
-@register_function("image")
-def image(x, y):
-    if x > 1 or x < -1:
-        import ipdb
-
-        ipdb.set_trace()
-    try:
-        x = int(((x + 0.95) / 2) * IMAGE.shape[0])
-        y = int(((y + 0.95) / 2) * IMAGE.shape[1])
-
-        return IMAGE[x, y]
-    except:
-        import ipdb
-
-        ipdb.set_trace()
-
-
-FUNCTIONS = dict()
 
 
 def generate_image_function(name, filename):
