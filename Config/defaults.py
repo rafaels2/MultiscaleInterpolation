@@ -46,6 +46,8 @@ ERROR_CALC = True
 
 BASE_SCALE = 1
 
+cmap = "viridis"
+
 # The sampling addition to the test grid: [-GRID_SIZE - GRID_BORDER, GRID_SIZE + GRID_BORDER]
 GRID_BORDER = 0.5
 

@@ -23,7 +23,7 @@ def build_diffs(number_of_scales):
         "EXECUTION_NAME": "multi_scale_with_same_end_scale",
         "SCALED_INTERPOLATION_METHOD": "quasi",
         "NUMBER_OF_SCALES": number_of_scales,
-        "TEST_FILL_DISTANCE": 0.015
+        "TEST_FILL_DISTANCE": 0.015,
     }
 
     config.set_base_config(base_config)
@@ -71,7 +71,9 @@ def main():
             plt.plot(SCALING_FACTORS, [sum(v) for v in results["times"].values()])
             plt.savefig("times.png")
 
-        for error, calculation_time in zip(results["mses"].values(), results["times"].values()):
+        for error, calculation_time in zip(
+            results["mses"].values(), results["times"].values()
+        ):
             error_rates.append(error[-1], label_name)
             times.append(sum(calculation_time), label_name)
 

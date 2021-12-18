@@ -5,6 +5,8 @@ from abc import abstractmethod
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 
+from Config.Config import config
+
 ALLOWED_AVERAGING_ERROR = 10 ** -3
 SYMMETRIC_ERROR = 10 ** -5
 
@@ -37,7 +39,7 @@ class AbstractManifold(object):
         for index in np.ndindex(visualization.shape):
             x = data[index]
             visualization[index] = self._to_numbers(x)
-        fig = plt.imshow(visualization)
+        fig = plt.imshow(visualization, cmap=config.cmap)
         fig.axes.get_xaxis().set_visible(False)
         fig.axes.get_yaxis().set_visible(False)
         cb = plt.colorbar()

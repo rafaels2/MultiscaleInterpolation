@@ -7,7 +7,9 @@ from Tools.Utils import set_output_directory
 def main():
     base_config = {
         "NUMBER_OF_SCALES": 1,
-        "ORIGINAL_FUNCTION": options.get_option("original_function", "anomaly_synthetic"),
+        "ORIGINAL_FUNCTION": options.get_option(
+            "original_function", "anomaly_synthetic"
+        ),
         "EXECUTION_NAME": f"anomaly_detection",
         "DATA_SITES_GENERATION": "halton",
         "SCALING_FACTOR": config.SCALING_FACTOR ** 5,

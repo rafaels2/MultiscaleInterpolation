@@ -38,9 +38,14 @@ class Visualizer(object):
     @staticmethod
     def _get_indices(shape):
         new_shape = tuple(min(axis_len, MAX_AXIS_LEN) for axis_len in shape)
-        indices = tuple(np.meshgrid(*(
-            [int(old_len / new_len) * index for index in range(new_len)] for new_len, old_len in zip(new_shape, shape)
-        )))
+        indices = tuple(
+            np.meshgrid(
+                *(
+                    [int(old_len / new_len) * index for index in range(new_len)]
+                    for new_len, old_len in zip(new_shape, shape)
+                )
+            )
+        )
 
         return indices
 

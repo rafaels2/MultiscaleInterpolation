@@ -126,7 +126,8 @@ def run_single_experiment():
         with set_output_directory("{}_{}".format(config.NAME, i + 1)):
             # Save the results of current scale
             with open("config.pkl", "wb") as f:
-                pkl.dump(config, f)
+                # pkl.dump(config, f)
+                pass
 
             # Evaluate the approximation on the test grid
             sites = get_grid(*grid_params)
@@ -211,7 +212,14 @@ def run_all_experiments(diffs):
         with open("results_dict.pkl", "wb") as f:
             pkl.dump(result, f)
 
-        plot_lines(fill_distances.results, calculation_times.results, "time_comparison.png", "Time Comparison", "$log(h_X)$", "time")
+        plot_lines(
+            fill_distances.results,
+            calculation_times.results,
+            "time_comparison.png",
+            "Time Comparison",
+            "$log(h_X)$",
+            "time",
+        )
 
     print("MSEs are: {}".format(mses))
     print("mesh_norms are: {}".format(fill_distances))
