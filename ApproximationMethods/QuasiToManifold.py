@@ -26,9 +26,17 @@ class QuasiToManifold(ApproximationMethod):
                 ),
             )
 
+<<<<<<< HEAD
         self._secondary_method = options.get_option(
             "approximation_method", config.SECONDARY_SCALED_INTERPOLATION_METHOD
         )(
+=======
+        original_function = self._secondary_manifold.exponent()
+        self._secondary_method = options.get_option(
+            "approximation_method", config.SECONDARY_SCALED_INTERPOLATION_METHOD
+        )(
+            self,
+>>>>>>> Added QuasiToManifold.py, still work to do.
             new_original_function,
             grid_parameters,
             scale,

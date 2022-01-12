@@ -144,30 +144,15 @@ class RigidRotations(AbstractManifold):
         print("start to visualize")
         RotationVisualizer(data, centers).save(filename, title)
 
-    def from_euclid_to_tangent(self, euclid):
-        return np.einsum("i, ijk -> jk", euclid, self._tangent_basis)
-
-    @staticmethod
-    def from_tangent_to_euclid(tangent):
-        return np.array([tangent[0, 1], tangent[0, 2], tangent[1, 2]])
-
 
 def main():
     m = RigidRotations()
 
-    e = np.eye(3)
     a = m.gen_point()
     b = m.gen_point()
     c = m.gen_point()
-    A = 0.2 * m.log(e, a) / m.distance(e, a)
-    B = 0.2 * m.log(e, b) / m.distance(e, c)
-    C = 0.2 * m.log(e, c) / m.distance(e, c)
-    a = m.exp(e, A)
-    b = m.exp(e, B)
-    c = m.exp(e, C)
+
     d = m.average([a, b, c], [1, 1, 1])
-    d_tag = m.exp(e, (A+B+C)/3)
-    print("D - D tag: ", m.distance(d, d_tag))
     e = m.log(a, b)
     f = m.exp(a, e)
     print("dist", m.distance(f, b))
