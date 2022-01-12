@@ -35,9 +35,11 @@ RBF = "wendland_3_1"
 
 # Option from Manifolds
 MANIFOLD = "numbers"
+SECONDARY_MANIFOLD = "rotations"
 
 # Option from ApproximationMethods
 SCALED_INTERPOLATION_METHOD = "quasi"
+SECONDARY_SCALED_INTERPOLATION_METHOD = "quasi"
 
 # Option from OriginalFunction
 ORIGINAL_FUNCTION = "numbers"
