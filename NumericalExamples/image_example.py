@@ -12,7 +12,7 @@ import os
 def main():
     print(os.getcwd())
     generate_image_function("iguana", join("..", "images", "iguana.jpg"))
-    plt.set_cmap('gray')
+    plt.set_cmap("gray")
     base_config = {
         "NUMBER_OF_SCALES": 5,
         "ORIGINAL_FUNCTION": options.get_option("original_function", "iguana"),

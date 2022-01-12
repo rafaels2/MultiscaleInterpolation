@@ -64,6 +64,7 @@ def generate_image_function(name, filename):
     FUNCTIONS[name] = image
     register_function(name)(FUNCTIONS[name])
 
+
 @register_function("rotations_euler_gauss")
 def rotations_euler_gauss(x, y):
     return Rotation.from_euler(

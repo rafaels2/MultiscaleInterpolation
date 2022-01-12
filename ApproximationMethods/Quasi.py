@@ -18,6 +18,7 @@ class Quasi(ApproximationMethod):
         original_function,
         grid_parameters,
         scale,
+        manifold=None,
     ):
         """
         See the description of this file.
@@ -25,8 +26,11 @@ class Quasi(ApproximationMethod):
         :param grid_parameters: (x_min, x_max, y_min, y_max, fill_distance)
         :param scale: The rbf support radius.
         """
+        if manifold is None:
+            manifold = config.MANIFOLD
+
         super().__init__(
-            config.MANIFOLD,
+            manifold,
             original_function,
             grid_parameters,
             options.get_option("rbf", config.RBF),
