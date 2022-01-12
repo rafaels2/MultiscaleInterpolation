@@ -132,6 +132,9 @@ def main():
     a = m.gen_point()
     b = m.gen_point()
     c = m.gen_point()
+    d = m.gen_point()
+
+    print(f"A-(B+(D-C)): {m.log(m.exp(b, m.log(c, d)), a)}")
 
     d = m.average([a, b, c], [1, 1, 1])
     e = m.log(a, b)

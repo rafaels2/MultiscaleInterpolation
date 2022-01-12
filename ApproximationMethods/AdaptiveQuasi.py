@@ -11,13 +11,15 @@ from . import register_approximation_method
 
 @register_approximation_method("adaptive_quasi")
 class AdaptiveQuasi(Quasi):
-    def __init__(self, original_function, grid_parameters, scale):
+    def __init__(self, original_function, grid_parameters, scale, **kwargs):
         if isinstance(original_function, tuple):
             original_function = combine(*original_function)
             self._is_adaptive = True
         else:
             self._is_adaptive = False
-        super(AdaptiveQuasi, self).__init__(original_function, grid_parameters, scale)
+        super(AdaptiveQuasi, self).__init__(
+            original_function, grid_parameters, scale, **kwargs
+        )
 
     def _get_values_to_average(self, x, y):
         values_to_average = list()
