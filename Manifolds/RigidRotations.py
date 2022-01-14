@@ -144,6 +144,9 @@ class RigidRotations(AbstractManifold):
         print("start to visualize")
         RotationVisualizer(data, centers).save(filename, title)
 
+    def from_euclid_to_tangent(self, euclid):
+        return np.einsum("i, ijk -> jk", euclid, self._tangent_basis)
+
 
 def main():
     m = RigidRotations()
@@ -151,6 +154,9 @@ def main():
     a = m.gen_point()
     b = m.gen_point()
     c = m.gen_point()
+    d = m.gen_point()
+
+    print(f"A-(B+(D-C)): {m.log(m.exp(b, m.log(c, d)), a)}")
 
     d = m.average([a, b, c], [1, 1, 1])
     e = m.log(a, b)

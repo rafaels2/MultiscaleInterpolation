@@ -26,28 +26,20 @@ class QuasiToManifold(ApproximationMethod):
                 ),
             )
 
-<<<<<<< HEAD
-        self._secondary_method = options.get_option(
-            "approximation_method", config.SECONDARY_SCALED_INTERPOLATION_METHOD
-        )(
-=======
         original_function = self._secondary_manifold.exponent()
         self._secondary_method = options.get_option(
             "approximation_method", config.SECONDARY_SCALED_INTERPOLATION_METHOD
         )(
             self,
->>>>>>> Added QuasiToManifold.py, still work to do.
             new_original_function,
             grid_parameters,
             scale,
             manifold=config.SECONDARY_MANIFOLD,
         )
 
-    @cached(cache=generate_cache(maxsize=1000))
+    @cached(cache=generate_cache(maxsize=10000))
     def approximation(self, x, y):
         approximation = self._secondary_method.approximation(x, y)
-        return self._secondary_manifold.from_tangent_to_euclid(
-            self._secondary_manifold.log(
-                self._secondary_manifold.zero_func(x, y), approximation
-            )
+        return self._secondary_manifold.log(
+            self._secondary_manifold.zero_func(x, y), approximation
         )
