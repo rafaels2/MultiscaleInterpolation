@@ -24,9 +24,10 @@ def main():
     config.renew()
 
     methods = {
-        # "Quasi-interpolation with quadratic reproduction": Combination("moving", None),
-        # "Quasi-interpolation with constant reproduction": Combination("quasi", None),
-        "Manifold projection with quadratic reproduction": Combination("projection", "quasi")
+        "Quasi-interpolation with quadratic reproduction": Combination("moving", None),
+        "Quasi-interpolation with constant reproduction": Combination("quasi", None),
+        "Manifold projection with constant reproduction": Combination("projection", "quasi"),
+        "Manifold projection with quadratic reproduction": Combination("projection", "moving")
     }
 
     diffs = list()
