@@ -22,6 +22,23 @@ class RigidRotations(AbstractManifold):
         super().__init__()
         self.dim = dim
 
+        # TODO: this is specific for n=3
+        self._tangent_basis = np.array([
+            np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 0]]),
+            np.array([[0, 0, 1], [0, 0, 0], [-1, 0, 0]]),
+            np.array(
+                [
+                    [
+                        0,
+                        0,
+                        0,
+                    ],
+                    [0, 0, 1],
+                    [0, -1, 0],
+                ]
+            ),
+        ])
+
     def zero_func(self, x_0, x_1):
         return np.eye(self.dim)
 
@@ -124,6 +141,9 @@ class RigidRotations(AbstractManifold):
             centers[index] = np.array([index[0], index[1], 0])
         print("start to visualize")
         RotationVisualizer(data, centers).save(filename, title)
+
+    def from_euclid_to_tangent(self, euclid):
+        return np.einsum("i, ijk -> jk", euclid, self._tangent_basis)
 
 
 def main():

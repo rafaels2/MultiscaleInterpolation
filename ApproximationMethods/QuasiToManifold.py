@@ -7,7 +7,7 @@ from . import register_approximation_method
 from .ApproximationMethod import ApproximationMethod
 
 
-@register_approximation_method("quasi_to_manifold")
+@register_approximation_method("projection")
 class QuasiToManifold(ApproximationMethod):
     def __init__(
         self,
@@ -17,26 +17,25 @@ class QuasiToManifold(ApproximationMethod):
     ):
         self._secondary_manifold = config.SECONDARY_MANIFOLD
 
+        @cached(cache=generate_cache(maxsize=1000))
         def new_original_function(*args):
-            return self._secondary_manifold.exponent(
+            return self._secondary_manifold.exp(
                 self._secondary_manifold.zero_func(*args),
                 self._secondary_manifold.from_euclid_to_tangent(
                     original_function(*args)
                 ),
             )
 
-        original_function = self._secondary_manifold.exponent()
         self._secondary_method = options.get_option(
             "approximation_method", config.SECONDARY_SCALED_INTERPOLATION_METHOD
         )(
-            self,
             new_original_function,
             grid_parameters,
             scale,
             manifold=config.SECONDARY_MANIFOLD,
         )
 
-    @cached(cache=generate_cache(maxsize=10000))
+    @cached(cache=generate_cache(maxsize=1000))
     def approximation(self, x, y):
         approximation = self._secondary_method.approximation(x, y)
         return self._secondary_manifold.log(

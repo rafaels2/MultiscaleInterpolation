@@ -37,6 +37,8 @@ RBF = "wendland_3_1"
 MANIFOLD = "numbers"
 SECONDARY_MANIFOLD = "rotations"
 
+EUCLIDEAN_DIMENSION = 3
+
 # Option from ApproximationMethods
 SCALED_INTERPOLATION_METHOD = "quasi"
 SECONDARY_SCALED_INTERPOLATION_METHOD = "quasi"

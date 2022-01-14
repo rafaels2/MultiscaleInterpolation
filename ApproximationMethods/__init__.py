@@ -8,3 +8,4 @@ from . import MovingLeastSquares
 from . import Naive
 from . import NoNormalization
 from . import Quasi
+from . import QuasiToManifold

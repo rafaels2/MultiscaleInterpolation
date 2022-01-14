@@ -6,3 +6,4 @@ from . import Circle
 from . import RealNumbers
 from . import RigidRotations
 from . import SymmetricPositiveDefinite
+from . import Euclidean

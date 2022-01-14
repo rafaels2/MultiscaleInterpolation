@@ -92,3 +92,10 @@ def spd(x, y):
         5 * np.eye(3) + np.array([[np.sin(5 * y), y, x * y], [0, 0, y ** 2], [0, 0, 0]])
     ) + 0.3 * np.eye(3)
     return z + np.transpose(z)
+
+
+@register_function("euclidean")
+def euclidean(x, y):
+    return 0.2 * np.array(
+        [np.sin(3 * x), np.cos(4.5 * y), np.exp(-4 * (x ** 2 + y ** 2))]
+    )
