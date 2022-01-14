@@ -147,6 +147,10 @@ class RigidRotations(AbstractManifold):
     def from_euclid_to_tangent(self, euclid):
         return np.einsum("i, ijk -> jk", euclid, self._tangent_basis)
 
+    @staticmethod
+    def from_tangent_to_euclid(tangent):
+        return np.array([tangent[0, 1], tangent[0, 2], tangent[1, 2]])
+
 
 def main():
     m = RigidRotations()
