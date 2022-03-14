@@ -26,7 +26,8 @@ def main():
         "BASE_RESOLUTION": 2,
         "TEST_FILL_DISTANCE": 0.008,
         "SCALING_FACTOR": 0.6,
-        "cmap": "gray",
+        "CMAP": "gray",
+        "CB": False,
     }
 
     config.set_base_config(base_config)
