@@ -62,7 +62,7 @@ class Visualizer(object):
         # Add a color bar which maps values to colors.
         # plt.colorbar()
         # plt.title(title)
-        plt.savefig(filename)
+        plt.savefig(filename, bbox_inches="tight")
         plt.close(self.fig)
 
     def show(self):
@@ -162,7 +162,7 @@ class RotationVisualizer(Visualizer):
         # Add a color bar which maps values to colors.
         # plt.colorbar()
         # plt.title(title)
-        plt.savefig(filename)
+        plt.savefig(filename, bbox_inches="tight")
         plt.close(self.fig)
 
 
