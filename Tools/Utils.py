@@ -7,6 +7,8 @@ from matplotlib import pyplot as plt
 
 from numpy import linalg as la
 
+from Config.Config import config
+
 num_of_caches_g = 0
 
 
@@ -26,14 +28,17 @@ def act_on_functions(action, a, b):
 
 
 def plot_and_save(data, title, filename):
+    print(f"Saving {filename}")
     plt.figure()
     # plt.title(title)
     fig = plt.imshow(data)
     fig.axes.get_xaxis().set_visible(False)
     fig.axes.get_yaxis().set_visible(False)
-    cb = plt.colorbar()
-    plt.savefig(filename)
-    cb.remove()
+    if config.CB:
+        cb = plt.colorbar()
+    plt.savefig(filename, bbox_inches='tight')
+    if config.CB:
+        cb.remove()
 
 
 def plot_lines(x_values, y_values, filename, title, x_label, y_label):

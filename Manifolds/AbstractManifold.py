@@ -39,18 +39,20 @@ class AbstractManifold(object):
         for index in np.ndindex(visualization.shape):
             x = data[index]
             visualization[index] = self._to_numbers(x)
-        fig = plt.imshow(visualization, cmap=config.cmap)
+        fig = plt.imshow(visualization, cmap=config.CMAP)
         fig.axes.get_xaxis().set_visible(False)
         fig.axes.get_yaxis().set_visible(False)
-        cb = plt.colorbar()
-        return cb
+        if config.CB:
+            cb = plt.colorbar()
+            return cb
 
     def plot(self, data, title, filename, **kwargs):
         self.fig = plt.figure()
         # plt.title(title)
         cb = self._visualize(plt, data)
-        plt.savefig(filename)
-        cb.remove()
+        plt.savefig(filename, bbox_inches="tight")
+        if cb is not None:
+            cb.remove()
         plt.close(self.fig)
 
     def zero_func(self, x_0, x_1):

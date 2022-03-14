@@ -17,7 +17,7 @@ def main():
         "NUMBER_OF_SCALES": 1,
         "SCALING_FACTOR": 0.75,
         "EXECUTION_NAME": "comparison_between_quasi_and_manifold_projection",
-        "TEST_FILL_DISTANCE": 0.08
+        "TEST_FILL_DISTANCE": 0.08,
     }
 
     config.set_base_config(base_config)
@@ -26,8 +26,12 @@ def main():
     methods = {
         "Quasi-interpolation with quadratic reproduction": Combination("moving", None),
         "Quasi-interpolation with constant reproduction": Combination("quasi", None),
-        "Manifold projection with constant reproduction": Combination("projection", "quasi"),
-        "Manifold projection with quadratic reproduction": Combination("projection", "moving")
+        "Manifold projection with constant reproduction": Combination(
+            "projection", "quasi"
+        ),
+        "Manifold projection with quadratic reproduction": Combination(
+            "projection", "moving"
+        ),
     }
 
     diffs = list()

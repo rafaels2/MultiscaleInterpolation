@@ -23,21 +23,23 @@ class RigidRotations(AbstractManifold):
         self.dim = dim
 
         # TODO: this is specific for n=3
-        self._tangent_basis = np.array([
-            np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 0]]),
-            np.array([[0, 0, 1], [0, 0, 0], [-1, 0, 0]]),
-            np.array(
-                [
+        self._tangent_basis = np.array(
+            [
+                np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 0]]),
+                np.array([[0, 0, 1], [0, 0, 0], [-1, 0, 0]]),
+                np.array(
                     [
-                        0,
-                        0,
-                        0,
-                    ],
-                    [0, 0, 1],
-                    [0, -1, 0],
-                ]
-            ),
-        ])
+                        [
+                            0,
+                            0,
+                            0,
+                        ],
+                        [0, 0, 1],
+                        [0, -1, 0],
+                    ]
+                ),
+            ]
+        )
 
     def zero_func(self, x_0, x_1):
         return np.eye(self.dim)
