@@ -40,6 +40,8 @@ class QuasiToManifold(ApproximationMethod):
     @cached(cache=generate_cache(maxsize=10000))
     def approximation(self, x, y):
         approximation = self._secondary_method.approximation(x, y)
-        return self._secondary_manifold.from_tangent_to_euclid(self._secondary_manifold.log(
-            self._secondary_manifold.zero_func(x, y), approximation
-        ))
+        return self._secondary_manifold.from_tangent_to_euclid(
+            self._secondary_manifold.log(
+                self._secondary_manifold.zero_func(x, y), approximation
+            )
+        )
