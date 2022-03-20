@@ -172,6 +172,7 @@ def run_all_experiments(diffs):
     mses = ResultsStorage()
     fill_distances = ResultsStorage()
     calculation_times = ResultsStorage()
+    errors = ResultsStorage()
     mus = list()
 
     # Output of the run is in results/path
@@ -184,13 +185,29 @@ def run_all_experiments(diffs):
             config.update_config_with_diff(diff)
 
             # Run the iteration
-            for calculation_time, mse, fill_distance, _ in run_single_experiment():
+            for calculation_time, mse, fill_distance, error in run_single_experiment():
                 # log results
                 mse_label = config.MSE_LABEL
                 calculation_times.append(calculation_time, mse_label)
                 mses.append(np.log(mse), mse_label)
                 fill_distances.append(np.log(fill_distance), mse_label)
                 mus.append(config.SCALING_FACTOR)
+                errors.append(error, mse_label)
+
+        errors_list = list(errors.results.values())
+        errors_comparison = [np.log(la.norm(a - b)) for a, b in zip(errors_list[0], errors_list[1])]
+        fig = plt.figure()
+        plt.plot(list(mses.results.values())[0], errors_comparison, 'o--')
+        plt.xlabel("log($h_X$)")
+        plt.ylabel("log($Q(f) - Q^M(B\oplus f)\ominus B$)")
+        plt.savefig("Projection_and_euclidean_comparison.png", bbox_inches='tight')
+        plt.close(fig)
+
+        label = 'projection comparison'
+        temp_fill = list(fill_distances.results.values())[0]
+        for error, h_x in zip(errors_comparison, temp_fill):
+            mses.append(error, label)
+            fill_distances.append(h_x, label)
 
         # Plot error rates comparison
         plot_lines(
