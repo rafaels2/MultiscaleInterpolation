@@ -59,6 +59,7 @@ class Visualizer(object):
         self.ax.set_xticks([])
         self.ax.set_yticks([])
         self.ax.set_zticks([])
+        self.ax.set_axis_off()
         # Add a color bar which maps values to colors.
         # plt.colorbar()
         # plt.title(title)
