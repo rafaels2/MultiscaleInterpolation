@@ -14,7 +14,7 @@ def main():
     generate_image_function("iguana", join("..", "images", "iguana.jpg"))
     plt.set_cmap("gray")
     base_config = {
-        "NUMBER_OF_SCALES": 5,
+        "NUMBER_OF_SCALES": 4,
         "ORIGINAL_FUNCTION": options.get_option("original_function", "iguana"),
         "EXECUTION_NAME": f"Image",
         "DATA_SITES_GENERATION": "grid",
