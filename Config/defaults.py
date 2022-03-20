@@ -52,6 +52,7 @@ BASE_SCALE = 1
 
 CMAP = "viridis"
 CB = True
+IS_PROXIMITY = False
 
 # The sampling addition to the test grid: [-GRID_SIZE - GRID_BORDER, GRID_SIZE + GRID_BORDER]
 GRID_BORDER = 0.5
