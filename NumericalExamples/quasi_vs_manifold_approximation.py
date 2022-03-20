@@ -11,6 +11,7 @@ NUMBER_OF_SCALES = 5
 
 def main():
     base_config = {
+        "IS_PROXIMITY": True,
         "MANIFOLD": options.get_option("manifold", "euclidean")(),
         "SECONDARY_MANIFOLD": options.get_option("manifold", "rotations")(),
         "ORIGINAL_FUNCTION": options.get_option("original_function", "euclidean"),

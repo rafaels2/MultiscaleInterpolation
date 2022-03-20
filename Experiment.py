@@ -194,20 +194,21 @@ def run_all_experiments(diffs):
                 mus.append(config.SCALING_FACTOR)
                 errors.append(error, mse_label)
 
-        errors_list = list(errors.results.values())
-        errors_comparison = [np.log(la.norm(a - b)) for a, b in zip(errors_list[0], errors_list[1])]
-        fig = plt.figure()
-        plt.plot(list(mses.results.values())[0], errors_comparison, 'o--')
-        plt.xlabel("log($h_X$)")
-        plt.ylabel("log($Q(f) - Q^M(B\oplus f)\ominus B$)")
-        plt.savefig("Projection_and_euclidean_comparison.png", bbox_inches='tight')
-        plt.close(fig)
+        if config.IS_PROXIMITY:
+            errors_list = list(errors.results.values())
+            errors_comparison = [np.log(la.norm(a - b)) for a, b in zip(errors_list[0], errors_list[1])]
+            fig = plt.figure()
+            plt.plot(list(mses.results.values())[0], errors_comparison, 'o--')
+            plt.xlabel("log($h_X$)")
+            plt.ylabel("log($Q(f) - Q^M(B\oplus f)\ominus B$)")
+            plt.savefig("Projection_and_euclidean_comparison.png", bbox_inches='tight')
+            plt.close(fig)
 
-        label = 'projection comparison'
-        temp_fill = list(fill_distances.results.values())[0]
-        for error, h_x in zip(errors_comparison, temp_fill):
-            mses.append(error, label)
-            fill_distances.append(h_x, label)
+            label = 'projection comparison'
+            temp_fill = list(fill_distances.results.values())[0]
+            for error, h_x in zip(errors_comparison, temp_fill):
+                mses.append(error, label)
+                fill_distances.append(h_x, label)
 
         # Plot error rates comparison
         plot_lines(
