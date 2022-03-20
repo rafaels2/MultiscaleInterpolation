@@ -50,9 +50,9 @@ def plot_lines(x_values, y_values, filename, title, x_label, y_label):
     for line_name in y_values.keys():
         if x_values is not None:
             if isinstance(x_values, dict):
-                plt.plot(x_values[line_name], y_values[line_name], label=line_name)
+                plt.plot(x_values[line_name], y_values[line_name],'o--' , label=line_name)
             else:
-                plt.plot(x_values, y_values[line_name], label=line_name)
+                plt.plot(x_values, y_values[line_name], 'o--', label=line_name)
         else:
             _x_values = [x + 1 for x in range(len(y_values[line_name]))]
             plt.plot(_x_values, y_values[line_name], label=line_name)
