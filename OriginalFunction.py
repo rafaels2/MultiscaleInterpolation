@@ -23,6 +23,11 @@ def numbers_gauss(x, y):
     return 5 * (np.exp(-(x ** 2) - y ** 2))
 
 
+@register_function("numbers_non_smooth")
+def numbers_gauss(x, y):
+    return np.abs(np.sin(4 * x) * np.cos(5 * y))
+
+
 @register_function("one")
 def one(*_):
     return 1

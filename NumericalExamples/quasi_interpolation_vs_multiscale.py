@@ -3,14 +3,14 @@ from Config.Config import config
 from Config.Options import options
 from Tools.Utils import set_output_directory
 
-NUMBER_OF_SCALES = 4
+NUMBER_OF_SCALES = 5
 
 
 def run_multiscale_vs_single_scale(function):
     base_config = {
         "MANIFOLD": options.get_option("manifold", "numbers")(),
         "NUMBER_OF_SCALES": NUMBER_OF_SCALES,
-        "SCALING_FACTOR": 0.75,
+        "SCALING_FACTOR": 0.8,
         "ORIGINAL_FUNCTION": options.get_option("original_function", function),
         "EXECUTION_NAME": f"quasi_interpolation_vs_multiscale_{function}",
         "SCALED_INTERPOLATION_METHOD": "quasi",
@@ -48,7 +48,7 @@ def run_multiscale_vs_single_scale(function):
 
 
 def main():
-    original_functions = ["numbers", "numbers_gauss"]
+    original_functions = ["numbers_non_smooth", "numbers", "numbers_gauss"]
 
     for function in original_functions:
         run_multiscale_vs_single_scale(function)

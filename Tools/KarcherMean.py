@@ -42,6 +42,7 @@ class KarcherMean(object):
 
     def get_average(self, base=None, i=0):
         if base is None:
+            print("Warning! you should validate that average is in manifold")
             base = self._get_start_point()
 
         step_length = self._get_step_length(base)

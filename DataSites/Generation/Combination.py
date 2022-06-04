@@ -1,5 +1,5 @@
 """
-This module allows to generate data sites with different configurations and types.
+This module allows generating data sites with different configurations and types.
 Not tested
 """
 from Config.Options import options
