@@ -1,7 +1,7 @@
 cachetools==4.2.2
 json5==0.9.6
 matplotlib==3.4.3
-numpy==1.21.1
+numpy==1.22.0
 pyquaternion==0.9.9
 pytransform3d==1.9.1
 scikit-learn==0.24.2
