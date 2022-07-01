@@ -1,6 +1,7 @@
 from collections import namedtuple
 
 import numpy as np
+from matplotlib import pyplot as plt
 
 from Config.Options import options
 
@@ -41,7 +42,7 @@ def calculate_max_derivative(original_function, grid_params, manifold):
     return result
 
 
-def evaluate_on_grid(func, grid_size, resolution, scale, points=None, should_log=False):
+def evaluate_on_grid(func, grid_size, resolution, scale, points=None, should_log=False, dtype=object):
     """ Probably deprecated, use the evaluation in {Storage} module """
     if points is not None:
         x, y = points
@@ -55,7 +56,7 @@ def evaluate_on_grid(func, grid_size, resolution, scale, points=None, should_log
             should_ravel=False,
         )
 
-    z = np.zeros(x.shape, dtype=object)
+    z = np.zeros(x.shape, dtype=dtype)
     print("Z shape", z.shape)
 
     for index in np.ndindex(x.shape):
@@ -63,7 +64,7 @@ def evaluate_on_grid(func, grid_size, resolution, scale, points=None, should_log
             print("current percentage: ", index[0] / x.shape[0])
         z[index] = func(x[index], y[index])
 
-    return z
+    return x, y, z
 
 
 # Defining the parameters for generation and storage of data.
@@ -74,3 +75,23 @@ GridParameters = namedtuple(
 
 def symmetric_grid_params(grid_size, fill_distance):
     return GridParameters(-grid_size, grid_size, -grid_size, grid_size, fill_distance)
+
+
+def main():
+    def func(x, y):
+        if x > 0 and y > 0.2:
+            return 10
+        else:
+            return 0
+
+    evaluation = evaluate_on_grid(func, 1, 10, 0.8, dtype=float)
+    import ipdb; ipdb.set_trace()
+    plt.figure()
+    plt.imshow(evaluation)
+    plt.colorbar()
+    plt.show()
+
+
+if __name__ == '__main__':
+    main()
+

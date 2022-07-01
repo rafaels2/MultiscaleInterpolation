@@ -84,6 +84,8 @@ def rotations_euler_gauss(x, y):
 
 @register_function("rotations_euler")
 def rotations_euler(x, y):
+    if x < 0 and y > 0.2:
+        return Rotation.from_euler("xyz", [0, 0, 0]).as_matrix()
     return Rotation.from_euler(
         "xyz",
         [1.2 * np.sin(5 * x - 0.1), y ** 2 / 2 - np.sin(3 * x), 1.5 * np.cos(2 * x)],
@@ -92,6 +94,8 @@ def rotations_euler(x, y):
 
 @register_function("spd")
 def spd(x, y):
+    if x < 0 and y > 0.2:
+        return 10 * np.eye(3)
     # TODO: add check if function returns a valid manifold point.
     z = (0.3 * np.abs(np.cos(2 * y)) + 0.6) * np.exp(-(x ** 2) - y ** 2) * (
         5 * np.eye(3) + np.array([[np.sin(5 * y), y, x * y], [0, 0, y ** 2], [0, 0, 0]])
