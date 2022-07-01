@@ -27,11 +27,14 @@ def act_on_functions(action, a, b):
     return new_func
 
 
-def plot_and_save(data, title, filename):
+def plot_and_save(data, title, filename, cmax=None):
     print(f"Saving {filename}")
     plt.figure()
     # plt.title(title)
-    fig = plt.imshow(data)
+    if not cmax:
+        fig = plt.imshow(data)
+    else:
+        fig = plt.pcolor(data, vmin=0, vmax=cmax)
     fig.axes.get_xaxis().set_visible(False)
     fig.axes.get_yaxis().set_visible(False)
     if config.CB:

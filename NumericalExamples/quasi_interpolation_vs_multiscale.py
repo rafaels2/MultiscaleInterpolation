@@ -9,6 +9,7 @@ NUMBER_OF_SCALES = 5
 def run_multiscale_vs_single_scale(function):
     base_config = {
         "MANIFOLD": options.get_option("manifold", "numbers")(),
+        "CMAX": 0.6,
         "NUMBER_OF_SCALES": NUMBER_OF_SCALES,
         "SCALING_FACTOR": 0.8,
         "ORIGINAL_FUNCTION": options.get_option("original_function", function),

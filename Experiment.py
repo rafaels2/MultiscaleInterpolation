@@ -147,7 +147,7 @@ def run_single_experiment():
             error = config.MANIFOLD.calculate_error(
                 approximated_values_on_grid, true_values_on_grid
             )
-            plot_and_save(error, "Difference Map", "difference.png")
+            plot_and_save(error, "Difference Map", "difference.png", config.CMAX)
 
             # Calculate the l_2 norm of the error
             if config.ERROR_CALC:
