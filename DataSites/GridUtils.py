@@ -7,7 +7,7 @@ from Config.Options import options
 
 
 def calculate_max_derivative(original_function, grid_params, manifold):
-    """ Calculate max directional differences in the function on the test grid """
+    """Calculate max directional differences in the function on the test grid"""
 
     def derivative(x, y):
         y = -y
@@ -44,8 +44,10 @@ def calculate_max_derivative(original_function, grid_params, manifold):
     return result
 
 
-def evaluate_on_grid(func, grid_size, resolution, scale, points=None, should_log=False, dtype=object):
-    """ Probably deprecated, use the evaluation in {Storage} module """
+def evaluate_on_grid(
+    func, grid_size, resolution, scale, points=None, should_log=False, dtype=object
+):
+    """Probably deprecated, use the evaluation in {Storage} module"""
     if points is not None:
         x, y = points
     else:
@@ -87,13 +89,14 @@ def main():
             return 0
 
     evaluation = evaluate_on_grid(func, 1, 10, 0.8, dtype=float)
-    import ipdb; ipdb.set_trace()
+    import ipdb
+
+    ipdb.set_trace()
     plt.figure()
     plt.imshow(evaluation)
     plt.colorbar()
     plt.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-

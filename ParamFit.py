@@ -32,7 +32,7 @@ DIR = "fit_results"
 
 
 def parse_results(results):
-    """ Parse results.pkl """
+    """Parse results.pkl"""
     tags = results["mses"].keys()
     return [
         RunData(
@@ -75,7 +75,7 @@ def plot_comparison(
 ):
     y_new = [func(x, *params) for x in x_orig]
     plt.figure()
-    plt.plot(x_orig, y_new, '--', label="fit")
+    plt.plot(x_orig, y_new, "--", label="fit")
     plt.grid()
     if y_err is not None:
         plt.scatter(x_orig, y_orig)
@@ -83,7 +83,7 @@ def plot_comparison(
     elif is_fit:
         plt.scatter(x_orig, y_orig, marker="*")
     else:
-        plt.plot(x_orig, y_orig, 'o', label="original")
+        plt.plot(x_orig, y_orig, "o", label="original")
         plt.legend()
     if xlabel == "iteration":
         plt.xticks(x_orig)

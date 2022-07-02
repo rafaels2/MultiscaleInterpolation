@@ -56,10 +56,12 @@ class Quasi(ApproximationMethod):
 
     def plot_sites(self):
         plt.figure()
-        fig = plt.scatter(self._data_sites.x, self._data_sites.y, c='#000000', marker='+')
+        fig = plt.scatter(
+            self._data_sites.x, self._data_sites.y, c="#000000", marker="+"
+        )
         fig.axes.get_xaxis().set_visible(False)
         fig.axes.get_yaxis().set_visible(False)
-        plt.savefig("sites_scatter.png", bbox_inches='tight')
+        plt.savefig("sites_scatter.png", bbox_inches="tight")
 
     @staticmethod
     def _get_weights_for_point(point, x, y):
@@ -87,7 +89,7 @@ class Quasi(ApproximationMethod):
     @cached(cache=generate_cache(maxsize=10000))
     def approximation(self, x, y):
         # TODO: point should be an array - not x, y. so we can generalize dimensions
-        """ Average sampled points around (x, y), using phis as weights """
+        """Average sampled points around (x, y), using phis as weights"""
         values_to_average, weights = self._get_values_to_average(x, y)
         weights = self._normalize_weights(weights)
         # print(len(weights))

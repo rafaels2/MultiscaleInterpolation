@@ -15,20 +15,20 @@ class Config(object):
             self.update_config_with_diff(base_config)
 
     def update_config_with_diff(self, diff):
-        """ Update current config with diff dict """
+        """Update current config with diff dict"""
         for setting, value in diff.items():
             setattr(self, setting, value)
 
     def renew(self):
-        """ initialize the configurations to base config """
+        """initialize the configurations to base config"""
         self.__init__(base_config=self._base_config)
 
     def set_base_config(self, base_config):
-        """ Update base config before renew """
+        """Update base config before renew"""
         self._base_config = base_config
 
     def __repr__(self):
-        """ This is here to print and debug """
+        """This is here to print and debug"""
         representation = dict()
         for d in dir(self):
             if d.isupper():

@@ -11,6 +11,7 @@ from DataSites.Storage.Grid import Grid
 from Tools.Results import ResultsStorage
 from Tools.Utils import *
 from DataSites.GridUtils import symmetric_grid_params
+import Tools.Noise
 
 # Configure plot style
 config_plt(plt)
@@ -25,7 +26,8 @@ def multiscale_approximation():
     f_j = config.MANIFOLD.zero_func
 
     # Initial error e_0 = log(0, f_j)
-    e_j = act_on_functions(config.MANIFOLD.log, f_j, config.ORIGINAL_FUNCTION)
+    noised_original = options.get_option("noise", config.NOISE)(config.ORIGINAL_FUNCTION)
+    e_j = act_on_functions(config.MANIFOLD.log, f_j, noised_original)
 
     # For all scales do
     for scale_index in range(1, config.NUMBER_OF_SCALES + 1):
@@ -73,8 +75,9 @@ def multiscale_approximation():
         f_j = act_on_functions(config.MANIFOLD.exp, f_j, function_added_to_f_j)
 
         # Update the error for next step
-        e_j = act_on_functions(config.MANIFOLD.log, f_j, config.ORIGINAL_FUNCTION)
-        yield fill_distance, f_j, approximation_method.plot_sites
+        e_j = act_on_functions(config.MANIFOLD.log, f_j, noised_original)
+        # yield fill_distance, f_j, approximation_method.plot_sites
+        yield fill_distance, noised_original, approximation_method.plot_sites
 
 
 def calculate_execution_time(func):
@@ -92,7 +95,7 @@ def calculate_execution_time(func):
 
 @calculate_execution_time
 def run_single_experiment():
-    """ Run an experiment with the current config """
+    """Run an experiment with the current config"""
 
     # Initialize test grid
     grid_params = symmetric_grid_params(config.GRID_SIZE, config.TEST_FILL_DISTANCE)
@@ -122,7 +125,9 @@ def run_single_experiment():
     )
 
     # Run multiscale iterations
-    for i, (fill_distance, interpolant, plotter) in enumerate(multiscale_approximation()):
+    for i, (fill_distance, interpolant, plotter) in enumerate(
+        multiscale_approximation()
+    ):
         # Each scale in the multiscale, evaluate and save the error
         with set_output_directory("{}_{}".format(config.NAME, i + 1)):
             # Save the results of current scale
@@ -174,7 +179,7 @@ def run_single_experiment():
 
 
 def run_all_experiments(diffs):
-    """ Experiments runner, gets a list of config differences for each iteration """
+    """Experiments runner, gets a list of config differences for each iteration"""
     mses = ResultsStorage()
     fill_distances = ResultsStorage()
     calculation_times = ResultsStorage()
@@ -202,15 +207,17 @@ def run_all_experiments(diffs):
 
         if config.IS_PROXIMITY:
             errors_list = list(errors.results.values())
-            errors_comparison = [np.log(la.norm(a - b)) for a, b in zip(errors_list[0], errors_list[1])]
+            errors_comparison = [
+                np.log(la.norm(a - b)) for a, b in zip(errors_list[0], errors_list[1])
+            ]
             fig = plt.figure()
-            plt.plot(list(mses.results.values())[0], errors_comparison, 'o--')
+            plt.plot(list(mses.results.values())[0], errors_comparison, "o--")
             plt.xlabel("log($h_X$)")
             plt.ylabel("log($Q(f) - Q^M(B\oplus f)\ominus B$)")
-            plt.savefig("Projection_and_euclidean_comparison.png", bbox_inches='tight')
+            plt.savefig("Projection_and_euclidean_comparison.png", bbox_inches="tight")
             plt.close(fig)
 
-            label = 'projection comparison'
+            label = "projection comparison"
             temp_fill = list(fill_distances.results.values())[0]
             for error, h_x in zip(errors_comparison, temp_fill):
                 mses.append(error, label)

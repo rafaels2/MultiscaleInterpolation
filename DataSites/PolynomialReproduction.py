@@ -88,7 +88,7 @@ class PolynomialReproduction(object):
             pkl.dump(self._lambdas, f, protocol=pkl.HIGHEST_PROTOCOL)
 
     def weight_for_grid(self, x_j, y_j):
-        """ Get a(x, y) coefficient for the quasi-interpolation {sum a(p)f(p_i)} """
+        """Get a(x, y) coefficient for the quasi-interpolation {sum a(p)f(p_i)}"""
 
         def weight(x, y):
             # TODO: Debug! why did i need to transpose?

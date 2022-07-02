@@ -117,7 +117,7 @@ class RigidRotations(AbstractManifold):
     def geodesic_l2_mean(
         self, noisy_samples, weights, tolerance=0.00000001, maximum_iteration=10
     ):
-        """ L2 mean From my weiszfeld project, adapted to weighted averaging """
+        """L2 mean From my weiszfeld project, adapted to weighted averaging"""
         mean_estimator = noisy_samples[0]
         mean_estimator_list = [mean_estimator]
         state_of_convergence = False
@@ -167,7 +167,7 @@ def main():
     b = m.exp(e, B)
     c = m.exp(e, C)
     d = m.average([a, b, c], [1, 1, 1])
-    d_tag = m.exp(e, (A+B+C)/3)
+    d_tag = m.exp(e, (A + B + C) / 3)
     print("D - D tag: ", m.distance(d, d_tag))
     e = m.log(a, b)
     f = m.exp(a, e)

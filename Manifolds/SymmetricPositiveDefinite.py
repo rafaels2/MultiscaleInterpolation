@@ -87,7 +87,7 @@ def main():
     e = m.gen_point()
     f = m.gen_point()
 
-    print(m.is_in_manifold(a+b+e))
+    print(m.is_in_manifold(a + b + e))
 
     # s = m.average([a, b], [1, 1])
     # print("s: ", np.arctan2(s[1], s[0]))
