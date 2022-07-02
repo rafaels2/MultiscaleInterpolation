@@ -96,7 +96,8 @@ def run_single_experiment():
 
     # Initialize test grid
     grid_params = symmetric_grid_params(config.GRID_SIZE, config.TEST_FILL_DISTANCE)
-    sites = get_grid(*grid_params)
+    x, y = get_grid(*grid_params)
+    sites = (x, -y)
 
     # Evaluate original function on the grid
     true_values_on_grid = Grid(
@@ -118,7 +119,6 @@ def run_single_experiment():
         ),
         "Max Derivatives",
         "derivatives.png",
-        1
     )
 
     # Run multiscale iterations
@@ -131,7 +131,8 @@ def run_single_experiment():
                 pass
 
             # Evaluate the approximation on the test grid
-            sites = get_grid(*grid_params)
+            x, y = get_grid(*grid_params)
+            sites = (x, -y)
             approximated_values_on_grid = Grid(
                 sites, 1, interpolant, grid_params.fill_distance
             ).evaluation

@@ -75,7 +75,7 @@ class SymmetricPositiveDefinite(AbstractManifold):
             return super().plot(data, title, filename)
         centers = np.zeros_like(data, dtype=object)
         for index in np.ndindex(data.shape):
-            centers[index] = np.array([-index[0], index[1], 0])
+            centers[index] = np.array([index[0], index[1], 0])
         print("start to visualize")
         EllipsoidVisualizer(data, centers).save(filename, title)
 

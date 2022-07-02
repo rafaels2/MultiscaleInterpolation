@@ -10,6 +10,7 @@ def calculate_max_derivative(original_function, grid_params, manifold):
     """ Calculate max directional differences in the function on the test grid """
 
     def derivative(x, y):
+        y = -y
         delta = grid_params.fill_distance / 2
         evaluations_around = [
             original_function(x + (delta / np.sqrt(2)), y + (delta / np.sqrt(2))),
@@ -23,12 +24,13 @@ def calculate_max_derivative(original_function, grid_params, manifold):
         ]
         f_0 = original_function(x, y)
 
-        return max(
+        _result = max(
             [
                 manifold.distance(direction, f_0) / delta
                 for direction in evaluations_around
             ]
         )
+        return _result
 
     sites = options.get_option("generation_method", "grid")(*grid_params)
     evaluation = options.get_option("data_storage", "grid")(
