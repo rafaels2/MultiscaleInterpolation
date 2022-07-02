@@ -64,3 +64,11 @@ class KDTreeSampler(DataSitesStorage):
             )
 
         return evaluation
+
+    @property
+    def x(self):
+        return self._seq[:, 0]
+
+    @property
+    def y(self):
+        return self._seq[:, 1]

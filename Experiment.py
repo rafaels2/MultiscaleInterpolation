@@ -74,7 +74,7 @@ def multiscale_approximation():
 
         # Update the error for next step
         e_j = act_on_functions(config.MANIFOLD.log, f_j, config.ORIGINAL_FUNCTION)
-        yield fill_distance, f_j
+        yield fill_distance, f_j, approximation_method.plot_sites
 
 
 def calculate_execution_time(func):
@@ -121,10 +121,11 @@ def run_single_experiment():
     )
 
     # Run multiscale iterations
-    for i, (fill_distance, interpolant) in enumerate(multiscale_approximation()):
+    for i, (fill_distance, interpolant, plotter) in enumerate(multiscale_approximation()):
         # Each scale in the multiscale, evaluate and save the error
         with set_output_directory("{}_{}".format(config.NAME, i + 1)):
             # Save the results of current scale
+            plotter()
             with open("config.pkl", "wb") as f:
                 # pkl.dump(config, f)
                 pass

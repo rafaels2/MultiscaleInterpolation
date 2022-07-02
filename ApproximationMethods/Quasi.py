@@ -2,6 +2,7 @@
 This is the main method we discuss.
 Q(f)(x) = sum f(x_i) a(x) / sum a(x).
 """
+import matplotlib.pyplot as plt
 from cachetools import cached
 
 from Config.Config import config
@@ -51,8 +52,14 @@ class Quasi(ApproximationMethod):
             grid_parameters.fill_distance,
             phi_generator=self._calculate_phi,
         )
-
         self._kernel = generate_kernel(self._rbf, self._rbf_radius)
+
+    def plot_sites(self):
+        plt.figure()
+        fig = plt.scatter(self._data_sites.x, self._data_sites.y, c='#000000', marker='+')
+        fig.axes.get_xaxis().set_visible(False)
+        fig.axes.get_yaxis().set_visible(False)
+        plt.savefig("sites_scatter.png", bbox_inches='tight')
 
     @staticmethod
     def _get_weights_for_point(point, x, y):
