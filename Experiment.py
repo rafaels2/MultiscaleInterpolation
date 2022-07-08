@@ -26,11 +26,14 @@ def multiscale_approximation():
     f_j = config.MANIFOLD.zero_func
 
     # Initial error e_0 = log(0, f_j)
-    noised_original = options.get_option("noise", config.NOISE)(config.ORIGINAL_FUNCTION)
+    noised_original = options.get_option("noise", config.NOISE)(
+        config.ORIGINAL_FUNCTION
+    )
     e_j = act_on_functions(config.MANIFOLD.log, f_j, noised_original)
 
     # For all scales do
     for scale_index in range(1, config.NUMBER_OF_SCALES + 1):
+        config.scale_index = scale_index
         scale = config.BASE_SCALE * config.SCALING_FACTOR ** scale_index
 
         if config.IS_APPROXIMATING_ON_TANGENT:
@@ -76,8 +79,7 @@ def multiscale_approximation():
 
         # Update the error for next step
         e_j = act_on_functions(config.MANIFOLD.log, f_j, noised_original)
-        # yield fill_distance, f_j, approximation_method.plot_sites
-        yield fill_distance, noised_original, approximation_method.plot_sites
+        yield fill_distance, f_j, approximation_method.plot_sites, noised_original
 
 
 def calculate_execution_time(func):
@@ -125,7 +127,7 @@ def run_single_experiment():
     )
 
     # Run multiscale iterations
-    for i, (fill_distance, interpolant, plotter) in enumerate(
+    for i, (fill_distance, interpolant, plotter, noised) in enumerate(
         multiscale_approximation()
     ):
         # Each scale in the multiscale, evaluate and save the error
@@ -143,6 +145,10 @@ def run_single_experiment():
                 sites, 1, interpolant, grid_params.fill_distance
             ).evaluation
 
+            noised_original_on_grid = Grid(
+                sites, 1, noised, grid_params.fill_distance
+            ).evaluation
+
             # Plot the evaluation
             config.MANIFOLD.plot(
                 approximated_values_on_grid,
@@ -155,10 +161,25 @@ def run_single_experiment():
             error = config.MANIFOLD.calculate_error(
                 approximated_values_on_grid, true_values_on_grid
             )
+
+            error_of_noise = config.MANIFOLD.calculate_error(
+                noised_original_on_grid, true_values_on_grid
+            )
+            error_with_noise = config.MANIFOLD.calculate_error(
+                noised_original_on_grid, approximated_values_on_grid
+            )
             if config.CMAX > 0:
                 plot_and_save(error, "Difference Map", "difference.png", config.CMAX)
+                plot_and_save(
+                    error_of_noise, "Noise error", "noise_diff.png", config.CMAX
+                )
+                plot_and_save(
+                    error_with_noise, "Noise error", "noise_w_diff.png", config.CMAX
+                )
             else:
                 plot_and_save(error, "Difference Map", "difference.png")
+                plot_and_save(error_of_noise, "Noise error", "noise_diff.png")
+                plot_and_save(error_with_noise, "Noise error", "noise_w_diff.png")
 
             # Calculate the l_2 norm of the error
             if config.ERROR_CALC:

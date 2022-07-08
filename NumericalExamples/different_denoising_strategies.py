@@ -13,14 +13,14 @@ def run_multiscale_vs_single_scale(function):
         "SCALING_FACTOR": 0.75,
         "TEST_FILL_DISTANCE": 0.02,
         "ORIGINAL_FUNCTION": options.get_option("original_function", function),
-        "EXECUTION_NAME": f"quasi_interpolation_vs_multiscale_{function}",
+        "EXECUTION_NAME": f"different_denoising_thresholds",
         "SCALED_INTERPOLATION_METHOD": "quasi",
         "DATA_SITES_GENERATION": "halton",
         "DATA_SITES_STORAGE": "kd-tree",
         "IS_APPROXIMATING_ON_TANGENT": True,
         "NOISE": "rotation_gaussian_noise",
         "DENOISE": True,
-        "DENOISE_THRESHOLD": 0.9,
+        "NOISE_SIGMA": 0.1,
     }
 
     config.set_base_config(base_config)
@@ -29,24 +29,15 @@ def run_multiscale_vs_single_scale(function):
     diffs = list()
 
     # Add multiscale iterations
-    diffs.append(
-        {
-            "MSE_LABEL": "Multiscale",
-            "NAME": "Multiscale",
-            "NUMBER_OF_SCALES": NUMBER_OF_SCALES,
-        }
-    )
-
-    # Add single scale iterations
-    # for iteration in range(1, NUMBER_OF_SCALES + 1):
-    #     current_diff = {
-    #         "MSE_LABEL": "Single Scale",
-    #         "NUMBER_OF_SCALES": 1,
-    #         "NAME": f"Single_Scale_{iteration}",
-    #         "SCALING_FACTOR": config.SCALING_FACTOR ** iteration,
-    #         "SCALING_FACTOR_POWER": iteration,
-    #     }
-    #     diffs.append(current_diff)
+    for threshold in range(75, 100, 5):
+        threshold_formatted = f"0.{threshold}"
+        diffs.append(
+            {
+                "MSE_LABEL": f"t = {threshold_formatted}",
+                "NAME": f"threshold_{threshold}",
+                "DENOISE_THRESHOLD": 0.01 * threshold,
+            }
+        )
 
     with set_output_directory("results"):
         Experiment.run_all_experiments(diffs)

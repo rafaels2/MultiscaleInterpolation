@@ -55,6 +55,9 @@ CB = True
 CMAX = 0
 IS_PROXIMITY = False
 NOISE = "none"
+DENOISE = False
+DENOISE_THRESHOLD = 1
+NOISE_SIGMA = 0.1
 
 # The sampling addition to the test grid: [-GRID_SIZE - GRID_BORDER, GRID_SIZE + GRID_BORDER]
 GRID_BORDER = 0.5

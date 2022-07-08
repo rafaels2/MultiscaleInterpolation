@@ -13,6 +13,7 @@ class Config(object):
 
         if base_config is not None:
             self.update_config_with_diff(base_config)
+        self.scale_index = 0
 
     def update_config_with_diff(self, diff):
         """Update current config with diff dict"""
