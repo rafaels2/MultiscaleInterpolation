@@ -54,14 +54,9 @@ class Quasi(ApproximationMethod):
         )
         self._kernel = generate_kernel(self._rbf, self._rbf_radius)
 
-    def plot_sites(self):
-        plt.figure()
-        fig = plt.scatter(
-            self._data_sites.x, self._data_sites.y, c="#000000", marker="+"
-        )
-        fig.axes.get_xaxis().set_visible(False)
-        fig.axes.get_yaxis().set_visible(False)
-        plt.savefig("sites_scatter.png", bbox_inches="tight")
+    @property
+    def data_sites(self):
+        return self._data_sites
 
     @staticmethod
     def _get_weights_for_point(point, x, y):

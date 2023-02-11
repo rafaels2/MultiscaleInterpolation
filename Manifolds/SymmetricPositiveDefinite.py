@@ -86,6 +86,13 @@ def main():
     b = m.gen_point()
     e = m.gen_point()
     f = m.gen_point()
+    from Tools.Visualization import EllipsoidVisualizer
+
+    vis = EllipsoidVisualizer(
+        np.array([a, b, e, m.average([a, b, e], [1, 1, 1])]),
+        np.array([[0, x, 0] for x in range(4)]),
+    )
+    vis.save("elipsoids.png", "")
 
     print(m.is_in_manifold(a + b + e))
 

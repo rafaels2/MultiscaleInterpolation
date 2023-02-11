@@ -26,11 +26,9 @@ class QuasiToManifold(ApproximationMethod):
                 ),
             )
 
-        original_function = self._secondary_manifold.exponent()
         self._secondary_method = options.get_option(
             "approximation_method", config.SECONDARY_SCALED_INTERPOLATION_METHOD
         )(
-            self,
             new_original_function,
             grid_parameters,
             scale,
@@ -45,3 +43,7 @@ class QuasiToManifold(ApproximationMethod):
                 self._secondary_manifold.zero_func(x, y), approximation
             )
         )
+
+    @property
+    def data_sites(self):
+        return self._secondary_method.data_sites

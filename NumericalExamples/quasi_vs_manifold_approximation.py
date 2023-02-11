@@ -6,7 +6,7 @@ from ParamFit import fit_moving_and_quasi
 from Tools.Utils import set_output_directory
 
 Combination = namedtuple("Combination", ["method", "secondary"])
-NUMBER_OF_SCALES = 5
+NUMBER_OF_SCALES = 4
 
 
 def main():
@@ -18,7 +18,7 @@ def main():
         "NUMBER_OF_SCALES": 1,
         "SCALING_FACTOR": 0.75,
         "EXECUTION_NAME": "comparison_between_quasi_and_manifold_projection",
-        "TEST_FILL_DISTANCE": 0.08,
+        "TEST_FILL_DISTANCE": 0.02,
     }
 
     config.set_base_config(base_config)
@@ -26,10 +26,10 @@ def main():
 
     methods = {
         "Quasi-interpolation with quadratic reproduction": Combination("moving", None),
-        "Quasi-interpolation with constant reproduction": Combination("quasi", None),
-        "Manifold projection with constant reproduction": Combination(
-            "projection", "quasi"
-        ),
+        # "Quasi-interpolation with constant reproduction": Combination("quasi", None),
+        # "Manifold projection with constant reproduction": Combination(
+        #     "projection", "quasi"
+        # ),
         "Manifold projection with quadratic reproduction": Combination(
             "projection", "moving"
         ),

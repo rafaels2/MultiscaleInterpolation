@@ -17,10 +17,12 @@ def run_multiscale_vs_single_scale(function):
         "SCALED_INTERPOLATION_METHOD": "quasi",
         "DATA_SITES_GENERATION": "halton",
         "DATA_SITES_STORAGE": "kd-tree",
-        "IS_APPROXIMATING_ON_TANGENT": True,
+        "IS_APPROXIMATING_ON_TANGENT": False,
         "NOISE": "rotation_gaussian_noise",
         "DENOISE": True,
         "DENOISE_THRESHOLD": 0.9,
+        "NOISE_SIGMA": 0.2,
+        "CMAX": 1.3,
     }
 
     config.set_base_config(base_config)
@@ -33,20 +35,8 @@ def run_multiscale_vs_single_scale(function):
         {
             "MSE_LABEL": "Multiscale",
             "NAME": "Multiscale",
-            "NUMBER_OF_SCALES": NUMBER_OF_SCALES,
         }
     )
-
-    # Add single scale iterations
-    # for iteration in range(1, NUMBER_OF_SCALES + 1):
-    #     current_diff = {
-    #         "MSE_LABEL": "Single Scale",
-    #         "NUMBER_OF_SCALES": 1,
-    #         "NAME": f"Single_Scale_{iteration}",
-    #         "SCALING_FACTOR": config.SCALING_FACTOR ** iteration,
-    #         "SCALING_FACTOR_POWER": iteration,
-    #     }
-    #     diffs.append(current_diff)
 
     with set_output_directory("results"):
         Experiment.run_all_experiments(diffs)

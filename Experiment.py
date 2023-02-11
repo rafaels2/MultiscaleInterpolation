@@ -32,6 +32,27 @@ def multiscale_approximation():
     e_j = act_on_functions(config.MANIFOLD.log, f_j, noised_original)
 
     # For all scales do
+    if config.NUMBER_OF_SCALES == 1:
+        scale_index = config.scale_index = 1
+        scale = config.BASE_SCALE * config.SCALING_FACTOR ** scale_index
+        fill_distance = scale / config.BASE_RESOLUTION
+        current_grid_parameters = symmetric_grid_params(
+            config.GRID_SIZE + config.GRID_BORDER, fill_distance
+        )
+        # Call the approximation method
+        approximation_method = options.get_option(
+            "approximation_method", config.SCALED_INTERPOLATION_METHOD
+        )(
+            noised_original,
+            current_grid_parameters,
+            scale,
+        )
+
+        # s_j = Q(e_j)
+        f_j = approximation_method.approximation
+        yield fill_distance, f_j, approximation_method.plot_sites, noised_original
+        return
+
     for scale_index in range(1, config.NUMBER_OF_SCALES + 1):
         config.scale_index = scale_index
         scale = config.BASE_SCALE * config.SCALING_FACTOR ** scale_index
@@ -195,6 +216,14 @@ def run_single_experiment():
                     "mesh_norm": fill_distance,
                 }
                 pkl.dump(results, f)
+
+        # Plot the evaluation of noise
+        config.MANIFOLD.plot(
+            noised_original_on_grid,
+            "Noise",
+            "noisy_samples.png",
+            norm_visualization=config.NORM_VISUALIZATION,
+        )
 
         yield mse, fill_distance, error
 

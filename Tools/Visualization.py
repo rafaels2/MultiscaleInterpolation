@@ -14,6 +14,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from pytransform3d.rotations import plot_basis
 
+
 if __name__ == "__main__":
     from Manifolds.SymmetricPositiveDefinite import SymmetricPositiveDefinite
     from Manifolds.RigidRotations import RigidRotations
@@ -32,6 +33,7 @@ class Visualizer(object):
         else:
             self.ax = self.fig.add_subplot()
         indices = self._get_indices(matrices.shape)
+        print(indices)
         self._matrices = matrices[indices]
         self._centers = centers[indices]
 
@@ -96,7 +98,7 @@ class EllipsoidVisualizer(Visualizer):
 
         print("Max Radius is ", max_radius)
 
-        self._normalizer = max_radius
+        self._normalizer = 6 * max_radius
 
     def _svd_matrices(self):
         singular_values = np.zeros_like(self._matrices, dtype=object)
@@ -108,8 +110,8 @@ class EllipsoidVisualizer(Visualizer):
         self._rotations = rotations
 
     def _process_matrix(self, index):
-        if not ((index[0] % 2 == 0) and (index[1] % 2 == 0)):
-            return
+        # if not ((index[0] % 2 == 0) and (index[1] % 2 == 0)):
+        #     return
         center = self._centers[index]
         radii = 2.4 * self._singular_values[index]
         rotation = self._rotations[index]
@@ -167,26 +169,51 @@ class RotationVisualizer(Visualizer):
         plt.close(self.fig)
 
 
+def replace_center_with_average(matrices, manifold):
+    matrices[1, 1] = manifold.average(
+        [
+            matrices[0, 0],
+            matrices[1, 0],
+            matrices[2, 0],
+            matrices[1, 0],
+            matrices[1, 2],
+            matrices[2, 0],
+            matrices[2, 1],
+            matrices[2, 2],
+        ],
+        [np.sqrt(2), 1, np.sqrt(2), 1, 1, np.sqrt(2), 1, np.sqrt(2)],
+    )
+    return matrices
+
+
 def ellipsoids_main():
     print("start")
     spd = SymmetricPositiveDefinite()
     matrices = np.zeros((3, 3), dtype=object)
     centers = np.zeros_like(matrices)
     for index in np.ndindex(matrices.shape):
-        matrices[index] = spd.gen_point()
+        matrices[index] = np.eye(3) + 0.1 * spd.gen_point()
         centers[index] = np.array([index[0], index[1], 0])
+
+    matrices = replace_center_with_average(matrices, spd)
+
     print("start to visualize")
     EllipsoidVisualizer(matrices, centers).save("vis.png", "ellipsoids")
 
 
 def rotations_main():
+    from Tools.Noise import rotational_noise
+    from Config.Config import config
+    config.update_config_with_diff({"NOISE_SIGMA": 0.4})
     print("start")
     so_3 = RigidRotations()
     matrices = np.zeros((3, 3), dtype=object)
     centers = np.zeros_like(matrices)
     for index in np.ndindex(matrices.shape):
-        centers[index] = np.array([index[0], index[1], 0])
-        matrices[index] = so_3.gen_point()
+        centers[index] = 0.25 * np.array([index[0], index[1], 0])
+        matrices[index] = rotational_noise(np.eye(3))
+
+    matrices = replace_center_with_average(matrices, so_3)
 
     print("start to visualize")
     RotationVisualizer(matrices, centers).save("rotations.png", "rotations")

@@ -20,7 +20,7 @@ def run_multiscale_vs_single_scale(function):
         "IS_APPROXIMATING_ON_TANGENT": True,
         "NOISE": "rotation_gaussian_noise",
         "DENOISE": True,
-        "NOISE_SIGMA": 0.1,
+        "NOISE_SIGMA": 0.2,
     }
 
     config.set_base_config(base_config)
@@ -29,7 +29,7 @@ def run_multiscale_vs_single_scale(function):
     diffs = list()
 
     # Add multiscale iterations
-    for threshold in range(75, 100, 5):
+    for threshold in range(80, 100, 5):
         threshold_formatted = f"0.{threshold}"
         diffs.append(
             {
